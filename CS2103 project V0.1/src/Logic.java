@@ -17,7 +17,7 @@ public void implementCommand(Cone_Organizer cmd) {
 		System.out.println("yay");
 	}
 	case "display" :{
-		s.displayCommand(cmd);
+		s.displayCommand();
 	}
 	
 	}
