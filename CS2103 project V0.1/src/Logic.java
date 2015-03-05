@@ -1,19 +1,23 @@
 
 public class Logic {
-private static void executeCommand(Cone_Organizer item) {
+	Parser p = new Parser();
+	Storage s = new Storage();
+	
+public void executeCommand(Cone_Organizer item) {
 		
-		parse(item);
+		p.parse(item);
 		implementCommand(item);
 		
 		
 	}
-private static void implementCommand(Cone_Organizer item) {
+public void implementCommand(Cone_Organizer item) {
 	switch (item.command_type){
 	case "add" :{
-		addCommand(item);
+		s.addCommand(item);
+		System.out.println("yay");
 	}
 	case "display" :{
-		displayCommand(item);
+		s.displayCommand(item);
 	}
 	
 	}

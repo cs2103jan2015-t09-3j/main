@@ -1,19 +1,25 @@
-
+import java.util.Scanner;
 public class UI {
+	private static Scanner sc = new Scanner(System.in);
+	
 
 	public static void main(String[] args) {
 		Cone_Organizer item = new Cone_Organizer();
+		
+		Logic l = new Logic();
 		System.out.println("Welcome to Co-Ne organizer!!!!");
-		System.out.println("Current tasks: ");
-		displayCommand(item);
+		
+		
 		while(!item.command.equals("exit")){
 			
 		
 		System.out.println("Command: ");
 		item.command = sc.nextLine();
-		executeCommand(item);
+		l.executeCommand(item);
 		}
 
 	}
-
 }
+
+
+	
