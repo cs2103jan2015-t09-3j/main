@@ -21,6 +21,12 @@ public void implementCommand(Cone_Organizer cmd) {
 	}
 	
 	}
+	case "delete" :{
+		s.deleteCommand(cmd);
+	}
+	case "edit" :{
+		s.editCommand(cmd);
+	}
 	}
 
 }

@@ -11,6 +11,22 @@ public class Storage {
 			// TODO Auto-generated method stub
 			
 		}
+		public void deleteCommand(Cone_Organizer cmd){
+			
+		}
+		public void editCommand(Cone_Organizer cmd){
+			
+		}
+		private static void readToFile(Cone_Organizer cmd){
+			
+		}
+		private static void writeToFile(Cone_Organizer cmd){
+			
+		}
+		private static void deleteFromFile(Cone_Organizer cmd){
+			
+		}
+		
 
 }
 
