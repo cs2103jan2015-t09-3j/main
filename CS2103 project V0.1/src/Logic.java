@@ -7,7 +7,7 @@ public void executeCommand(Cone_Organizer cmd) {
 		
 		p.parse(cmd);
 		implementCommand(cmd);
-		kkk
+		
 		
 	}
 public void implementCommand(Cone_Organizer cmd) {
