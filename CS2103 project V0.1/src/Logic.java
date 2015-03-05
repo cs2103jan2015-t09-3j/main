@@ -3,21 +3,21 @@ public class Logic {
 	Parser p = new Parser();
 	Storage s = new Storage();
 	
-public void executeCommand(Cone_Organizer item) {
+public void executeCommand(Cone_Organizer cmd) {
 		
-		p.parse(item);
-		implementCommand(item);
+		p.parse(cmd);
+		implementCommand(cmd);
 		
 		
 	}
-public void implementCommand(Cone_Organizer item) {
-	switch (item.command_type){
+public void implementCommand(Cone_Organizer cmd) {
+	switch (cmd.command_type){
 	case "add" :{
-		s.addCommand(item);
+		s.addCommand(cmd);
 		System.out.println("yay");
 	}
 	case "display" :{
-		s.displayCommand(item);
+		s.displayCommand(cmd);
 	}
 	
 	}

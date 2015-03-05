@@ -2,9 +2,9 @@
 public class Parser {
 	
 	//Parser part -- LIQI
-	public void parse(Cone_Organizer item) {
-		int index = item.command.indexOf(' ');
-		item.command_type = item.command.substring(0,index);
-		item.detail = item.command.substring(index, item.command.length());
+	public void parse(Cone_Organizer cmd) {
+		int index = cmd.command.indexOf(' ');
+		cmd.command_type = cmd.command.substring(0,index);
+		cmd.detail = cmd.command.substring(index, cmd.command.length());
 	}
 }
