@@ -1,24 +1,31 @@
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+
 
 
 public class Storage {
 	
-	File file = new File("CO-NE.txt");
+	static File file = new File("Cone.txt");
 	
-	public class Storage {
+
 		
 		//Storage part -- QiaoDi
 		public void addCommand(Cone_Organizer cmd) {
 			// TODO Auto-generated method stub
-			String cmd = cmd.detail;
+			
 			try {
 			         BufferedWriter output = new BufferedWriter(new FileWriter(file));
-			         output.write(cmd);
+			         output.write(cmd.detail);
 			         output.close();
 			     } catch ( IOException e ) {
 			          e.printStackTrace();
 			     }		    
 			
-			System.out.println("\"", cmd, "is added."\"");
+			System.out.println("\""+ cmd + "is added. \"");
 		}
 	
 			
@@ -28,8 +35,8 @@ public class Storage {
 		System.out.println(file.toString());
 		}	
 
-		public void deleteCommand(Cone_Organizer cmd){
-			deleteFromFile(cmd);
+		public void deleteCommand(int index){
+			deleteFromFile(index);
 		}
 		
 		public void editCommand(Cone_Organizer cmd){
@@ -54,19 +61,21 @@ public class Storage {
 		    br.readLine(); //skip the deleted line
             
 		    String line; 
-		    while(null != (line = br.nextLine()){
+		    while(null != (line = br.readLine())) {
 		    	String str = taskNum + line.substring(1);
 		    	bw.write(String.format("%s%n",str));
 		        taskNum ++;
 		    }
 		     
-		    File oldFile = new File(file);
-		    if (oldFile.delete())
-		        tmp.renameTo(oldFile);		    	
+		  
+		    
+		     tmp.renameTo(file);	
+		     file.delete();
 	   
 		}
 
 }
+
 
 
 
