@@ -33,7 +33,7 @@ public class Storage {
 		}	
 
 		
-		public void deleteCommand(Cone_Organizer cmd){
+		public void deleteCommand(int index){
 			
 		}
 		public void editCommand(Cone_Organizer cmd){

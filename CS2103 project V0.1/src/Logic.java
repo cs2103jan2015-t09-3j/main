@@ -20,7 +20,9 @@ public class Logic {
 		}
 
 		case "delete": {
-			s.deleteCommand(cmd);
+			int index;
+			index=Integer.parseInt(cmd.detail);
+			s.deleteCommand(index);
 		}
 		case "edit": {
 			s.editCommand(cmd);
