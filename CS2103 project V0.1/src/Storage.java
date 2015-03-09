@@ -6,8 +6,6 @@ public class Storage {
 	
 	public class Storage {
 		
-		//File file = new File("CO-NE.txt");
-		
 		//Storage part -- QiaoDi
 		public void addCommand(Cone_Organizer cmd) {
 			// TODO Auto-generated method stub
@@ -50,7 +48,7 @@ public class Storage {
 		    BufferedReader br = new BufferedReader(new FileReader(file));
 		    BufferedWriter bw = new BufferedWriter(new FileWriter(tmp));
 
-		    for (int i = 0; i < toRemove; i++)
+		    for (int i = 0; i < taskNum; i++)
 		        bw.write(String.format("%s%n", br.readLine()));
 
 		    br.readLine(); //skip the deleted line
