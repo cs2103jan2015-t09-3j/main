@@ -62,7 +62,7 @@ public class Storage {
 		        taskNum ++;
 		    }
 		     
-		    File oldFile = new File(f);
+		    File oldFile = new File(file);
 		    if (oldFile.delete())
 		        tmp.renameTo(oldFile);		    	
 	   
