@@ -8,11 +8,13 @@ import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.io.Writer;
 import java.util.ArrayList;
+import java.util.Scanner;
 
 
 
 public class Storage {
 	private static final String DEFAULT_STRING = "DEFAULT";
+	
 	
 	static File file = new File("Cone.txt");
 	
@@ -64,8 +66,13 @@ public class Storage {
 
 		}
 		
-		public void editCommand(Cone_Organizer cmd){
+
+		public void clearCommand(ArrayList<Cone_Organizer> list){
 			
+			list.clear();
+			
+			System.out.println("All items cleared from the file!");
+				
 		}
 		
 		public ArrayList<Cone_Organizer> readFromFile(){
@@ -85,6 +92,7 @@ public class Storage {
 				//at the Cone_Organizer.detail && .date	
 					
 				while(null!= (line = br.readLine())){
+					temp = new Cone_Organizer();
 					temp.detail = line;
 					temp.date = br.readLine();
 					temp_list.add(temp);
