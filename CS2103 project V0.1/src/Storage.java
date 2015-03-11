@@ -14,7 +14,7 @@ import java.util.Scanner;
 
 public class Storage {
 	private static final String DEFAULT_STRING = "DEFAULT";
-	
+	private static Scanner sc = new Scanner(System.in);
 	
 	static File file = new File("Cone.txt");
 	
@@ -25,6 +25,7 @@ public class Storage {
 			
 			
 			list.add(cmd);
+			System.out.println(cmd.detail + " has been successfully added!");
 			
 			
 		}
@@ -33,13 +34,12 @@ public class Storage {
 		//storage part -- QiaoDi
 		public void displayCommand(ArrayList<Cone_Organizer> list) {
 			for (int i = 0; i < list.size(); i++) {
-				if(list.get(i).detail!= DEFAULT_STRING){
-					System.out.println(i+1 + ". "+ "task : "+ list.get(i).detail);
-					if(list.get(i).date !=DEFAULT_STRING){
-						System.out.println("date: "+list.get(i).date);
-					}
+				System.out.println(i+1 + ". "+ "task : "+ list.get(i).detail);
+				if(list.get(i).date !=DEFAULT_STRING){
+					System.out.println("date: "+list.get(i).date);
 				}
-				}
+				
+			}
 		}	
 
 		//this method should delete the item from the list at 'index-1' and push up the list by one index
@@ -47,31 +47,16 @@ public class Storage {
 			
 			System.out.println("deleted from file : \"" + list.get(index-1).detail
 					+ "\"");
-			list.get(index-1).detail = DEFAULT_STRING;
-			list.get(index-1).date = DEFAULT_STRING;
-			organizeStorage(list);
+			list.remove(index-1);
 		}
-		private static void organizeStorage(ArrayList<Cone_Organizer> list) {
-			for (int i = 0; i < list.size() - 1; i++) {
-				if (list.get(i).detail == DEFAULT_STRING && list.get(i+1).detail != DEFAULT_STRING) {
-					list.get(i).detail = list.get(i+1).detail;
-					list.get(i+1).detail = DEFAULT_STRING;
-				}
-				if (list.get(i).date == DEFAULT_STRING && list.get(i+1).date != DEFAULT_STRING) {
-					list.get(i).date = list.get(i+1).date;
-					list.get(i+1).date = DEFAULT_STRING;
-				}
-
-			}
-
-		}
+		
 		
 
 		public void clearCommand(ArrayList<Cone_Organizer> list){
 			
 			list.clear();
 			
-			System.out.println("All items cleared from the file!");
+			System.out.println("All items removed from the file!");
 				
 		}
 		
@@ -103,6 +88,16 @@ public class Storage {
 			}
 			
 			return temp_list;
+		}
+		public void editCommand(ArrayList<Cone_Organizer> list, int index) {
+			System.out.println("Old task: "+list.get(index-1).detail);
+			System.out.print("New task: ");
+			list.get(index-1).detail = sc.nextLine();
+			System.out.println("Old date: "+list.get(index-1).date);
+			System.out.print("New date: ");
+			
+			list.get(index-1).date = sc.nextLine();
+			
 		}
 			
 		
