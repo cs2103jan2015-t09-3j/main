@@ -32,11 +32,13 @@ public class Storage {
 		//storage part -- QiaoDi
 		public void displayCommand(ArrayList<Cone_Organizer> list) {
 			for (int i = 0; i < list.size(); i++) {
-				System.out.println(i+1 + ". "+ "task : "+ list.get(i).detail);
-				if(list.get(i).date !=DEFAULT_STRING){
+				System.out.println(i+1 + ". "+ "task :"+ list.get(i).detail);
+				if(!list.get(i).date.equals(DEFAULT_STRING)){
 					System.out.println("date: "+list.get(i).date);
-				}
-				
+				}	
+			}
+			if(list.size()==0){
+				System.out.println("The file is empty!");
 			}
 		}	
 
@@ -78,6 +80,9 @@ public class Storage {
 					temp = new Cone_Organizer();
 					temp.detail = line;
 					temp.date = br.readLine();
+					int index = temp.detail.indexOf(' ');
+					temp.detail = temp.detail.substring(index+1);
+					temp.date = temp.date.substring(1);
 					temp_list.add(temp);
 				}
 				br.close();
@@ -114,9 +119,9 @@ public class Storage {
 			
 				int size = list.size();
 				for(int i = 0; i < size; i++){                    
-					bw.write(list.get(i).detail.toString());
+					bw.write(i+1+". " + list.get(i).detail.toString());
 					bw.newLine();
-					bw.write(list.get(i).date.toString());
+					bw.write("\t" + list.get(i).date.toString());
 					bw.newLine();
 				}
 				bw.close();
