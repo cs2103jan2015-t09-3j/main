@@ -1,12 +1,10 @@
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.RandomAccessFile;
-import java.io.Writer;
 import java.util.ArrayList;
 import java.util.Scanner;
 
@@ -116,8 +114,10 @@ public class Storage {
 			
 				int size = list.size();
 				for(int i = 0; i < size; i++){                    
-					bw.write(list.get(i).detail.toString() + "\n");
-					bw.write(list.get(i).date.toString() + "\n");
+					bw.write(list.get(i).detail.toString());
+					bw.newLine();
+					bw.write(list.get(i).date.toString());
+					bw.newLine();
 				}
 				bw.close();
 			} catch (IOException e) {
