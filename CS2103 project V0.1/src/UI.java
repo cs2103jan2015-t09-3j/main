@@ -3,19 +3,25 @@ import java.util.Scanner;
 public class UI {
 	private static Scanner sc = new Scanner(System.in);
 	static Storage s = new Storage();
-	
-
+	static Logic l = new Logic();
+	static ArrayList<Cone_Organizer> list = new ArrayList <Cone_Organizer>();
+	static Cone_Organizer cmd = new Cone_Organizer();
 	public static void main(String[] args) {
-		ArrayList<Cone_Organizer> list = new ArrayList <Cone_Organizer>();
-		//import the contents from the file
-		list = s.readFromFile();
 		
-		Cone_Organizer cmd = new Cone_Organizer();
 		
-		Logic l = new Logic();
 		System.out.println("Welcome to Co-Ne organizer!!!!");
 		
+		//import the contents from the file
+		list = s.readFromFile();
+		takeCommand();
 		
+		//save changes to the file
+		s.writeToFile(list);
+
+	}
+
+
+	private static void takeCommand() {
 		while(!cmd.command.equals("exit")){
 			
 			cmd = new Cone_Organizer();
@@ -25,9 +31,6 @@ public class UI {
 			l.executeCommand(cmd, list);
 		}
 		
-		//save changes to the file
-		s.writeToFile(list);
-
 	}
 }
 
