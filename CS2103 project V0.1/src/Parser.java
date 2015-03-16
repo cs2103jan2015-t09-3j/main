@@ -14,7 +14,7 @@ public class Parser {
 		
 	}
 	
-	public void commandOnly (cmd){
+	public void commandOnly (Cone_Organizer cmd){
 		cmd.command_type = cmd.command;
 	}
 	
