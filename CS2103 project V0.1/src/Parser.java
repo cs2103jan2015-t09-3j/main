@@ -9,9 +9,13 @@ public class Parser {
 
 		}
 		else{
-			cmd.command_type = cmd.command;
+			commandOnly(cmd);
 		}	
 		
+	}
+	
+	public void commandOnly (cmd){
+		cmd.command_type = cmd.command;
 	}
 	
 	public void identifyType (Cone_Organizer cmd, int index){
