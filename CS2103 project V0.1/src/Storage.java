@@ -81,6 +81,10 @@ public class Storage {
 					temp.detail = line;
 					temp.date = br.readLine();
 					int index = temp.detail.indexOf(' ');
+					if(index == -1){
+						System.out.println("File invalid, label your tasks");
+						return temp_list;
+					}
 					temp.detail = temp.detail.substring(index+1);
 					temp.date = temp.date.substring(1);
 					temp_list.add(temp);
