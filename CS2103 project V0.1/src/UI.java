@@ -12,11 +12,11 @@ public class UI {
 		System.out.println("Welcome to Co-Ne organizer!!!!");
 		
 		//import the contents from the file
-		list = s.readFromFile();
+		list=l.import_From_File(list);
 		takeCommand();
 		
-		//save changes to the file
-		s.writeToFile(list);
+		
+		
 
 	}
 

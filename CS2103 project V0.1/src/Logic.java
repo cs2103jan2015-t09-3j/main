@@ -46,6 +46,11 @@ public class Logic {
 		implementCommand(cmd, list);
 
 	}
+	public ArrayList<Cone_Organizer> import_From_File(ArrayList<Cone_Organizer> list){
+		list = s.readFromFile();
+		return list;
+	}
+	
 
 	public void implementCommand(Cone_Organizer cmd, ArrayList<Cone_Organizer> list) {
 		switch (cmd.command_type) {
@@ -78,6 +83,7 @@ public class Logic {
 			break;
 		}
 		case "exit": {
+			s.writeToFile(list);
 			break;
 		}
 		default:
