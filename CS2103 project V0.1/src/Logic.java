@@ -46,6 +46,11 @@ public class Logic {
 			s.clearCommand(list);
 			break;
 		}
+		default:
+		{
+			System.out.println("Invalid command");
+			
+		}
 		}
 	}
 }
