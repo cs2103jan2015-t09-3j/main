@@ -5,6 +5,7 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.logging.SimpleFormatter;
 
+/*
 Logger logger = Logger.getLogger("TextBuddy");
 logger.log(Level.INFO,  "going to start processing");
 FileHandler fh;
@@ -29,7 +30,7 @@ try {
 logger.info("Hi How r u?");
 
 }
-
+*/
 
 
 
