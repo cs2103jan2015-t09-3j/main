@@ -44,10 +44,7 @@ public class Logic {
 			s.clearCommand(list);
 			break;
 		}
-		default:{
-			throw new AssertionError(cmd.command_type);
-
-		  }
+		
 		}
 
 	}
