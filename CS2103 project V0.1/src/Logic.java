@@ -9,7 +9,7 @@ public class Logic {
 
 
 	public void executeCommand(Cone_Organizer cmd, ArrayList<Cone_Organizer> list) {
-		assert list==null;
+		assert list!=null;
 
 		p.parse(cmd);
 		implementCommand(cmd, list);
@@ -20,6 +20,7 @@ public class Logic {
 		switch (cmd.command_type) {
 		case "add": {
 			s.addCommand(cmd, list);
+			
 			break;
 			
 		}
