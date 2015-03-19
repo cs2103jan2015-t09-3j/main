@@ -9,6 +9,7 @@ public class Logic {
 
 
 	public void executeCommand(Cone_Organizer cmd, ArrayList<Cone_Organizer> list) {
+		assert list!=null;
 
 		p.parse(cmd);
 		implementCommand(cmd, list);
