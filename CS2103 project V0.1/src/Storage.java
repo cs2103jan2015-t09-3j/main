@@ -15,6 +15,7 @@ public class Storage {
 	private static Scanner sc = new Scanner(System.in);
 	
 	static File file = new File("Cone.txt");
+	ArrayList<Cone_Organizer> temp_list = new ArrayList<Cone_Organizer>();
 	
 
 		
@@ -62,7 +63,7 @@ public class Storage {
 		
 		public ArrayList<Cone_Organizer> readFromFile(){
 			Cone_Organizer temp = new Cone_Organizer();
-			ArrayList<Cone_Organizer> temp_list = new ArrayList<Cone_Organizer>();
+			
 			
 			//if file is empty, return the default Cone_Organizer
 			if ((file.length() == 0)){
