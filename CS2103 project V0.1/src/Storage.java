@@ -139,6 +139,29 @@ public class Storage {
 				System.out.println(e);
 				}
 			}
+
+		/**
+		 * This method will mark the task as completed.
+		 * @param index This is the index of the item to be marked in the list
+		 * @param list	This is list of cone_organizer object. each element contains different commands entered by user
+		 */
+		public void markCompleted(ArrayList<Cone_Organizer> list, int index) {
+			list.get(index-1).detail = "(completed)"+ list.get(index-1).detail;
+			System.out.println("The task no."+index+" has been marked completed!");
+			
+			
+			
+		}
+
+		/**
+		 * This method will mark the task as incomplete.
+		 * @param index This is the index of the item to be marked in the list
+		 * @param list	This is list of cone_organizer object. each element contains different commands entered by user
+		 */
+		public void markIncomplete(ArrayList<Cone_Organizer> list, int index) {
+			list.get(index-1).detail = list.get(index-1).detail.substring(list.get(index-1).detail.indexOf(')')+1);
+			System.out.println("The task no."+index+" has been marked incompleted!");
+		}
 		}
 		
 

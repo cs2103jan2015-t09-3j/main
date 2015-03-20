@@ -98,6 +98,18 @@ public class Logic {
 			s.writeToFile(list);
 			break;
 		}
+		case "mark": {
+			int index;
+			index=Integer.parseInt(cmd.detail);
+			if(list.get(index-1).detail.contains("(completed)")){
+				s.markIncomplete(list, index);
+			}
+			else{
+				s.markCompleted(list, index);
+			}
+			
+			break;
+		}
 		default:
 		{
 			System.out.println("Invalid command");
