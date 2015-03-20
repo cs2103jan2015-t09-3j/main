@@ -38,7 +38,11 @@ public class Logic {
 	Parser p = new Parser();
 	Storage s = new Storage();
 
-
+	/**
+	 * This method will identify the command type and details from the user input and send it to implement command method
+	 * @param cmd  	This initially contains user input and will be containing command type and details after parser
+	 * @param list	This is list of cone_organizer object. each element contains different commands entered by user
+	 */
 	public void executeCommand(Cone_Organizer cmd, ArrayList<Cone_Organizer> list) {
 		assert list!=null;
 
@@ -46,12 +50,20 @@ public class Logic {
 		implementCommand(cmd, list);
 
 	}
+	/**
+	 * This method imports items in the text file currently saved in same directory and put them in the array list.
+	 * @param list	This is list of cone_organizer object. each element contains different commands entered by user
+	 */
 	public ArrayList<Cone_Organizer> import_From_File(ArrayList<Cone_Organizer> list){
 		list = s.readFromFile();
 		return list;
 	}
 	
-
+	/**
+	 * This method assess the command type and assign an appropriate method for each commandtype for implementation.
+	 * @param cmd  	The current command that is being processed
+	 * @param list	This is list of cone_organizer object. each element contains different commands entered by user
+	 */
 	public void implementCommand(Cone_Organizer cmd, ArrayList<Cone_Organizer> list) {
 		switch (cmd.command_type) {
 		case "add": {

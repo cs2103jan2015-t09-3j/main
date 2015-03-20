@@ -19,7 +19,11 @@ public class UI {
 		
 
 	}
-
+	/**
+	 * This method takes in command from the user until 'exit' command is entered.
+	 * @param cmd  	This currently contains user command 
+	 * @param list	This is list of cone_organizer object. each element contains different commands entered by user
+	 */
 
 	private static void takeCommand() {
 		while(!cmd.command.equals("exit")){
