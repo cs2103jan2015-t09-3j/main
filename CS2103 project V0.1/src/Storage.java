@@ -19,6 +19,11 @@ public class Storage {
 
 		
 		//Storage part -- QiaoDi
+		/**
+		 * This execute the command add, which creates a new task by copying the cmd to the list  
+		 * @param cmd  	this contains the task content and date of the new task
+		 * @param list	this is the new list that contains all the tasks
+		 */
 		public void addCommand(Cone_Organizer cmd, ArrayList<Cone_Organizer> list) {
 			
 			
