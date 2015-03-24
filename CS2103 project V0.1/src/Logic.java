@@ -49,7 +49,7 @@ public class Logic {
 		GUI.clearBuffer();
 		
 		p.parse(cmd);
-		implementCommand(cmd, list, GUI);
+		implementCommand(cmd, list, tempList, GUI);
 
 	}
 	/**
@@ -70,6 +70,9 @@ public class Logic {
 	public void implementCommand(Cone_Organizer cmd, ArrayList<Cone_Organizer> list, ArrayList<Cone_Organizer> tempList, UI GUI) {
 		switch (cmd.command_type) {
 		case "add": {
+			tempList.clear();
+			tempList.addAll(list);
+			
 			s.addCommand(cmd, list);
 			GUI.print(cmd.detail + " has been successfully added!");
 			break;			
@@ -81,6 +84,11 @@ public class Logic {
 		}
 
 		case "delete": {
+			tempList.clear();
+			tempList.addAll(list);
+	
+			
+			
 			int index;
 			index=Integer.parseInt(cmd.detail);
 			s.deleteCommand(index, list);
@@ -89,6 +97,10 @@ public class Logic {
 		}
 		
 		case "edit": {
+			tempList.clear();
+			tempList.addAll(list);
+		
+			
 			int index;
 			index=Integer.parseInt(cmd.detail);
 			s.editCommand(list, index, GUI);
@@ -106,6 +118,9 @@ public class Logic {
 			break;
 		}
 		case "mark": {
+			tempList.clear();
+			tempList.addAll(list);
+			
 			int index;
 			index=Integer.parseInt(cmd.detail);
 			if(list.get(index-1).detail.contains("(completed)")){
@@ -118,7 +133,8 @@ public class Logic {
 			break;
 		}
 		case "undo":{
-			list = tempList;
+			list.clear();
+			list.addAll(tempList);
 			break;
 		}
 		case "search": {
@@ -132,4 +148,5 @@ public class Logic {
 		}
 		}
 	}
+
 }

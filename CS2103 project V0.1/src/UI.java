@@ -19,7 +19,7 @@ public class UI extends JFrame {
 	static Storage s = new Storage();
 	static Logic l = new Logic();
 	static ArrayList<Cone_Organizer> list = new ArrayList<Cone_Organizer>();
-	static ArrayList<Cone_Organizer> tempList;
+	static ArrayList<Cone_Organizer> tempList = new ArrayList<Cone_Organizer>();
 	static Cone_Organizer cmd = new Cone_Organizer();
 	static JLabel bg;
 	static JLabel msg;
@@ -68,7 +68,7 @@ public class UI extends JFrame {
 
 	public void print(String text) {
 		msg = new JLabel();
-		if(COUNT<4){
+		if(COUNT<ROW_NUM){
 			left_col.add(msg);
 			
 		}
@@ -83,6 +83,7 @@ public class UI extends JFrame {
 
 	public static void main(String[] args) {
 		list = l.import_From_File(list);
+		tempList.addAll(list);
 		UI GUI = new UI();
 		
 		takeCommand(GUI);
@@ -94,20 +95,25 @@ public class UI extends JFrame {
 		String temp = "LOL";
 
 		while (!input.equals("exit") && temp != input) {
+			
+			//when user type enter
 
 			jt.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
+					
 					cmd = new Cone_Organizer();
 					input = jt.getText();
 					cmd.command = input;
 
 					jt.setText("");
-					tempList = list
+				
+					
 					l.executeCommand(cmd, list, tempList, GUI);
 					
 
 				}
 			});
+			//When button is pressed
 			jb.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
 
@@ -115,6 +121,7 @@ public class UI extends JFrame {
 					input = jt.getText();
 					cmd.command = input;
 					jt.setText("");
+					
 					l.executeCommand(cmd, list, tempList, GUI);
 					
 
