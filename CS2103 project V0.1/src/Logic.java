@@ -42,12 +42,14 @@ public class Logic {
 	 * This method will identify the command type and details from the user input and send it to implement command method
 	 * @param cmd  	This initially contains user input and will be containing command type and details after parser
 	 * @param list	This is list of cone_organizer object. each element contains different commands entered by user
+	 * @param gUI 
 	 */
-	public void executeCommand(Cone_Organizer cmd, ArrayList<Cone_Organizer> list) {
+	public void executeCommand(Cone_Organizer cmd, ArrayList<Cone_Organizer> list, UI GUI) {
 		assert list!=null;
-
+		GUI.clearBuffer();
+		
 		p.parse(cmd);
-		implementCommand(cmd, list);
+		implementCommand(cmd, list, GUI);
 
 	}
 	/**
@@ -63,16 +65,18 @@ public class Logic {
 	 * This method assess the command type and assign an appropriate method for each commandtype for implementation.
 	 * @param cmd  	The current command that is being processed
 	 * @param list	This is list of cone_organizer object. each element contains different commands entered by user
+	 * @param GUI 
 	 */
-	public void implementCommand(Cone_Organizer cmd, ArrayList<Cone_Organizer> list) {
+	public void implementCommand(Cone_Organizer cmd, ArrayList<Cone_Organizer> list, UI GUI) {
 		switch (cmd.command_type) {
 		case "add": {
 			s.addCommand(cmd, list);
+			GUI.print(cmd.detail + " has been successfully added!");
 			break;			
 		}
 		
 		case "display": {
-			s.displayCommand(list);
+			s.displayCommand(list, GUI);
 			break;
 		}
 
@@ -80,39 +84,42 @@ public class Logic {
 			int index;
 			index=Integer.parseInt(cmd.detail);
 			s.deleteCommand(index, list);
+			GUI.print(cmd.detail + "has been deleted successfully!");
 			break;
 		}
 		
 		case "edit": {
 			int index;
 			index=Integer.parseInt(cmd.detail);
-			s.editCommand(list, index);
+			s.editCommand(list, index, GUI);
 			break;
 		}
 		
 		case "clear": {
 			s.clearCommand(list);
+			GUI.print("All contents are cleared");
 			break;
 		}
-		case "exit": {
+		case "save": {
 			s.writeToFile(list);
+			GUI.print("All changes saved!");
 			break;
 		}
 		case "mark": {
 			int index;
 			index=Integer.parseInt(cmd.detail);
 			if(list.get(index-1).detail.contains("(completed)")){
-				s.markIncomplete(list, index);
+				s.markIncomplete(list, index,GUI);
 			}
 			else{
-				s.markCompleted(list, index);
+				s.markCompleted(list, index,GUI);
 			}
 			
 			break;
 		}
 		default:
 		{
-			System.out.println("Invalid command");
+			GUI.print("Invalid Command");
 			
 		}
 		}
