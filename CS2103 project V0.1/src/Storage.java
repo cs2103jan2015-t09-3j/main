@@ -42,7 +42,7 @@ public class Storage {
 				GUI.print(i+1 + ". "+ "task :"+ list.get(i).detail);
 				if(!list.get(i).date.equals(DEFAULT_STRING)){
 					GUI.print("date: "+ list.get(i).date);
-					System.out.println("date: "+list.get(i).date);
+					
 				}	
 			}
 			if(list.size()==0){
@@ -54,8 +54,7 @@ public class Storage {
 		//this method should delete the item from the list at 'index-1' and push up the list by one index
 		public void deleteCommand(int index, ArrayList<Cone_Organizer> list){
 			
-			System.out.println("deleted from file : \"" + list.get(index-1).detail
-					+ "\"");
+			
 			list.remove(index-1);
 		}
 		
@@ -65,7 +64,7 @@ public class Storage {
 			
 			list.clear();
 			
-			System.out.println("All items removed from the file!");
+			
 				
 		}
 		
@@ -165,6 +164,21 @@ public class Storage {
 		public void markIncomplete(ArrayList<Cone_Organizer> list, int index, UI GUI) {
 			list.get(index-1).detail = list.get(index-1).detail.substring(list.get(index-1).detail.indexOf(')')+1);
 			GUI.print("The task no."+index+" has been marked incompleted!");
+		}
+
+
+		public void searchCommand(ArrayList<Cone_Organizer> list, UI GUI, Cone_Organizer cmd) {
+			GUI.print("Search results: ");
+			for(int i=0; i<list.size(); i++){
+				if(list.get(i).detail.contains(cmd.detail)){
+					GUI.print(i+1 + ". "+ "task :"+ list.get(i).detail);
+					if(!list.get(i).date.equals(DEFAULT_STRING)){
+						GUI.print("date: "+ list.get(i).date);
+						
+					}
+				}
+			}
+			
 		}
 		}
 		

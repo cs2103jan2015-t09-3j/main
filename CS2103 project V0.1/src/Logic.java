@@ -117,6 +117,10 @@ public class Logic {
 			
 			break;
 		}
+		case "search": {
+			s.searchCommand(list, GUI, cmd);
+			break;
+		}
 		default:
 		{
 			GUI.print("Invalid Command");
