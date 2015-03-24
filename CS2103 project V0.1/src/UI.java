@@ -27,7 +27,8 @@ public class UI extends JFrame {
 	static JPanel jp2, jp3,left_col, right_col;
 	static JTextField jt = new JTextField(30);
 	static String input = "deafult";
-	static int count=0;
+	static int COUNT=0;
+	static int ROW_NUM = 4;
 
 	public UI() {
 		setTitle("test Program");
@@ -51,8 +52,8 @@ public class UI extends JFrame {
 		jp.add(jt);
 		jp.add(jb);
 		jp3.setLayout(new FlowLayout(1));
-		left_col.setLayout(new GridLayout(4,1));
-		right_col.setLayout(new GridLayout(4,1));
+		left_col.setLayout(new GridLayout(ROW_NUM,1));
+		right_col.setLayout(new GridLayout(ROW_NUM,1));
 		jp3.add(left_col);
 		jp3.add(right_col);
 		
@@ -66,7 +67,7 @@ public class UI extends JFrame {
 
 	public void print(String text) {
 		msg = new JLabel();
-		if(count<4){
+		if(COUNT<4){
 			left_col.add(msg);
 			
 		}
@@ -75,7 +76,7 @@ public class UI extends JFrame {
 			
 		}
 		msg.setText(text);
-		count++;
+		COUNT++;
 
 	}
 
@@ -130,7 +131,7 @@ public class UI extends JFrame {
 		
 		left_col.removeAll();
 		right_col.removeAll();
-		count=0;
+		COUNT=0;
 		
 		
 		
