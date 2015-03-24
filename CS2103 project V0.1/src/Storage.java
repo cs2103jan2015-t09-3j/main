@@ -11,6 +11,7 @@ import java.util.Scanner;
 
 
 public class Storage {
+//	UI ui = new UI();
 	private static final String DEFAULT_STRING = "DEFAULT";
 	private static Scanner sc = new Scanner(System.in);
 	
@@ -29,22 +30,24 @@ public class Storage {
 			
 			
 			list.add(cmd);
-			System.out.println(cmd.detail + " has been successfully added!");
+		//	System.out.println(cmd.detail + " has been successfully added!");
 			
 			
 		}
 	
 			
 		//storage part -- QiaoDi
-		public void displayCommand(ArrayList<Cone_Organizer> list) {
+		public void displayCommand(ArrayList<Cone_Organizer> list, UI GUI) {
 			for (int i = 0; i < list.size(); i++) {
-				System.out.println(i+1 + ". "+ "task :"+ list.get(i).detail);
+				GUI.print(i+1 + ". "+ "task :"+ list.get(i).detail);
 				if(!list.get(i).date.equals(DEFAULT_STRING)){
+					GUI.print("date: "+ list.get(i).date);
 					System.out.println("date: "+list.get(i).date);
 				}	
 			}
 			if(list.size()==0){
-				System.out.println("The file is empty!");
+				GUI.print("The file is empty!");
+		//		System.out.println("The file is empty!");
 			}
 		}	
 
@@ -102,12 +105,12 @@ public class Storage {
 			
 			return temp_list;
 		}
-		public void editCommand(ArrayList<Cone_Organizer> list, int index) {
-			System.out.println("Old task: "+list.get(index-1).detail);
-			System.out.print("New task: ");
+		public void editCommand(ArrayList<Cone_Organizer> list, int index, UI GUI) {
+			GUI.print("Old task: "+list.get(index-1).detail);
+			GUI.print("New task: ");
 			list.get(index-1).detail = sc.nextLine();
-			System.out.println("Old date: "+list.get(index-1).date);
-			System.out.print("New date: ");
+			GUI.print("Old date: "+list.get(index-1).date);
+			GUI.print("New date: ");
 			
 			list.get(index-1).date = sc.nextLine();
 			
@@ -145,9 +148,9 @@ public class Storage {
 		 * @param index This is the index of the item to be marked in the list
 		 * @param list	This is list of cone_organizer object. each element contains different commands entered by user
 		 */
-		public void markCompleted(ArrayList<Cone_Organizer> list, int index) {
+		public void markCompleted(ArrayList<Cone_Organizer> list, int index, UI GUI) {
 			list.get(index-1).detail = "(completed)"+ list.get(index-1).detail;
-			System.out.println("The task no."+index+" has been marked completed!");
+			GUI.print("The task no."+index+" has been marked completed!");
 			
 			
 			
@@ -157,10 +160,11 @@ public class Storage {
 		 * This method will mark the task as incomplete.
 		 * @param index This is the index of the item to be marked in the list
 		 * @param list	This is list of cone_organizer object. each element contains different commands entered by user
+		 * @param GUI 
 		 */
-		public void markIncomplete(ArrayList<Cone_Organizer> list, int index) {
+		public void markIncomplete(ArrayList<Cone_Organizer> list, int index, UI GUI) {
 			list.get(index-1).detail = list.get(index-1).detail.substring(list.get(index-1).detail.indexOf(')')+1);
-			System.out.println("The task no."+index+" has been marked incompleted!");
+			GUI.print("The task no."+index+" has been marked incompleted!");
 		}
 		}
 		
