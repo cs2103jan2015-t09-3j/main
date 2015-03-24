@@ -24,9 +24,10 @@ public class UI extends JFrame {
 	static JLabel msg;
 	static JButton jb;
 	JPanel jp;
-	static JPanel jp2, jp3;
+	static JPanel jp2, jp3,left_col, right_col;
 	static JTextField jt = new JTextField(30);
 	static String input = "deafult";
+	static int count=0;
 
 	public UI() {
 		setTitle("test Program");
@@ -39,6 +40,8 @@ public class UI extends JFrame {
 		jb = new JButton("send");
 		
 		jp3 = new JPanel();
+		left_col = new JPanel();
+		right_col = new JPanel();
 
 		bg = new JLabel();
 		bg.setIcon(new ImageIcon("background.png"));
@@ -47,7 +50,12 @@ public class UI extends JFrame {
 		jp.setLayout(new FlowLayout(2));
 		jp.add(jt);
 		jp.add(jb);
-		jp3.setLayout(new GridLayout(4,2));
+		jp3.setLayout(new FlowLayout(1));
+		left_col.setLayout(new GridLayout(4,1));
+		right_col.setLayout(new GridLayout(4,1));
+		jp3.add(left_col);
+		jp3.add(right_col);
+		
 		add(jp, BorderLayout.SOUTH);
 		add(jp3, BorderLayout.NORTH);
 		add(jp2);
@@ -57,16 +65,24 @@ public class UI extends JFrame {
 	}
 
 	public void print(String text) {
-		
 		msg = new JLabel();
-		jp3.add(msg);
+		if(count<4){
+			left_col.add(msg);
+			
+		}
+		else{
+			right_col.add(msg);
+			
+		}
 		msg.setText(text);
+		count++;
 
 	}
 
 	public static void main(String[] args) {
 		list = l.import_From_File(list);
 		UI GUI = new UI();
+		
 		takeCommand(GUI);
 		
 
@@ -112,6 +128,11 @@ public class UI extends JFrame {
 	protected void clearBuffer() {
 		
 		
-		jp3.removeAll();
+		left_col.removeAll();
+		right_col.removeAll();
+		count=0;
+		
+		
+		
 	}
 }
