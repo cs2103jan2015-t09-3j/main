@@ -30,6 +30,7 @@ public class UI extends JFrame {
 	static String input = "deafult";
 	static int COUNT=0;
 	static int ROW_NUM = 4;
+	int editing=0;
 
 	public UI() {
 		setTitle("test Program");
@@ -85,14 +86,15 @@ public class UI extends JFrame {
 		list = l.import_From_File(list);
 		tempList.addAll(list);
 		UI GUI = new UI();
-		
 		takeCommand(GUI);
+		
 		
 
 	}
 
-	private static void takeCommand(UI GUI) {
+	public static String takeCommand(UI GUI) {
 		String temp = "LOL";
+		
 
 		while (!input.equals("exit") && temp != input) {
 			
@@ -106,7 +108,8 @@ public class UI extends JFrame {
 					cmd.command = input;
 
 					jt.setText("");
-				
+					
+					
 					
 					l.executeCommand(cmd, list, tempList, GUI);
 					
@@ -131,9 +134,14 @@ public class UI extends JFrame {
 			
 
 			temp = input;
+			
 		}
+		return input;
+		
 
 	}
+
+
 
 	protected void clearBuffer() {
 		

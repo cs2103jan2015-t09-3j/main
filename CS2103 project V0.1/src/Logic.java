@@ -143,7 +143,7 @@ public class Logic {
 		}
 		default:
 		{
-			GUI.print("Invalid Command");
+		//	GUI.print("Invalid Command");
 			
 		}
 		}
