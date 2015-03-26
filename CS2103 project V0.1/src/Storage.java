@@ -30,7 +30,7 @@ public class Storage {
 			
 			
 			list.add(cmd);
-		//	System.out.println(cmd.detail + " has been successfully added!");
+			
 			
 			
 		}
@@ -106,16 +106,32 @@ public class Storage {
 		}
 		public void editCommand(ArrayList<Cone_Organizer> list, int index, UI GUI) {
 			GUI.print("Old task: "+list.get(index-1).detail);
-			GUI.print("New task: ");
-			list.get(index-1).detail = sc.nextLine();
 			GUI.print("Old date: "+list.get(index-1).date);
-			GUI.print("New date: ");
 			
-			list.get(index-1).date = sc.nextLine();
+			GUI.jt.setText("add "+list.get(index-1).detail + " - "+ list.get(index-1).date);
+			
+
+			
 			
 		}
 			
 		
+		public void replaceItem(ArrayList<Cone_Organizer> list, Cone_Organizer cmd, int index) {
+
+			
+			
+			
+		
+			
+			list.add(index-1,cmd);
+
+			list.remove(index);
+			
+		
+			
+		}
+
+
 		//this method should delete whatever is in the file and then write the contents of arraylist in to the file
 		public void writeToFile(ArrayList<Cone_Organizer> list){
 			
@@ -170,13 +186,14 @@ public class Storage {
 		public void searchCommand(ArrayList<Cone_Organizer> list, UI GUI, Cone_Organizer cmd) {
 			GUI.print("Search results: ");
 			for(int i=0; i<list.size(); i++){
-				if(list.get(i).detail.contains(cmd.detail)){
+				if(list.get(i).detail.contains(cmd.detail) || list.get(i).date.contains(cmd.detail)){
 					GUI.print(i+1 + ". "+ "task :"+ list.get(i).detail);
 					if(!list.get(i).date.equals(DEFAULT_STRING)){
 						GUI.print("date: "+ list.get(i).date);
 						
 					}
 				}
+				
 			}
 			
 		}

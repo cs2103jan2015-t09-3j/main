@@ -26,11 +26,11 @@ public class UI extends JFrame {
 	static JButton jb;
 	JPanel jp;
 	static JPanel jp2, jp3,left_col, right_col;
-	static JTextField jt = new JTextField(30);
+	JTextField jt = new JTextField(30);
 	static String input = "deafult";
 	static int COUNT=0;
 	static int ROW_NUM = 4;
-	int editing=0;
+
 
 	public UI() {
 		setTitle("test Program");
@@ -86,13 +86,13 @@ public class UI extends JFrame {
 		list = l.import_From_File(list);
 		tempList.addAll(list);
 		UI GUI = new UI();
-		takeCommand(GUI);
+		GUI.takeCommand(GUI);
 		
 		
 
 	}
 
-	public static String takeCommand(UI GUI) {
+	public String takeCommand(UI GUI) {
 		String temp = "LOL";
 		
 
@@ -113,6 +113,7 @@ public class UI extends JFrame {
 					
 					l.executeCommand(cmd, list, tempList, GUI);
 					
+					
 
 				}
 			});
@@ -126,6 +127,7 @@ public class UI extends JFrame {
 					jt.setText("");
 					
 					l.executeCommand(cmd, list, tempList, GUI);
+					
 					
 
 				}

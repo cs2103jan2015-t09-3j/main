@@ -37,6 +37,8 @@ logger.info("Hi How r u?");
 public class Logic {
 	Parser p = new Parser();
 	Storage s = new Storage();
+	
+	int edit = 0;
 
 	/**
 	 * This method will identify the command type and details from the user input and send it to implement command method
@@ -72,9 +74,17 @@ public class Logic {
 		case "add": {
 			tempList.clear();
 			tempList.addAll(list);
+			if(edit==0){
+				s.addCommand(cmd, list);
+				GUI.print(cmd.detail + " has been successfully added!");
+			}
+			else if(edit!=0){
+				
+				s.replaceItem(list,cmd, edit);
+				edit=0;
+				GUI.print(list.get(edit).detail + " has been successfully edited!");
+			}
 			
-			s.addCommand(cmd, list);
-			GUI.print(cmd.detail + " has been successfully added!");
 			break;			
 		}
 		
@@ -104,6 +114,8 @@ public class Logic {
 			int index;
 			index=Integer.parseInt(cmd.detail);
 			s.editCommand(list, index, GUI);
+			edit=index;
+		
 			break;
 		}
 		
@@ -143,7 +155,7 @@ public class Logic {
 		}
 		default:
 		{
-		//	GUI.print("Invalid Command");
+			GUI.print("Invalid Command");
 			
 		}
 		}
