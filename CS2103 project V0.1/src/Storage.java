@@ -6,14 +6,13 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.util.*;
-import java.text.*;
 
 
 
 public class Storage {
 //	UI ui = new UI();
-	private static final String DEFAULT_STRING = "none";
-
+	private static final String DEFAULT_STRING = "DEFAULT";
+	private static Scanner sc = new Scanner(System.in);
 	
 	static File file = new File("Cone.txt");
 	ArrayList<Cone_Organizer> temp_list = new ArrayList<Cone_Organizer>();
@@ -40,10 +39,10 @@ public class Storage {
 		public void displayCommand(ArrayList<Cone_Organizer> list, UI GUI) {
 			for (int i = 0; i < list.size(); i++) {
 				GUI.print(i+1 + ". "+ "task :"+ list.get(i).detail);
-				
-				GUI.print("date: "+ list.get(i).date);
+				if(!list.get(i).date.equals(DEFAULT_STRING)){
+					GUI.print("date: "+ list.get(i).date);
 					
-					
+				}	
 			}
 			if(list.size()==0){
 				GUI.print("The file is empty!");
@@ -194,55 +193,60 @@ public class Storage {
 			
 		}
 		
-		@SuppressWarnings("deprecation")
-		public void sortByDate(ArrayList<Cone_Organizer> list, Cone_Organizer cmd){
+		//@SuppressWarnings("deprecation")
+		public void sortByDate(ArrayList<Cone_Organizer> list, Cone_Organizer cmd, UI GUI){
 			ArrayList<Cone_Organizer> dateList = new ArrayList<Cone_Organizer>();
 			
 			//take out the floating tasks first
 			for(int i=0; i<list.size(); i++){
-				if(list.get(i).date == DEFAULT_STRING){
-					dateList.add(list.get(i));
-					list.remove(i);
+				if(list.get(i).date.equals(DEFAULT_STRING)){
+					GUI.print(i+1 + ". "+ "task :"+ list.get(i).detail);
 				}
 			}
 			
 			//Compare dates of the timed task
 			int i = 0;
 			while(!list.isEmpty()){
+				if(list.get(i).date.equals(DEFAULT_STRING))
+					i++;
+				else{
 				String dateX = list.get(i).date;
-				Date date = new Date(dateX);
+				Date date1 = new Date(dateX);
 				
-				int j = i+1;
+				int j = 0;
 				while(j< list.size()){
+					if(list.get(j).date.equals(DEFAULT_STRING))
+						j++;
+					else{
 					String dateY = list.get(j).date;
-					Date date1 = new Date(dateY);
+					Date date2 = new Date(dateY);
 					
-					if(date1.after(date)){					
+					if(date2.after(date1)){					
 						if(j == list.size()-1){
-							dateList.add(list.get(i));
-							list.remove(i);
+							//dateList.add(list.get(i));
+							//list.remove(i);
+							GUI.print(i+1 + ". "+ "task :"+ list.get(i).detail + list.get(i).date);
 						}
 						else
 							j++;
 					}
 					
-					if(date.after(date1)){
+					if(date1.after(date2)){
 						if(j == list.size() -1){
-							dateList.add(list.get(j));
-							list.remove(j);
+							GUI.print(i+1 + ". "+ "task :"+ list.get(i).detail + list.get(j).date);
 						}
 						else{
-						date = new Date(dateY);
+						date1 = new Date(dateY);
 						j++;
 						}
-					}
-					
-				}
-				
+					}					
+				}				
 				i++;
 			}
-			list.addAll(dateList);
+			}
+			}
 		}
+			
 }
 		
 
