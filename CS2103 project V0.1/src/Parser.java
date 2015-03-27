@@ -39,7 +39,7 @@ public class Parser {
 			cmd.detail = cmd.command.substring(index+1,index2);
 			String date_input;
 			date_input=cmd.command.substring(index2+2, cmd.command.length());
-			if(!data_input.equals("none")){			
+			if(!date_input.equals("none")){			
 				group=getNattyDateGroup(date_input);
 				cmd.date = group.getDates().toString();	
 			}
