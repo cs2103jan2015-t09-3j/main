@@ -5,8 +5,8 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.RandomAccessFile;
-import java.util.ArrayList;
-import java.util.Scanner;
+import java.util.*;
+import java.text.*;
 
 
 
@@ -60,12 +60,8 @@ public class Storage {
 		
 		
 
-		public void clearCommand(ArrayList<Cone_Organizer> list){
-			
-			list.clear();
-			
-			
-				
+		public void clearCommand(ArrayList<Cone_Organizer> list){			
+			list.clear();				
 		}
 		
 		public ArrayList<Cone_Organizer> readFromFile(){
@@ -197,7 +193,57 @@ public class Storage {
 			}
 			
 		}
+		
+		@SuppressWarnings("deprecation")
+		public void sortByDate(ArrayList<Cone_Organizer> list, Cone_Organizer cmd){
+			ArrayList<Cone_Organizer> dateList = new ArrayList<Cone_Organizer>();
+			
+			//take out the floating tasks first
+			for(int i=0; i<list.size(); i++){
+				if(list.get(i).date == "DEFAULT_STRING"){
+					dateList.add(list.get(i));
+					list.remove(i);
+				}
+			}
+			
+			//Compare dates of the timed task
+			int i = 0;
+			while(!list.isEmpty()){
+				String dateX = list.get(i).date;
+				Date date = new Date(dateX);
+				
+				int j = i+1;
+				while(j< list.size()){
+					String dateY = list.get(j).date;
+					Date date1 = new Date(dateY);
+					
+					if(date1.after(date)){					
+						if(j == list.size()-1){
+							dateList.add(list.get(i));
+							list.remove(i);
+						}
+						else
+							j++;
+					}
+					
+					if(date.after(date1)){
+						if(j == list.size() -1){
+							dateList.add(list.get(j));
+							list.remove(j);
+						}
+						else{
+						date = new Date(dateY);
+						j++;
+						}
+					}
+					
+				}
+				
+				i++;
+			}
+			list.addAll(dateList);
 		}
+}
 		
 
 
