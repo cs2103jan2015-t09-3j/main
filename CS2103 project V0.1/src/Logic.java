@@ -153,6 +153,13 @@ public class Logic {
 			s.searchCommand(list, GUI, cmd);
 			break;
 		}
+		
+		case "sort":{
+			s.sortByDate(list, cmd);
+			break;
+		}
+		
+		
 		default:
 		{
 			GUI.print("Invalid Command");
