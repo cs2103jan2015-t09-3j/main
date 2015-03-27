@@ -11,7 +11,7 @@ import java.util.*;
 
 public class Storage {
 //	UI ui = new UI();
-	private static final String DEFAULT_STRING = "DEFAULT";
+	private static final String DEFAULT_STRING = "none";
 	private static Scanner sc = new Scanner(System.in);
 	
 	static File file = new File("Cone.txt");
@@ -39,10 +39,10 @@ public class Storage {
 		public void displayCommand(ArrayList<Cone_Organizer> list, UI GUI) {
 			for (int i = 0; i < list.size(); i++) {
 				GUI.print(i+1 + ". "+ "task :"+ list.get(i).detail);
-				if(!list.get(i).date.equals(DEFAULT_STRING)){
-					GUI.print("date: "+ list.get(i).date);
+				
+				GUI.print("date: "+ list.get(i).date);
 					
-				}	
+					
 			}
 			if(list.size()==0){
 				GUI.print("The file is empty!");
@@ -196,24 +196,26 @@ public class Storage {
 		//@SuppressWarnings("deprecation")
 		public void sortByDate(ArrayList<Cone_Organizer> list, Cone_Organizer cmd, UI GUI){
 			ArrayList<Cone_Organizer> dateList = new ArrayList<Cone_Organizer>();
+			List<Integer> listint = new ArrayList<Integer>();
 			
 			//take out the floating tasks first
 			for(int i=0; i<list.size(); i++){
 				if(list.get(i).date.equals(DEFAULT_STRING)){
 					GUI.print(i+1 + ". "+ "task :"+ list.get(i).detail);
+					GUI.print("date: "+list.get(i).date);
 				}
 			}
 			
 			//Compare dates of the timed task
 			int i = 0;
-			while(!list.isEmpty()){
+			while(i<list.size()){
 				if(list.get(i).date.equals(DEFAULT_STRING))
 					i++;
 				else{
 				String dateX = list.get(i).date;
 				Date date1 = new Date(dateX);
 				
-				int j = 0;
+				int j = i+1;
 				while(j< list.size()){
 					if(list.get(j).date.equals(DEFAULT_STRING))
 						j++;
@@ -221,29 +223,26 @@ public class Storage {
 					String dateY = list.get(j).date;
 					Date date2 = new Date(dateY);
 					
-					if(date2.after(date1)){					
-						if(j == list.size()-1){
-							//dateList.add(list.get(i));
-							//list.remove(i);
-							GUI.print(i+1 + ". "+ "task :"+ list.get(i).detail + list.get(i).date);
-						}
-						else
-							j++;
+					if(date2.after(date1)){
+						listint.add(i);
+						i++;
+						
 					}
-					
-					if(date1.after(date2)){
-						if(j == list.size() -1){
-							GUI.print(i+1 + ". "+ "task :"+ list.get(i).detail + list.get(j).date);
-						}
-						else{
-						date1 = new Date(dateY);
+					else if(date1.after(date2)){
+						listint.add(j);
 						j++;
-						}
-					}					
-				}				
-				i++;
+					}
+					else if(i==j){
+						j++;
+					}
+					}
+				}
+					
+				}
 			}
-			}
+			for(int I=0; I<listint.size(); I++){
+				GUI.print(I+1 + ". "+ "task :"+ list.get(I).detail);
+				GUI.print("date: "+ list.get(I).date);
 			}
 		}
 			
