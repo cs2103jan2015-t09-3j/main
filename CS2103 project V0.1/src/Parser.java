@@ -25,7 +25,7 @@ public class Parser {
 	
 	public void identifyType (Cone_Organizer cmd, int index){
 		cmd.command_type = cmd.command.substring(0,index);
-		if(cmd.command.contains("by")){
+		if(cmd.command.contains("-")){
 			timed(cmd, index);
 		}
 		else if (index!= cmd.command.length()-1){
@@ -35,12 +35,14 @@ public class Parser {
 	
 	public void timed(Cone_Organizer cmd, int index){
 	
-			int index2 = cmd.command.indexOf("by");
+			int index2 = cmd.command.indexOf("-");
 			cmd.detail = cmd.command.substring(index+1,index2);
 			String date_input;
-			date_input=cmd.command.substring(index2+3, cmd.command.length());
-			group=getNattyDateGroup(date_input);
-			cmd.date = group.getDates().toString();	
+			date_input=cmd.command.substring(index2+2, cmd.command.length());
+			if(!data_input.equals("none")){			
+				group=getNattyDateGroup(date_input);
+				cmd.date = group.getDates().toString();	
+			}
 			
 	}
 	
