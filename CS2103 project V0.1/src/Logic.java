@@ -155,7 +155,7 @@ public class Logic {
 		}
 		
 		case "sort":{
-			s.sortByDate(list, cmd);
+			s.sortByDate(list, cmd, GUI);
 			break;
 		}
 		
