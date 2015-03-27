@@ -12,8 +12,8 @@ import java.text.*;
 
 public class Storage {
 //	UI ui = new UI();
-	private static final String DEFAULT_STRING = "DEFAULT";
-	private static Scanner sc = new Scanner(System.in);
+	private static final String DEFAULT_STRING = "none";
+
 	
 	static File file = new File("Cone.txt");
 	ArrayList<Cone_Organizer> temp_list = new ArrayList<Cone_Organizer>();
@@ -40,10 +40,10 @@ public class Storage {
 		public void displayCommand(ArrayList<Cone_Organizer> list, UI GUI) {
 			for (int i = 0; i < list.size(); i++) {
 				GUI.print(i+1 + ". "+ "task :"+ list.get(i).detail);
-				if(!list.get(i).date.equals(DEFAULT_STRING)){
-					GUI.print("date: "+ list.get(i).date);
+				
+				GUI.print("date: "+ list.get(i).date);
 					
-				}	
+					
 			}
 			if(list.size()==0){
 				GUI.print("The file is empty!");
@@ -200,7 +200,7 @@ public class Storage {
 			
 			//take out the floating tasks first
 			for(int i=0; i<list.size(); i++){
-				if(list.get(i).date == "DEFAULT_STRING"){
+				if(list.get(i).date == DEFAULT_STRING){
 					dateList.add(list.get(i));
 					list.remove(i);
 				}
