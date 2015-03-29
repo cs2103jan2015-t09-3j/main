@@ -1,9 +1,5 @@
-import java.io.IOException;
+import java.text.ParseException;
 import java.util.ArrayList;
-import java.util.logging.FileHandler;
-import java.util.logging.Level;
-import java.util.logging.Logger;
-import java.util.logging.SimpleFormatter;
 
 /*
 Logger logger = Logger.getLogger("TextBuddy");
@@ -154,11 +150,19 @@ public class Logic {
 			break;
 		}
 		
-		case "sort":{
-			s.sortByDate(list, cmd, GUI);
+		case "sortdate":{
+			try {
+				s.sortByDate(list, cmd, GUI);
+			} catch (ParseException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
 			break;
 		}
 		
+		case "sortmark":{
+			s.sortByMark(list, cmd, GUI);
+		}
 		
 		default:
 		{

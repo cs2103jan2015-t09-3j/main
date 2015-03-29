@@ -5,6 +5,8 @@ import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.RandomAccessFile;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 
@@ -193,56 +195,94 @@ public class Storage {
 			
 		}
 		
-		//@SuppressWarnings("deprecation")
-		public void sortByDate(ArrayList<Cone_Organizer> list, Cone_Organizer cmd, UI GUI){
-			ArrayList<Cone_Organizer> dateList = new ArrayList<Cone_Organizer>();
-			List<Integer> listint = new ArrayList<Integer>();
+		public void sortByDate(ArrayList<Cone_Organizer> list, Cone_Organizer cmd, UI GUI) throws ParseException{
+			ArrayList<Cone_Organizer> dateList = new ArrayList<Cone_Organizer>(list);
+			List<Integer> index = new ArrayList<Integer>();
+			SimpleDateFormat ft = new SimpleDateFormat("EEE MMM DD HH:mm:SS ZZZ yyyy");
+			
+			
+			for(int p=0; p<list.size(); p++){
+				index.add(p+1);
+			}
 			
 			//take out the floating tasks first
-			for(int i=0; i<list.size(); i++){
+			for(int i=0; i<dateList.size(); i++){
 				if(list.get(i).date.equals(DEFAULT_STRING)){
-					GUI.print(i+1 + ". "+ "task :"+ list.get(i).detail);
-					GUI.print("date: "+list.get(i).date);
+					GUI.print(index.get(i) + ". "+ "task :"+ dateList.get(i).detail);
+					GUI.print("date: "+ dateList.get(i).date);
+					dateList.remove(i);
+					index.remove(i);
 				}
 			}
 			
 			//Compare dates of the timed task
-			int i = 0;
-			while(i<list.size()){
-				if(list.get(i).date.equals(DEFAULT_STRING))
-					i++;
-				else{
-				String dateX = list.get(i).date;
-				Date date1 = new Date(dateX);
-				
-				int j = i+1;
-				while(j< list.size()){
-					if(list.get(j).date.equals(DEFAULT_STRING))
-						j++;
-					else{
-					String dateY = list.get(j).date;
-					Date date2 = new Date(dateY);
-					
-					if(date2.after(date1)){
-						listint.add(i);
-						i++;
-						
-					}
-					else if(date1.after(date2)){
-						listint.add(j);
-						j++;
-					}
-					else if(i==j){
-						j++;
-					}
-					}
+			while(!dateList.isEmpty()){
+				if(dateList.size() == 1){
+					GUI.print(index.get(0) + ". "+ "task :"+ dateList.get(0).detail);
+					GUI.print("date: "+ dateList.get(0).date);
+					dateList.remove(0);
+					index.remove(0);
 				}
+				
+				else{
+					String dateX = dateList.get(0).date;
+					dateX = dateX.substring(1,dateX.length()-1);
+					Date date1 = ft.parse(dateX);
 					
+					int j = 1;
+					while(j < dateList.size()){
+						String dateY = dateList.get(j).date;
+						dateY = dateY.substring(1,dateY.length()-1);
+						Date date2 = ft.parse(dateY);
+					
+						if(date2.after(date1)){
+							if(j == dateList.size() -1){
+								GUI.print(index.get(j-1) + ". "+ "task :"+ dateList.get(j-1).detail);
+								GUI.print("date: "+dateList.get(j-1).date);
+								dateList.remove(j-1);	
+								index.remove(j-1);
+							}
+							else
+								j++;
+						}		
+					
+						else{
+							if(j == dateList.size() -1){
+								GUI.print(index.get(j) + ". "+ "task :"+ dateList.get(j).detail);
+								GUI.print("date: "+dateList.get(j).date);
+								dateList.remove(j);
+								index.remove(j);
+							}
+							else{	
+								date1 = ft.parse(dateY);
+								j++;
+							}
+						}
+					}
 				}
 			}
-			for(int I=0; I<listint.size(); I++){
-				GUI.print(I+1 + ". "+ "task :"+ list.get(I).detail);
-				GUI.print("date: "+ list.get(I).date);
+		}
+		
+		public void sortByMark(ArrayList<Cone_Organizer> list, Cone_Organizer cmd, UI GUI){
+			ArrayList<Cone_Organizer> markList = new ArrayList<Cone_Organizer>(list);
+			List<Integer> pos = new ArrayList<Integer>();
+			
+			for(int i=0; i<list.size(); i++){
+				pos.add(i+1);
+			}
+			
+			for(int j=0; j<markList.size();j++){
+				if(markList.get(j).detail.contains("(completed)")){
+					GUI.print(pos.get(j) + ". "+ "task :"+ markList.get(j).detail);
+					GUI.print("date: "+markList.get(j).date);
+					markList.remove(j);
+					pos.remove(j);
+				}
+			}
+			
+			for(int k=0; k<markList.size();k++){
+				GUI.print(pos.get(k) + ". "+ "task :"+ markList.get(k).detail);
+				GUI.print("date: "+markList.get(k).date);
 			}
 		}
 			
