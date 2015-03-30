@@ -20,6 +20,7 @@ public class UI extends JFrame {
 	static Logic l = new Logic();
 	static ArrayList<Cone_Organizer> list = new ArrayList<Cone_Organizer>();
 	static ArrayList<Cone_Organizer> tempList = new ArrayList<Cone_Organizer>();
+	static ArrayList<Cone_Organizer> currList = new ArrayList<Cone_Organizer>();
 	static Cone_Organizer cmd = new Cone_Organizer();
 	static JLabel bg;
 	static JLabel msg;
@@ -111,7 +112,7 @@ public class UI extends JFrame {
 					
 					
 					
-					l.executeCommand(cmd, list, tempList, GUI);
+					l.executeCommand(cmd, list, tempList, currList, GUI);
 					
 					
 
@@ -126,7 +127,7 @@ public class UI extends JFrame {
 					cmd.command = input;
 					jt.setText("");
 					
-					l.executeCommand(cmd, list, tempList, GUI);
+					l.executeCommand(cmd, list, tempList, currList, GUI);
 					
 					
 

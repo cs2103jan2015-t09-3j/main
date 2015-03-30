@@ -141,8 +141,19 @@ public class Logic {
 			break;
 		}
 		case "undo":{
+			currList.clear();
+			currList.addAll(list);
 			list.clear();
 			list.addAll(tempList);
+			GUI.print(" Undo to latest 1 change(s)!");
+			
+			break;
+		}
+		case "redo":{
+			list.clear();
+			list.addAll(currList);
+			GUI.print(" Redo to latest 1 undo(s)!");
+
 			break;
 		}
 		case "search": {
