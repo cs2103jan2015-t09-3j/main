@@ -42,7 +42,7 @@ public class Logic {
 	 * @param list	This is list of cone_organizer object. each element contains different commands entered by user
 	 * @param gUI 
 	 */
-	public void executeCommand(Cone_Organizer cmd, ArrayList<Cone_Organizer> list, ArrayList<Cone_Organizer> tempList, UI GUI) {
+	public void executeCommand(Cone_Organizer cmd, ArrayList<Cone_Organizer> list, ArrayList<Cone_Organizer> tempList, ArrayList<Cone_Organizer> currList, UI GUI) {
 		assert list!=null;
 		GUI.clearBuffer();
 		
@@ -65,7 +65,7 @@ public class Logic {
 	 * @param list	This is list of cone_organizer object. each element contains different commands entered by user
 	 * @param GUI 
 	 */
-	public void implementCommand(Cone_Organizer cmd, ArrayList<Cone_Organizer> list, ArrayList<Cone_Organizer> tempList, UI GUI) {
+	public void implementCommand(Cone_Organizer cmd, ArrayList<Cone_Organizer> list, ArrayList<Cone_Organizer> tempList, ArrayList<Cone_Organizer> currList, UI GUI) {
 		switch (cmd.command_type) {
 		case "add": {
 			tempList.clear();
