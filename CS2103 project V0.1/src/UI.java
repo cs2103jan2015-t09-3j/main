@@ -1,37 +1,48 @@
+import java.awt.AlphaComposite;
 import java.awt.BorderLayout;
+import java.awt.Color;
+import java.awt.Component;
+import java.awt.Dimension;
 import java.awt.FlowLayout;
-import java.awt.GridLayout;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Scanner;
 
-import javax.swing.ImageIcon;
+import javax.imageio.ImageIO;
 import javax.swing.JButton;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
 import javax.swing.JTextField;
+import javax.swing.OverlayLayout;
+import javax.swing.table.DefaultTableCellRenderer;
+import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableCellRenderer;
+import javax.swing.table.TableColumnModel;
 
 @SuppressWarnings("serial")
 public class UI extends JFrame {
-	private static Scanner sc = new Scanner(System.in);
-	static Storage s = new Storage();
+	private static final String DEFAULT_STRING = "none";
 	static Logic l = new Logic();
-	static ArrayList<Cone_Organizer> list = new ArrayList<Cone_Organizer>();
-	static ArrayList<Cone_Organizer> tempList = new ArrayList<Cone_Organizer>();
-	static ArrayList<Cone_Organizer> currList = new ArrayList<Cone_Organizer>();
-	static Cone_Organizer cmd = new Cone_Organizer();
+	static ArrayList<Tasks> list;
 	static JLabel bg;
-	static JLabel msg;
-	static JButton jb;
-	JPanel jp;
-	static JPanel jp2, jp3,left_col, right_col;
-	JTextField jt = new JTextField(30);
-	static String input = "deafult";
-	static int COUNT=0;
-	static int ROW_NUM = 4;
-
+	static JLabel feedbacks;
+	static JButton send_button;
+	static JPanel input_panel;
+	static JPanel bg_panel, feedback_panel, table_panel;
+	static JTextField text_field = new JTextField(40);
+	static String input = DEFAULT_STRING;
+	static JTable table;
+	static BufferedImage image;
+	static final String[] columns = { "Task no.", "Task Description", "Date" };
+	static DefaultTableModel tableModel = new DefaultTableModel(columns, 0);
 
 	public UI() {
 		setTitle("test Program");
@@ -39,121 +50,175 @@ public class UI extends JFrame {
 		setVisible(true);
 		setDefaultCloseOperation(EXIT_ON_CLOSE);
 		setResizable(false);
-		jp = new JPanel();
-		jp2 = new JPanel();
-		jb = new JButton("send");
+
+		input_panel = new JPanel();
+		bg_panel = new JPanel();
+		send_button = new JButton("send");
+		table = new JTable(tableModel) {
+			{
+				setOpaque(false);
+				
+				setDefaultRenderer(Object.class,
+						new DefaultTableCellRenderer() {
+							{
+								setOpaque(false);
+							}
+						});
+				
+			}
+
+			public boolean isCellEditable(int data, int columns) {
+				return false;
+			}
+
+			public Component prepareRenderer(TableCellRenderer r, int data,
+					int columns) {
+				Component c = super.prepareRenderer(r, data, columns);
+
+				if (data % 2 == 0) {
+					c.setBackground(Color.white);
+				} else {
+					c.setBackground(Color.LIGHT_GRAY);
+				}
+				if (isCellSelected(data, columns)) {
+					c.setBackground(Color.green);
+				}
+				return c;
+			}
+
+			protected void paintComponent(Graphics g) {
+				g.drawImage(image, 0, 0, getWidth(), getHeight(), null);
+				super.paintComponent(g);
+			}
+		};
+
+		table.setPreferredScrollableViewportSize(new Dimension(700, 100));
+		table.setFillsViewportHeight(true);
+		JScrollPane scrollbar = new JScrollPane(table);
+		scrollbar.setMaximumSize(new Dimension(700, 500));
 		
-		jp3 = new JPanel();
-		left_col = new JPanel();
-		right_col = new JPanel();
-
-		bg = new JLabel();
-		bg.setIcon(new ImageIcon("background.png"));
-		jp2.add(bg);
-
-		jp.setLayout(new FlowLayout(2));
-		jp.add(jt);
-		jp.add(jb);
-		jp3.setLayout(new FlowLayout(1));
-		left_col.setLayout(new GridLayout(ROW_NUM,1));
-		right_col.setLayout(new GridLayout(ROW_NUM,1));
-		jp3.add(left_col);
-		jp3.add(right_col);
 		
-		add(jp, BorderLayout.SOUTH);
-		add(jp3, BorderLayout.NORTH);
-		add(jp2);
 
-		validate();
+		feedback_panel = new JPanel();
+		table_panel = new JPanel(new BorderLayout());
+		table_panel.setLayout(new OverlayLayout(table_panel));
+		table_panel.setOpaque(false);
+
+		input_panel.setLayout(new FlowLayout(2));
+		input_panel.add(text_field);
+		input_panel.add(send_button);
+		table_panel.add(scrollbar);
+
+		add(input_panel, BorderLayout.SOUTH);
+		add(feedback_panel, BorderLayout.NORTH);
+		add(table_panel);
+
+		revalidate();
+		repaint();
 
 	}
 
-	public void print(String text) {
-		msg = new JLabel();
-		if(COUNT<ROW_NUM){
-			left_col.add(msg);
-			
+	public static void printFeedback(String text) {
+		clearFeedback();
+		feedbacks = new JLabel();
+		feedback_panel.add(feedbacks);
+		if(text.contains("edit ")){
+			int index = Integer.parseInt(text.substring(text.indexOf(' ')+1, text.length()));
+			text_field.setText("add "+list.get(index-1).detail+" - "+list.get(index-1).date);
+			feedbacks.setText("Old task : "+ list.get(index-1).detail + "       Old Date : "+list.get(index-1).date);
+		}
+		else if(text.contains("search ")){
+			String keyword = text.substring(text.indexOf(' ')+1, text.length());
+			printList(list, keyword);
+			feedbacks.setText("Search Results: ");
 		}
 		else{
-			right_col.add(msg);
-			
+			feedbacks.setText(text);
 		}
-		msg.setText(text);
-		COUNT++;
 
 	}
 
-	public static void main(String[] args) {
-		list = l.import_From_File(list);
-		tempList.addAll(list);
+	public static void main(String[] args) throws IOException {
+		image = ImageIO.read(new File("background.png"));
+		image = makeTransparent();
+
 		UI GUI = new UI();
-		GUI.takeCommand(GUI);
+		list = l.import_From_File(list);
+		printList(list,"");
 		
-		
+		takeCommand(GUI);
 
 	}
 
-	public String takeCommand(UI GUI) {
-		String temp = "LOL";
-		
+	private static BufferedImage makeTransparent() {
+		BufferedImage tmpImg = new BufferedImage(image.getWidth(),
+				image.getHeight(), BufferedImage.TYPE_INT_ARGB);
 
-		while (!input.equals("exit") && temp != input) {
-			
-			//when user type enter
+		Graphics2D g2d = (Graphics2D) tmpImg.getGraphics();
+		g2d.setComposite(AlphaComposite.SrcOver.derive(0.3f));
+		// set the transparency level in range 0.0f - 1.0f
+		g2d.drawImage(image, 0, 0, null);
+		return tmpImg;
+	}
 
-			jt.addActionListener(new ActionListener() {
+	private static void takeCommand(UI GUI) {
+		String temp = "default";
+
+		while (temp != input) {
+
+			// when user type enter
+			text_field.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
-					
-					cmd = new Cone_Organizer();
-					input = jt.getText();
-					cmd.command = input;
-
-					jt.setText("");
-					
-					
-					
-					l.executeCommand(cmd, list, tempList, currList, GUI);
-					
-					
-
-				}
-			});
-			//When button is pressed
-			jb.addActionListener(new ActionListener() {
-				public void actionPerformed(ActionEvent e) {
-
-					cmd = new Cone_Organizer();
-					input = jt.getText();
-					cmd.command = input;
-					jt.setText("");
-					
-					l.executeCommand(cmd, list, tempList, currList, GUI);
-					
-					
-
+					input = text_field.getText();
+					text_field.setText("");
+					String feedback = DEFAULT_STRING;
+					feedback = l.executeCommand(input, list);
+					printList(list,"");
+					printFeedback(feedback);
 				}
 
 			});
-			
-
+			// When button is pressed
+			send_button.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					input = text_field.getText();
+					text_field.setText("");
+					String feedback = new String(DEFAULT_STRING);
+					feedback = l.executeCommand(input, list);
+					printList(list,"");
+					printFeedback(feedback);
+				}
+			});
 			temp = input;
-			
 		}
-		return input;
-		
+	}
+
+	protected static void printList(ArrayList<Tasks> list, String keyword) {
+		clearTable();
+		for (int i = 0; i < list.size(); i++) {
+			if(list.get(i).detail.contains(keyword) || list.get(i).date.contains(keyword)){
+				int taskNum = i + 1;
+				String task = list.get(i).detail;
+				String date = list.get(i).date;
+				Object[] data = { taskNum, task, date };
+				tableModel.addRow(data);
+			}
+		}
+	}
+
+	private static void clearTable() {
+		int size = tableModel.getRowCount();
+		for (int i = 0; i < size; i++) {
+			tableModel.removeRow(0);
+		}
 
 	}
 
+	protected static void clearFeedback() {
 
+		feedback_panel.removeAll();
+		feedback_panel.revalidate();
+		feedback_panel.repaint();
 
-	protected void clearBuffer() {
-		
-		
-		left_col.removeAll();
-		right_col.removeAll();
-		COUNT=0;
-		
-		
-		
 	}
 }

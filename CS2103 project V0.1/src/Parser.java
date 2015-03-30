@@ -5,40 +5,42 @@ import java.util.List;
 import com.joestelmach.natty.DateGroup;
 public class Parser {
 	DateGroup group= new DateGroup();
+	static String command_type;
 	
 	//Parser part -- LIQI
-	public void parse(Cone_Organizer cmd) {
-		int index = cmd.command.indexOf(' ');
+	public String parse(String input, Tasks cmd) {
+		
+		int index = input.indexOf(' ');
 		if(index!=-1){
-			identifyType(cmd, index);
+			identifyType(input, cmd, index);
 
 		}
 		else{
-			commandOnly(cmd);
+			commandOnly(input);
 		}	
-		
+		return command_type;
 	}
 	
-	public void commandOnly (Cone_Organizer cmd){
-		cmd.command_type = cmd.command;
+	public void commandOnly (String input){
+		command_type = input;
 	}
 	
-	public void identifyType (Cone_Organizer cmd, int index){
-		cmd.command_type = cmd.command.substring(0,index);
-		if(cmd.command.contains("-")){
-			timed(cmd, index);
+	public void identifyType (String input, Tasks cmd, int index){
+		command_type = input.substring(0,index);
+		if(input.contains("-")){
+			timed(input, cmd, index);
 		}
-		else if (index!= cmd.command.length()-1){
-			floating(cmd, index);
+		else if (index!= input.length()-1){
+			floating(input, cmd, index);
 		}
 	}
 	
-	public void timed(Cone_Organizer cmd, int index){
+	public void timed(String input, Tasks cmd, int index){
 	
-			int index2 = cmd.command.indexOf("-");
-			cmd.detail = cmd.command.substring(index+1,index2);
+			int index2 = input.indexOf("-");
+			cmd.detail = input.substring(index+1,index2);
 			String date_input;
-			date_input=cmd.command.substring(index2+2, cmd.command.length());
+			date_input=input.substring(index2+2, input.length());
 			if(!date_input.equals("none")){			
 				group=getNattyDateGroup(date_input);
 				cmd.date = group.getDates().toString();	
@@ -46,9 +48,9 @@ public class Parser {
 			
 	}
 	
-	public void floating(Cone_Organizer cmd, int index){
+	public void floating(String input, Tasks cmd, int index){
 		
-			cmd.detail = cmd.command.substring(index+1, cmd.command.length());
+			cmd.detail = input.substring(index+1, input.length());
 		
 	}
 	private DateGroup getNattyDateGroup(String date_input) {
