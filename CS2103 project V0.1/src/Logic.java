@@ -47,7 +47,7 @@ public class Logic {
 		GUI.clearBuffer();
 		
 		p.parse(cmd);
-		implementCommand(cmd, list, tempList, GUI);
+		implementCommand(cmd, list, tempList, currList, GUI);
 
 	}
 	/**
