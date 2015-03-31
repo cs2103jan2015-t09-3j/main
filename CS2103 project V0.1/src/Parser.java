@@ -51,7 +51,7 @@ public class Parser {
 				cmd.endDate = date.substring(start+1, date.length()-1);
 			}
 			else{
-				cmd.endDate = date;
+				cmd.endDate = date.substring(1, date.length()-1);
 			}
 	}
 	
