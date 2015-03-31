@@ -9,7 +9,7 @@ public class Parser {
 	
 	//Parser part -- LIQI
 	public String parse(String input, Tasks cmd) {
-		
+		input.toLowerCase();
 		int index = input.indexOf(' ');
 		if(index!=-1){
 			identifyType(input, cmd, index);
@@ -18,7 +18,7 @@ public class Parser {
 		else{
 			commandOnly(input);
 		}	
-		return command_type;
+		return command_type.toLowerCase();
 	}
 	
 	public void commandOnly (String input){
@@ -39,11 +39,24 @@ public class Parser {
 	
 			int index2 = input.indexOf("-");
 			cmd.detail = input.substring(index+1,index2);
-			String date_input;
-			date_input=input.substring(index2+2, input.length());
-			if(!date_input.equals("none")){			
-				group=getNattyDateGroup(date_input);
-				cmd.date = group.getDates().toString();	
+			int start = input.indexOf("from");
+			int end = input.indexOf("to");
+			if(start!=-1){
+				String startDate = input.substring(start+4, end);
+				String endDate = input.substring(end+2, input.length());
+				group=getNattyDateGroup(startDate);
+				cmd.startDate = group.getDates().toString();	
+				group=getNattyDateGroup(endDate);
+				cmd.endDate = group.getDates().toString();	
+			}
+			else{
+				String date_input;
+				date_input=input.substring(index2+2, input.length());
+			
+				if(!date_input.equals("none")){			
+					group=getNattyDateGroup(date_input);
+					cmd.endDate = group.getDates().toString();	
+				}
 			}
 			
 	}
