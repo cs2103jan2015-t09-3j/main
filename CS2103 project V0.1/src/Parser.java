@@ -48,7 +48,7 @@ public class Parser {
 			int start = date.indexOf(",");
 			if(start!=-1){
 				cmd.startDate = date.substring(1, start);
-				cmd.endDate = date.substring(start+1, date.length());
+				cmd.endDate = date.substring(start+1, date.length()-1);
 			}
 			else{
 				cmd.endDate = date;
