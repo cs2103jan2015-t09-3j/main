@@ -10,10 +10,13 @@ public class Logic {
 	Parser p = new Parser();
 	Storage s = new Storage();
 	Tasks cmd = new Tasks();
+
 	ArrayList<Tasks> list = new ArrayList<Tasks>();
 	ArrayList<Tasks> tempList = new ArrayList<Tasks>();
 	ArrayList<Tasks> currList = new ArrayList<Tasks>();
 	static String command_type = DEFAULT_STRING;
+	int tmp;
+	int index;
 
 	int edit = 0;
 
@@ -36,14 +39,14 @@ public class Logic {
 		cmd = new Tasks();
 		command_type = p.parse(input, cmd);
 		feedback = implementCommand(command_type, cmd, list, feedback);
-//		sortList(list);
+		sortList(list);
 		return feedback;
 	}
 
 	public String implementCommand(String command_type, Tasks cmd,
 			ArrayList<Tasks> list, String feedback) {
 		switch (command_type) {
-		case "cd":{
+		case "cd": {
 			s.changeDirectory(cmd.detail);
 			return saveCommand(list);
 		}
@@ -79,96 +82,265 @@ public class Logic {
 		}
 		}
 	}
-/*
-	private void sortList(ArrayList<Tasks> list){
-		try {
-			sortByMark(list);
-		} catch (ParseException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+
+	private void sortList(ArrayList<Tasks> list) {
+		sortByMark(list);
+		sortByDate(list);
+	}
+
+	private void sortByMark(ArrayList<Tasks> list) {
+		ArrayList<Tasks> temp = new ArrayList<Tasks>();
+
+		for (int i = 0; i < list.size(); i++) {
+			if (list.get(i).detail.contains("(completed)")) {
+				temp.add(list.get(i));
+			}
+		}
+		for (int i = 0; i < list.size(); i++) {
+			if (!list.get(i).detail.contains("(completed)")) {
+				temp.add(list.get(i));
+			}
+		}
+		list.clear();
+		list.addAll(temp);
+
+	}
+
+	private void sortByDate(ArrayList<Tasks> list) {
+		DateSorter sorter = new DateSorter();
+		ArrayList<Integer> indexlist = new ArrayList<Integer>();
+		ArrayList<Tasks> nodatelist = new ArrayList<Tasks>();
+		ArrayList<DateSorter> datelist = new ArrayList<DateSorter>();
+
+		for (int i = 0; i < list.size(); i++) {
+			sorter = new DateSorter();
+			if (list.get(i).endDate.equals("none")) {
+				nodatelist.add(list.get(i));
+				list.remove(i);
+				i--;
+			} 
+			else {
+
+				sorter.index = i;
+				sorter.year = Integer.parseInt(list.get(i).endDate.substring(
+						24, 28));
+				sorter.month = returnNumMonth(list.get(i).endDate.substring(4,
+						7));
+				sorter.day = Integer.parseInt(list.get(i).endDate.substring(8,
+						10));
+				sorter.time = Integer.parseInt(list.get(i).endDate.substring(
+						11, 13)
+						+ list.get(i).endDate.substring(14, 16)
+						+ list.get(i).endDate.substring(17, 19));
+				datelist.add(sorter);
+			}
+
+		}
+		while (!datelist.isEmpty()) {
+			boolean value_same = false;
+			compareYear(indexlist, value_same, datelist);
+		}
+			modifyList(indexlist, list, nodatelist);
+		
+
+	}
+
+	private int returnNumMonth(String month) {
+		if (month.equals("Jan")) {
+			return 1;
+		}
+		if (month.equals("Feb")) {
+			return 2;
+		}
+		if (month.equals("Mar")) {
+			return 3;
+		}
+		if (month.equals("Apr")) {
+			return 4;
+		}
+		if (month.equals("May")) {
+			return 5;
+		}
+		if (month.equals("Jun")) {
+			return 6;
+		}
+		if (month.equals("Jul")) {
+			return 7;
+		}
+		if (month.equals("Aug")) {
+			return 8;
+		}
+		if (month.equals("Sep")) {
+			return 9;
+		}
+		if (month.equals("Oct")) {
+			return 10;
+		}
+		if (month.equals("Nov")) {
+			return 11;
+		}
+		if (month.equals("Dec")) {
+			return 12;
+		} else {
+			return 0;
+		}
+
+	}
+
+	private void modifyList(ArrayList<Integer> indexlist,
+			ArrayList<Tasks> list, ArrayList<Tasks> nodatelist) {
+		ArrayList<Tasks> temp = new ArrayList<Tasks>();
+		for (int i = 0; i < indexlist.size(); i++) {
+			temp.add(list.get(indexlist.get(i)));
+		}
+		if (!nodatelist.isEmpty()) {
+			for (int i = 0; i < nodatelist.size(); i++) {
+				temp.add(nodatelist.get(i));
+			}
+			if(!list.isEmpty())
+			list.clear();
+			list.addAll(temp);
+
 		}
 	}
-	
-	private void sortByMark(ArrayList<Tasks> list) throws ParseException {
-		 ArrayList<Tasks> markList = new ArrayList<Tasks>();
-		 markList.addAll(list);
-		 list.clear();
-		 
-		 for(int i=0; i<markList.size();i++){
-		 if(!markList.get(i).detail.contains("(completed)")){
-			 list.add(markList.get(i));
-		 	 markList.remove(i);
-		 	 }
-		 }
-		 
-		 if(!list.isEmpty())
-			 sortByDate(list);
-		 if(!markList.isEmpty()){
-			 sortByDate(markList);
-			 for(int j=0; j<markList.size();j++){
-			 list.add(markList.get(j));
-			 markList.remove(j);
-			 }
-		 }
-	}
-/*	
-	private void sortByDate(ArrayList<Tasks> parselist) throws ParseException {
-		 ArrayList<Tasks> dateList = new ArrayList<Tasks>();
-		 dateList.addAll(parselist);
-		 parselist.clear();
-		 SimpleDateFormat ft = new SimpleDateFormat("EEE MMM DD HH:mm:SS ZZZ yyyy");
-		 
-		 //take out the floating tasks first 
-		 for(int i=0; i<dateList.size();i++){ 
-			  if(dateList.get(i).date.equals(DEFAULT_STRING)){
-				  parselist.add(dateList.get(i));
-				  dateList.remove(i); 
-		       } 
-		 }
-		  
-		 //Compare dates of the timed task while(!dateList.isEmpty()){
-		 
-		 while(!dateList.isEmpty()){
-			 if(dateList.size() == 1){ 
-				 parselist.add(dateList.get(0));
-				 dateList.remove(0);
-			 }
-		  
-			 else{ 
-				 String dateX = dateList.get(0).date; 
-				 dateX = dateX.substring(1,dateX.length()-1); 
-				 Date date1 = ft.parse(dateX);
-		  
-				 int j = 1; 
-				 while(j < dateList.size()){ 
-					 String dateY = dateList.get(j).date; 
-					 dateY = dateY.substring(1,dateY.length()-1);
-					 Date date2 = ft.parse(dateY);
-		 
-					 if(date2.after(date1)){ 
-						 if(j == dateList.size() -1){
-							 parselist.add(dateList.get(j));
-							 dateList.remove(j); 
-						 }
-						 else 
-							 j++;
-					 	 }
-		  
-				 	else{ 
-				 		if(j == dateList.size() -1){
-				 			parselist.add(dateList.get(j-1));
-				 			dateList.remove(j-1);
-				 		} 
-				 		else{ 
-				 			date1 = ft.parse(dateY);
-				 			j++; 
-				 		} 
-				 	}
+
+	private void compareTimes(ArrayList<Integer> indexlist, boolean value_same,
+			ArrayList<DateSorter> datelist) {
+		ArrayList<DateSorter> temp = new ArrayList<DateSorter>();
+		if (!datelist.isEmpty()) {
+			tmp = datelist.get(0).time;
+			index = 0;
+			for (int i = 1; i < datelist.size(); i++) {
+
+				if (tmp > datelist.get(i).time) {
+					tmp = datelist.get(i).time;
+					index = i;
 				}
-			}  
+
+			}
+			indexlist.add(datelist.get(index).index);
+			datelist.remove(index);
+			for (int i = 0; i < datelist.size(); i++) {
+
+				indexlist.add(datelist.get(i).index);
+				datelist.remove(i);
+				i--;
+
+			}
+
 		}
 	}
-*/
+
+	private void compareDay(ArrayList<Integer> indexlist, boolean value_same,
+			ArrayList<DateSorter> datelist) {
+		ArrayList<DateSorter> temp = new ArrayList<DateSorter>();
+		if (!datelist.isEmpty()) {
+			tmp = datelist.get(0).day;
+			index = 0;
+			for (int i = 1; i < datelist.size(); i++) {
+
+				if (tmp > datelist.get(i).day) {
+					tmp = datelist.get(i).day;
+					index = i;
+				}
+
+			}
+			temp.add(datelist.get(index));
+			datelist.remove(index);
+			for (int i = 0; i < datelist.size(); i++) {
+
+				if (datelist.get(i).day == tmp) {
+					value_same = true;
+					temp.add(datelist.get(i));
+					datelist.remove(i);
+					i--;
+				}
+
+			}
+			if (value_same == false) {
+				indexlist.add(datelist.get(index).index);
+
+			} else {
+				compareTimes(indexlist, value_same, temp);
+				compareDay(indexlist, value_same, datelist);
+			}
+		}
+	}
+
+	private void compareMonth(ArrayList<Integer> indexlist, boolean value_same,
+			ArrayList<DateSorter> datelist) {
+		ArrayList<DateSorter> temp = new ArrayList<DateSorter>();
+		if (!datelist.isEmpty()) {
+			tmp = datelist.get(0).month;
+			index = 0;
+			for (int i = 1; i < datelist.size(); i++) {
+
+				if (tmp > datelist.get(i).month) {
+					tmp = datelist.get(i).month;
+					index = i;
+				}
+
+			}
+			temp.add(datelist.get(index));
+			datelist.remove(index);
+			for (int i = 0; i < datelist.size(); i++) {
+
+				if (datelist.get(i).month == tmp) {
+					value_same = true;
+					temp.add(datelist.get(i));
+					datelist.remove(i);
+					i--;
+				}
+
+			}
+			if (value_same == false) {
+				indexlist.add(datelist.get(index).index);
+			} else {
+				compareDay(indexlist, value_same, temp);
+				compareMonth(indexlist, value_same, datelist);
+			}
+		}
+	}
+
+	private void compareYear(ArrayList<Integer> indexlist, boolean value_same,
+			ArrayList<DateSorter> datelist) {
+		ArrayList<DateSorter> temp = new ArrayList<DateSorter>();
+
+		if (!datelist.isEmpty()) {
+			tmp = datelist.get(0).year;
+			index = 0;
+			for (int i = 1; i < datelist.size(); i++) {
+
+				if (tmp > datelist.get(i).year) {
+					tmp = datelist.get(i).year;
+					index = i;
+				}
+
+			}
+			temp.add(datelist.get(index));
+			datelist.remove(index);
+
+			for (int i = 0; i < datelist.size(); i++) {
+
+				if (datelist.get(i).year == tmp) {
+					value_same = true;
+					temp.add(datelist.get(i));
+					datelist.remove(i);
+					i--;
+
+				}
+
+			}
+
+			if (value_same == false) {
+				indexlist.add(datelist.get(index).index);
+
+			} else {
+				compareMonth(indexlist, value_same, temp);
+				compareYear(indexlist, value_same, datelist);
+			}
+		}
+	}
 
 	/**
 	 * This method imports items in the text file currently saved in same
@@ -286,7 +458,8 @@ public class Logic {
 
 		for (int i = 0; i < list.size(); i++) {
 			if (list.get(i).detail.toLowerCase().contains(cmd.detail)
-					|| list.get(i).startDate.contains(cmd.detail) || list.get(i).endDate.contains(cmd.detail)) {
+					|| list.get(i).startDate.contains(cmd.detail)
+					|| list.get(i).endDate.contains(cmd.detail)) {
 				return "search " + detail;
 
 			}
@@ -303,10 +476,8 @@ public class Logic {
 	}
 
 	public void import_instruction(ArrayList<String> text) {
-		 s.importInstruction(text);
-		
+		s.importInstruction(text);
+
 	}
-
-
 
 }
