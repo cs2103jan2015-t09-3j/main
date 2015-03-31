@@ -1,0 +1,12 @@
+Welcome to CONE Organizer!!!!!
+
+Basic Functions:
+
+1. Adding function
+
+-> "add meeting"
+-> "add meeting - today"
+-> "add meeting - today 5pm"
+-> "add meeting - from today 5pm to tomorrow"
+
+end.

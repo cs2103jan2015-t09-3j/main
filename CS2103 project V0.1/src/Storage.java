@@ -77,4 +77,33 @@ public class Storage {
 			System.out.println(e);
 		}
 	}
+
+	public void importInstruction(ArrayList<String> text) {
+		String temp= new String();
+		
+		File instruction = new File("instruction.txt");
+		
+		try {
+			BufferedReader br = new BufferedReader(new FileReader(instruction));
+		
+
+			// if not, copy the file to the ArrayList Tasks
+			// at the Tasks.detail && .date
+			
+			
+			while(!(temp = br.readLine().toString()).contains("end")){
+				text.add(temp+"\n");
+			}
+			br.close();
+		}
+		 catch (IOException e) {
+			System.out.println(e);
+		 }
+		
+	}
 }
+		
+	
+
+	
+

@@ -302,4 +302,11 @@ public class Logic {
 
 	}
 
+	public void import_instruction(ArrayList<String> text) {
+		 s.importInstruction(text);
+		
+	}
+
+
+
 }

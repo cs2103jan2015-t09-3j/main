@@ -6,12 +6,14 @@ import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 
 import javax.imageio.ImageIO;
 import javax.swing.JButton;
@@ -34,7 +36,7 @@ public class UI extends JFrame {
 	static ArrayList<Tasks> list;
 	static JLabel bg;
 	static JLabel feedbacks;
-	static JButton send_button;
+	static JButton command_reference_button,send_button;
 	static JPanel input_panel;
 	static JPanel bg_panel, feedback_panel, table_panel;
 	static JTextField text_field = new JTextField(40);
@@ -43,6 +45,8 @@ public class UI extends JFrame {
 	static BufferedImage image;
 	static final String[] columns = { "Task no.", "Task Description", "Start Date", "End Date" };
 	static DefaultTableModel tableModel = new DefaultTableModel(columns, 0);
+
+
 
 	public UI() {
 		setTitle("test Program");
@@ -53,6 +57,7 @@ public class UI extends JFrame {
 
 		input_panel = new JPanel();
 		bg_panel = new JPanel();
+		command_reference_button = new JButton("Reference");
 		send_button = new JButton("send");
 		table = new JTable(tableModel) {
 			{
@@ -105,6 +110,7 @@ public class UI extends JFrame {
 		table_panel.setOpaque(false);
 
 		input_panel.setLayout(new FlowLayout(2));
+		input_panel.add(command_reference_button);
 		input_panel.add(text_field);
 		input_panel.add(send_button);
 		table_panel.add(scrollbar);
@@ -183,10 +189,37 @@ public class UI extends JFrame {
 				public void actionPerformed(ActionEvent e) {
 					input = text_field.getText();
 					text_field.setText("");
-					String feedback = new String(DEFAULT_STRING);
+					String feedback = DEFAULT_STRING;
 					feedback = l.executeCommand(input, list);
 					printList(list,"");
 					printFeedback(feedback);
+					
+				}
+			});
+			command_reference_button.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {					
+					final JFrame reference=new JFrame("Command Reference");
+					reference.setVisible(true);
+					reference.setSize(700, 500);
+					reference.setLayout(new FlowLayout(3));
+					final JPanel reference_panel = new JPanel();
+					reference_panel.setLayout(new GridLayout(20,1));
+					ArrayList<String> text = new ArrayList<String>(); 
+					l.import_instruction(text);
+					for(int i=0; i<text.size(); i++){
+						
+							JLabel content = new JLabel();
+							content.setText(text.get(i));
+							reference_panel.add(content);
+							
+						
+					}
+					
+					reference.add(reference_panel);
+					reference.revalidate();
+					reference.repaint();
+					
+
 				}
 			});
 			temp = input;
