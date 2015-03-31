@@ -39,6 +39,8 @@ public class Storage {
 					return temp_list;
 				}
 				temp.detail = temp.detail.substring(index + 1);
+				temp.startDate= temp.startDate.substring(1);
+				temp.endDate= temp.endDate.substring(1);
 				temp_list.add(temp);
 			}
 			br.close();
