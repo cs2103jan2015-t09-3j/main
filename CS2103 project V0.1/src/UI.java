@@ -4,6 +4,8 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
+import java.awt.Font;
+import java.awt.FontMetrics;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.GridLayout;
@@ -28,6 +30,7 @@ import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumnModel;
+import javax.swing.table.TableModel;
 
 @SuppressWarnings("serial")
 public class UI extends JFrame {
@@ -96,6 +99,12 @@ public class UI extends JFrame {
 				super.paintComponent(g);
 			}
 		};
+		
+		String name = tableModel.getColumnName(0);
+		Font f = table.getFont();
+		FontMetrics fm = table.getFontMetrics(f);
+		int width = fm.stringWidth(name);
+		table.getColumnModel().getColumn(0).setPreferredWidth(width);
 
 		table.setPreferredScrollableViewportSize(new Dimension(700, 100));
 		table.setFillsViewportHeight(true);
