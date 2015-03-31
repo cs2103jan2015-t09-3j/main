@@ -84,8 +84,9 @@ public class Logic {
 	}
 
 	private void sortList(ArrayList<Tasks> list) {
-		sortByMark(list);
+		
 		sortByDate(list);
+		sortByMark(list);
 	}
 
 	private void sortByMark(ArrayList<Tasks> list) {
