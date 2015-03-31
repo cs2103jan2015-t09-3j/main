@@ -36,7 +36,7 @@ public class Logic {
 		cmd = new Tasks();
 		command_type = p.parse(input, cmd);
 		feedback = implementCommand(command_type, cmd, list, feedback);
-		sortList();
+//		sortList(list);
 		return feedback;
 	}
 
@@ -80,16 +80,16 @@ public class Logic {
 		}
 	}
 
-	private void sortList(){
+	private void sortList(ArrayList<Tasks> list){
 		try {
-			sortByMark();
+			sortByMark(list);
 		} catch (ParseException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
 	}
 	
-	private void sortByMark() throws ParseException {
+	private void sortByMark(ArrayList<Tasks> list) throws ParseException {
 		 ArrayList<Tasks> markList = new ArrayList<Tasks>();
 		 markList.addAll(list);
 		 list.clear();

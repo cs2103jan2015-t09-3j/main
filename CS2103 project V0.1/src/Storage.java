@@ -12,7 +12,7 @@ public class Storage {
 	ArrayList<Tasks> temp_list = new ArrayList<Tasks>();
 	
 	public void changeDirectory(String directory){
-		file = new File(directory+ "Cone.txt");
+		file = new File(directory+ "\\Cone.txt");
 	}
 	
 	public ArrayList<Tasks> readFromFile() {
