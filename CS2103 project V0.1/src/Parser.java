@@ -39,26 +39,20 @@ public class Parser {
 	
 			int index2 = input.indexOf("-");
 			cmd.detail = input.substring(index+1,index2);
-			int start = input.indexOf("from");
-			int end = input.indexOf("to");
+		
+			String date_input;
+			date_input=input.substring(index2+2, input.length());	
+			
+			group=getNattyDateGroup(date_input);
+			String date = group.getDates().toString();
+			int start = date.indexOf(",");
 			if(start!=-1){
-				String startDate = input.substring(start+4, end);
-				String endDate = input.substring(end+2, input.length());
-				group=getNattyDateGroup(startDate);
-				cmd.startDate = group.getDates().toString();	
-				group=getNattyDateGroup(endDate);
-				cmd.endDate = group.getDates().toString();	
+				cmd.startDate = date.substring(1, start);
+				cmd.endDate = date.substring(start+1, date.length());
 			}
 			else{
-				String date_input;
-				date_input=input.substring(index2+2, input.length());
-			
-				if(!date_input.equals("none")){			
-					group=getNattyDateGroup(date_input);
-					cmd.endDate = group.getDates().toString();	
-				}
+				cmd.endDate = date;
 			}
-			
 	}
 	
 	public void floating(String input, Tasks cmd, int index){
