@@ -43,6 +43,10 @@ public class Logic {
 	public String implementCommand(String command_type, Tasks cmd,
 			ArrayList<Tasks> list, String feedback) {
 		switch (command_type) {
+		case "cd":{
+			s.changeDirectory(cmd.detail);
+			return saveCommand(list);
+		}
 		case "add": {
 			return addCommand(cmd, list);
 		}

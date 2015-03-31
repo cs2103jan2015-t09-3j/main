@@ -10,6 +10,11 @@ import java.util.*;
 public class Storage {
 	static File file = new File("Cone.txt");
 	ArrayList<Tasks> temp_list = new ArrayList<Tasks>();
+	
+	public void changeDirectory(String directory){
+		file = new File(directory+ "Cone.txt");
+	}
+	
 	public ArrayList<Tasks> readFromFile() {
 		Tasks temp = new Tasks();
 		// if file is empty, return the default Tasks
