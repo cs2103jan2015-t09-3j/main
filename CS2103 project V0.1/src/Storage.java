@@ -31,14 +31,16 @@ public class Storage {
 			while (null != (line = br.readLine())) {
 				temp = new Tasks();
 				temp.detail = line;
-				temp.date = br.readLine();
+				temp.startDate = br.readLine();
+				temp.endDate = br.readLine();
 				int index = temp.detail.indexOf(' ');
 				if (index == -1) {
 					System.out.println("File invalid, label your tasks");
 					return temp_list;
 				}
 				temp.detail = temp.detail.substring(index + 1);
-				temp.date = temp.date.substring(1);
+				temp.startDate = temp.startDate.substring(1);
+				temp.endDate = temp.endDate.substring(1);
 				temp_list.add(temp);
 			}
 			br.close();
@@ -67,7 +69,9 @@ public class Storage {
 			for (int i = 0; i < size; i++) {
 				bw.write(i + 1 + ". " + list.get(i).detail.toString());
 				bw.newLine();
-				bw.write("\t" + list.get(i).date.toString());
+				bw.write("\t" + list.get(i).startDate.toString());
+				bw.newLine();
+				bw.write("\t" + list.get(i).endDate.toString());
 				bw.newLine();
 			}
 			bw.close();

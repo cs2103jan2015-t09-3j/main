@@ -79,7 +79,7 @@ public class Logic {
 		}
 		}
 	}
-
+/*
 	private void sortList(ArrayList<Tasks> list){
 		try {
 			sortByMark(list);
@@ -111,7 +111,7 @@ public class Logic {
 			 }
 		 }
 	}
-	
+/*	
 	private void sortByDate(ArrayList<Tasks> parselist) throws ParseException {
 		 ArrayList<Tasks> dateList = new ArrayList<Tasks>();
 		 dateList.addAll(parselist);
@@ -168,7 +168,7 @@ public class Logic {
 			}  
 		}
 	}
-
+*/
 
 	/**
 	 * This method imports items in the text file currently saved in same
@@ -286,7 +286,7 @@ public class Logic {
 
 		for (int i = 0; i < list.size(); i++) {
 			if (list.get(i).detail.toLowerCase().contains(cmd.detail)
-					|| list.get(i).date.contains(cmd.detail)) {
+					|| list.get(i).startDate.contains(cmd.detail) || list.get(i).endDate.contains(cmd.detail)) {
 				return "search " + detail;
 
 			}

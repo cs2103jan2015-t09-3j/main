@@ -124,8 +124,8 @@ public class UI extends JFrame {
 		feedback_panel.add(feedbacks);
 		if(text.contains("edit ")){
 			int index = Integer.parseInt(text.substring(text.indexOf(' ')+1, text.length()));
-			text_field.setText("add "+list.get(index-1).detail+" - "+list.get(index-1).date);
-			feedbacks.setText("Old task : "+ list.get(index-1).detail + "       Old Date : "+list.get(index-1).date);
+			text_field.setText("add "+list.get(index-1).detail+" - from "+list.get(index-1).startDate+" to "+list.get(index-1).endDate);
+			feedbacks.setText("Old task : "+ list.get(index-1).detail + "       Old Date : "+list.get(index-1).startDate+" ~ "+list.get(index-1).endDate);
 		}
 		else if(text.contains("search ")){
 			String keyword = text.substring(text.indexOf(' ')+1, text.length());
@@ -196,11 +196,12 @@ public class UI extends JFrame {
 	protected static void printList(ArrayList<Tasks> list, String keyword) {
 		clearTable();
 		for (int i = 0; i < list.size(); i++) {
-			if(list.get(i).detail.contains(keyword) || list.get(i).date.contains(keyword)){
+			if(list.get(i).detail.contains(keyword) || list.get(i).startDate.contains(keyword) || list.get(i).endDate.contains(keyword)){
 				int taskNum = i + 1;
 				String task = list.get(i).detail;
-				String date = list.get(i).date;
-				Object[] data = { taskNum, task, date };
+				String startDate = list.get(i).startDate;
+				String endDate = list.get(i).endDate;
+				Object[] data = { taskNum, task, startDate, endDate };
 				tableModel.addRow(data);
 			}
 		}
