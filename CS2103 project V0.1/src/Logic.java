@@ -135,12 +135,11 @@ public class Logic {
 						+ list.get(i).endDate.substring(17, 19));
 				datelist.add(sorter);
 			}
-
 		}
-		while (!datelist.isEmpty()) {
+			
 			boolean value_same = false;
 			compareYear(indexlist, value_same, datelist);
-		}
+			
 			modifyList(indexlist, list, nodatelist);
 		
 
