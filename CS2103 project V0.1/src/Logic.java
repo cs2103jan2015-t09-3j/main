@@ -15,8 +15,7 @@ public class Logic {
 	ArrayList<Tasks> tempList = new ArrayList<Tasks>();
 	ArrayList<Tasks> currList = new ArrayList<Tasks>();
 	static String command_type = DEFAULT_STRING;
-	int tmp;
-	int index;
+
 
 	int edit = 0;
 
@@ -213,18 +212,8 @@ public class Logic {
 
 	private void compareTimes(ArrayList<Integer> indexlist, boolean value_same,
 			ArrayList<DateSorter> datelist) {
-		ArrayList<DateSorter> temp = new ArrayList<DateSorter>();
 		if (!datelist.isEmpty()) {
-			tmp = datelist.get(0).time;
-			index = 0;
-			for (int i = 1; i < datelist.size(); i++) {
-
-				if (tmp > datelist.get(i).time) {
-					tmp = datelist.get(i).time;
-					index = i;
-				}
-
-			}
+			int index = findSmallestTime(datelist);
 			indexlist.add(datelist.get(index).index);
 			datelist.remove(index);
 			for (int i = 0; i < datelist.size(); i++) {
@@ -238,25 +227,31 @@ public class Logic {
 		}
 	}
 
+	public int findSmallestTime(ArrayList<DateSorter> datelist) {
+		int tmp = datelist.get(0).time;
+		int index = 0;
+		for (int i = 1; i < datelist.size(); i++) {
+
+			if (tmp > datelist.get(i).time) {
+				tmp = datelist.get(i).time;
+				index = i;
+			}
+
+		}
+		return index;
+	}
+
 	private void compareDay(ArrayList<Integer> indexlist, boolean value_same,
 			ArrayList<DateSorter> datelist) {
 		ArrayList<DateSorter> temp = new ArrayList<DateSorter>();
 		if (!datelist.isEmpty()) {
-			tmp = datelist.get(0).day;
-			index = 0;
-			for (int i = 1; i < datelist.size(); i++) {
-
-				if (tmp > datelist.get(i).day) {
-					tmp = datelist.get(i).day;
-					index = i;
-				}
-
-			}
+			int index = findSmallestDay(datelist);
 			temp.add(datelist.get(index));
+			int tmp = datelist.get(index).day;
 			datelist.remove(index);
 			for (int i = 0; i < datelist.size(); i++) {
 
-				if (datelist.get(i).day == tmp) {
+				if (datelist.get(i).day==tmp) {
 					value_same = true;
 					temp.add(datelist.get(i));
 					datelist.remove(i);
@@ -274,25 +269,33 @@ public class Logic {
 		}
 	}
 
+	public int findSmallestDay(ArrayList<DateSorter> datelist) {
+		int tmp = datelist.get(0).day;
+		int index = 0;
+		for (int i = 1; i < datelist.size(); i++) {
+
+			if (tmp > datelist.get(i).day) {
+				tmp = datelist.get(i).day;
+				index = i;
+			}
+
+		}
+		return index;
+	}
+
 	private void compareMonth(ArrayList<Integer> indexlist, boolean value_same,
 			ArrayList<DateSorter> datelist) {
 		ArrayList<DateSorter> temp = new ArrayList<DateSorter>();
 		if (!datelist.isEmpty()) {
-			tmp = datelist.get(0).month;
-			index = 0;
-			for (int i = 1; i < datelist.size(); i++) {
-
-				if (tmp > datelist.get(i).month) {
-					tmp = datelist.get(i).month;
-					index = i;
-				}
-
-			}
+			
+			int index =findSmallestMonth(datelist);
 			temp.add(datelist.get(index));
+			int tmp = datelist.get(index).month;
 			datelist.remove(index);
+			
 			for (int i = 0; i < datelist.size(); i++) {
 
-				if (datelist.get(i).month == tmp) {
+				if (datelist.get(i).month==tmp) {
 					value_same = true;
 					temp.add(datelist.get(i));
 					datelist.remove(i);
@@ -309,22 +312,28 @@ public class Logic {
 		}
 	}
 
+	public int findSmallestMonth(ArrayList<DateSorter> datelist) {
+		int tmp = datelist.get(0).month;
+		int index = 0;
+		for (int i = 1; i < datelist.size(); i++) {
+
+			if (tmp > datelist.get(i).month) {
+				tmp = datelist.get(i).month;
+				index = i;
+			}
+
+		}
+		return index;
+	}
+
 	private void compareYear(ArrayList<Integer> indexlist, boolean value_same,
 			ArrayList<DateSorter> datelist) {
 		ArrayList<DateSorter> temp = new ArrayList<DateSorter>();
 
 		if (!datelist.isEmpty()) {
-			tmp = datelist.get(0).year;
-			index = 0;
-			for (int i = 1; i < datelist.size(); i++) {
-
-				if (tmp > datelist.get(i).year) {
-					tmp = datelist.get(i).year;
-					index = i;
-				}
-
-			}
+			int index = findSmallestYear(datelist);
 			temp.add(datelist.get(index));
+			int tmp = datelist.get(index).year;
 			datelist.remove(index);
 
 			for (int i = 0; i < datelist.size(); i++) {
@@ -347,6 +356,20 @@ public class Logic {
 				compareYear(indexlist, value_same, datelist);
 			}
 		}
+	}
+
+	public int findSmallestYear(ArrayList<DateSorter> datelist) {
+		int tmp = datelist.get(0).year;
+		int index = 0;
+		for (int i = 1; i < datelist.size(); i++) {
+
+			if (tmp > datelist.get(i).year) {
+				tmp = datelist.get(i).year;
+				index = i;
+			}
+
+		}
+		return index;
 	}
 
 	/**

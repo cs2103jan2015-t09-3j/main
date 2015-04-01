@@ -181,6 +181,7 @@ public class UI extends JFrame {
 
 		UI GUI = new UI();
 		list = l.import_From_File(list);
+		printFeedback("Displaying All Tasks:");
 		printWhat(print_what,list,"");
 
 		takeInputs(GUI);
