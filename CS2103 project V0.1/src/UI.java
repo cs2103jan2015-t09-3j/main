@@ -32,7 +32,7 @@ import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableModel;
-
+//
 @SuppressWarnings("serial")
 public class UI extends JFrame {
 	private static final String DEFAULT_STRING = "none";
