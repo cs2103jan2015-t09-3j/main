@@ -60,7 +60,7 @@ public class Parser {
 			cmd.detail = input.substring(index+1, input.length());
 		
 	}
-	private DateGroup getNattyDateGroup(String date_input) {
+	public DateGroup getNattyDateGroup(String date_input) {
 		com.joestelmach.natty.Parser parser = new com.joestelmach.natty.Parser();
 		List<DateGroup> groups = parser.parse(date_input);
 		if (!groups.isEmpty()) {
@@ -70,4 +70,5 @@ public class Parser {
 			return null;
 		}
 	}
+	
 }

@@ -114,25 +114,14 @@ public class Logic {
 		ArrayList<DateSorter> datelist = new ArrayList<DateSorter>();
 
 		for (int i = 0; i < list.size(); i++) {
-			sorter = new DateSorter();
+			
 			if (list.get(i).endDate.equals("none")) {
 				nodatelist.add(list.get(i));
 				list.remove(i);
 				i--;
 			} 
 			else {
-
-				sorter.index = i;
-				sorter.year = Integer.parseInt(list.get(i).endDate.substring(
-						24, 28));
-				sorter.month = returnNumMonth(list.get(i).endDate.substring(4,
-						7));
-				sorter.day = Integer.parseInt(list.get(i).endDate.substring(8,
-						10));
-				sorter.time = Integer.parseInt(list.get(i).endDate.substring(
-						11, 13)
-						+ list.get(i).endDate.substring(14, 16)
-						+ list.get(i).endDate.substring(17, 19));
+				sorter = initializeDateSorter(list.get(i).endDate,i);
 				datelist.add(sorter);
 			}
 		}
@@ -143,6 +132,24 @@ public class Logic {
 			modifyList(indexlist, list, nodatelist);
 		
 
+	}
+
+	public DateSorter initializeDateSorter(String date, int i) {
+		DateSorter sorter;
+		sorter = new DateSorter();
+
+		sorter.index = i;
+		sorter.year = Integer.parseInt(date.substring(
+				24, date.length()));
+		sorter.month = returnNumMonth(date.substring(4,
+				7));
+		sorter.day = Integer.parseInt(date.substring(8,
+				10));
+		sorter.time = Integer.parseInt(date.substring(
+				11, 13)
+				+ date.substring(14, 16)
+				+ date.substring(17, 19));
+		return sorter;
 	}
 
 	private int returnNumMonth(String month) {
@@ -478,6 +485,59 @@ public class Logic {
 	public void import_instruction(ArrayList<String> text) {
 		s.importInstruction(text);
 
+	}
+
+	public String parseDate(String date) {
+		return (p.getNattyDateGroup(date)).getDates().toString();
+		
+	}
+	public boolean sameTime(DateSorter sorter_today, DateSorter sorter_list){
+		if(sameDay(sorter_today, sorter_list)){
+			if(sorter_today.time==sorter_list.time){
+				return true;
+			}
+		}
+		return false;
+	}
+
+	public boolean sameDay(DateSorter sorter_today, DateSorter sorter_list) {
+		if(sameMonth(sorter_today,sorter_list)){
+			if(sorter_today.day == sorter_list.day){
+				return true;
+			}
+		}
+		return false;
+	}
+
+	public boolean sameMonth(DateSorter sorter_today, DateSorter sorter_list) {
+		if(sameYear(sorter_today,sorter_list)){
+			if(sorter_today.month==sorter_list.month){
+				return true;
+			}
+		}
+		return false;
+	}
+
+	public boolean sameYear(DateSorter sorter_today, DateSorter sorter_list) {
+		if(sorter_today.year==sorter_list.year){
+			return true;
+		}
+		return false;
+	}
+
+	public boolean sameWeek(DateSorter sorter_today, DateSorter sorter_list, DateSorter sorter_next_week) {
+		if(sameMonth(sorter_today, sorter_list)){
+			if(sorter_list.day-sorter_today.day<=7){
+				return true;
+			}
+		}
+		else if(sameMonth(sorter_next_week,sorter_list)) {
+			if(sorter_next_week.day-sorter_list.day <=6){
+				return true;
+			}
+			
+		}
+		return false;
 	}
 
 }
