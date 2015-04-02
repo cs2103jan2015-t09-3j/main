@@ -144,8 +144,8 @@ public class Logic {
 		sorter = new DateSorter();
 
 		sorter.index = i;
-		//sorter.year = Integer.parseInt(date.substring(
-			//	24, date.length()));
+//		sorter.year = Integer.parseInt(date.substring(
+//				24, date.length()));
 		sorter.month = returnNumMonth(date.substring(4,
 				7));
 		sorter.day = Integer.parseInt(date.substring(8,

@@ -48,6 +48,7 @@ public class Parser {
 			
 			String date = group.getDates().toString();
 			int start = date.indexOf(",");
+			
 			String startDate, endDate;
 			
 			if(start!=-1){
