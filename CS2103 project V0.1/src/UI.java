@@ -32,7 +32,7 @@ import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableModel;
-//
+
 @SuppressWarnings("serial")
 public class UI extends JFrame {
 	private static final String DEFAULT_STRING = "none";
@@ -294,18 +294,22 @@ public class UI extends JFrame {
 			String keyword) {
 		switch (printWhat) {
 		case "weeks": {
+			
 			printList_weeks(list, keyword);
 			break;
 		}
 		case "today": {
+			
 			printList_today(list, keyword);
 			break;
 		}
 		case "month": {
+			
 			printList_month(list, keyword);
 			break;
 		}
 		case "entire": {
+			
 			printList_entire(list, keyword);
 			break;
 		}

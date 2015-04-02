@@ -3,7 +3,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
-//
+
 public class Logic {
 	private static final String DEFAULT_STRING = "none";
 	private static final String FAILURE = "OPERATION FAILED!!";
@@ -38,7 +38,9 @@ public class Logic {
 		cmd = new Tasks();
 		command_type = p.parse(input, cmd);
 		feedback = implementCommand(command_type, cmd, list, feedback);
+		if(edit==0){
 		sortList(list);
+		}
 		return feedback;
 	}
 
@@ -82,7 +84,7 @@ public class Logic {
 		}
 	}
 
-	private void sortList(ArrayList<Tasks> list) {
+	void sortList(ArrayList<Tasks> list) {
 		
 		sortByDate(list);
 		sortByMark(list);
@@ -107,7 +109,7 @@ public class Logic {
 	}
 
 	private void sortByDate(ArrayList<Tasks> list) {
-		DateSorter sorter = new DateSorter();
+		DateSorter sorter ;
 		ArrayList<Integer> indexlist = new ArrayList<Integer>();
 		ArrayList<Tasks> nodatelist = new ArrayList<Tasks>();
 		ArrayList<DateSorter> datelist = new ArrayList<DateSorter>();
@@ -116,20 +118,24 @@ public class Logic {
 			
 			if (list.get(i).endDate.equals("none")) {
 				nodatelist.add(list.get(i));
-				list.remove(i);
-				i--;
+				
+				
 			} 
 			else {
+				sorter = new DateSorter();
 				sorter = initializeDateSorter(list.get(i).endDate,i);
 				datelist.add(sorter);
 			}
+			
+			
 		}
 			
 			boolean value_same = false;
 			compareYear(indexlist, value_same, datelist);
 			
+			
 			modifyList(indexlist, list, nodatelist);
-		
+			
 
 	}
 
@@ -203,26 +209,18 @@ public class Logic {
 			for (int i = 0; i < nodatelist.size(); i++) {
 				temp.add(nodatelist.get(i));
 			}
-			if(!list.isEmpty())
-			list.clear();
-			list.addAll(temp);
-
 		}
+		list.clear();
+		list.addAll(temp);
 	}
 
 	private void compareTimes(ArrayList<Integer> indexlist, boolean value_same,
 			ArrayList<DateSorter> datelist) {
-		if (!datelist.isEmpty()) {
+		while (!datelist.isEmpty()) {
 			int index = findSmallestTime(datelist);
 			indexlist.add(datelist.get(index).index);
 			datelist.remove(index);
-			for (int i = 0; i < datelist.size(); i++) {
-
-				indexlist.add(datelist.get(i).index);
-				datelist.remove(i);
-				i--;
-
-			}
+			
 
 		}
 	}
@@ -244,9 +242,10 @@ public class Logic {
 	private void compareDay(ArrayList<Integer> indexlist, boolean value_same,
 			ArrayList<DateSorter> datelist) {
 		ArrayList<DateSorter> temp = new ArrayList<DateSorter>();
-		if (!datelist.isEmpty()) {
+		while (!datelist.isEmpty()) {
 			int index = findSmallestDay(datelist);
-			temp.add(datelist.get(index));
+			DateSorter temp_obj = datelist.get(index);
+			temp.add(temp_obj);
 			int tmp = datelist.get(index).day;
 			datelist.remove(index);
 			for (int i = 0; i < datelist.size(); i++) {
@@ -260,11 +259,12 @@ public class Logic {
 
 			}
 			if (value_same == false) {
-				indexlist.add(datelist.get(index).index);
+				indexlist.add(temp_obj.index);
 
 			} else {
+				value_same = false;
 				compareTimes(indexlist, value_same, temp);
-				compareDay(indexlist, value_same, datelist);
+
 			}
 		}
 	}
@@ -286,10 +286,11 @@ public class Logic {
 	private void compareMonth(ArrayList<Integer> indexlist, boolean value_same,
 			ArrayList<DateSorter> datelist) {
 		ArrayList<DateSorter> temp = new ArrayList<DateSorter>();
-		if (!datelist.isEmpty()) {
+		while (!datelist.isEmpty()) {
 			
 			int index =findSmallestMonth(datelist);
-			temp.add(datelist.get(index));
+			DateSorter temp_obj = datelist.get(index);
+			temp.add(temp_obj);
 			int tmp = datelist.get(index).month;
 			datelist.remove(index);
 			
@@ -304,10 +305,10 @@ public class Logic {
 
 			}
 			if (value_same == false) {
-				indexlist.add(datelist.get(index).index);
+				indexlist.add(temp_obj.index);
 			} else {
+				value_same = false;
 				compareDay(indexlist, value_same, temp);
-				compareMonth(indexlist, value_same, datelist);
 			}
 		}
 	}
@@ -315,6 +316,7 @@ public class Logic {
 	public int findSmallestMonth(ArrayList<DateSorter> datelist) {
 		int tmp = datelist.get(0).month;
 		int index = 0;
+		
 		for (int i = 1; i < datelist.size(); i++) {
 
 			if (tmp > datelist.get(i).month) {
@@ -330,15 +332,17 @@ public class Logic {
 			ArrayList<DateSorter> datelist) {
 		ArrayList<DateSorter> temp = new ArrayList<DateSorter>();
 
-		if (!datelist.isEmpty()) {
+		while (!datelist.isEmpty()) {
 			int index = findSmallestYear(datelist);
-			temp.add(datelist.get(index));
+			DateSorter temp_obj = datelist.get(index);
+			temp.add(temp_obj);
 			int tmp = datelist.get(index).year;
+			
 			datelist.remove(index);
 
 			for (int i = 0; i < datelist.size(); i++) {
 
-				if (datelist.get(i).year == tmp) {
+				if (datelist.get(i).year == tmp ) {
 					value_same = true;
 					temp.add(datelist.get(i));
 					datelist.remove(i);
@@ -349,11 +353,13 @@ public class Logic {
 			}
 
 			if (value_same == false) {
-				indexlist.add(datelist.get(index).index);
+				indexlist.add(temp_obj.index);
 
 			} else {
+				value_same = false;
 				compareMonth(indexlist, value_same, temp);
-				compareYear(indexlist, value_same, datelist);
+
+
 			}
 		}
 	}
@@ -361,6 +367,7 @@ public class Logic {
 	public int findSmallestYear(ArrayList<DateSorter> datelist) {
 		int tmp = datelist.get(0).year;
 		int index = 0;
+	
 		for (int i = 1; i < datelist.size(); i++) {
 
 			if (tmp > datelist.get(i).year) {
@@ -369,6 +376,8 @@ public class Logic {
 			}
 
 		}
+		
+		
 		return index;
 	}
 
@@ -412,10 +421,13 @@ public class Logic {
 			list.add(cmd);
 			return cmd.detail + " has been successfully added!";
 		} else {
+			String msg = list.get(edit-1).detail;
 
 			replaceItem(list, cmd, edit);
+			
 			edit = 0;
-			return list.get(edit).detail + " has been successfully edited!";
+			
+			return msg + " has been successfully edited!";
 		}
 
 	}
@@ -427,8 +439,9 @@ public class Logic {
 
 		int index;
 		index = Integer.parseInt(cmd.detail);
+		String msg = cmd.detail;
 		list.remove(index - 1);
-		return cmd.detail + "has been deleted successfully!";
+		return msg + " has been deleted successfully!";
 	}
 
 	private String saveCommand(ArrayList<Tasks> list) {

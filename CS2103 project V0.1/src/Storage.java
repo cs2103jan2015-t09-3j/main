@@ -6,7 +6,7 @@ import java.io.FileWriter;
 import java.io.IOException;
 import java.io.RandomAccessFile;
 import java.util.*;
-//
+
 public class Storage {
 	static File file = new File("Cone.txt");
 	ArrayList<Tasks> temp_list = new ArrayList<Tasks>();
