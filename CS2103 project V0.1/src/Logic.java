@@ -263,9 +263,13 @@ public class Logic {
 
 			} else {
 				value_same = false;
-				compareTimes(indexlist, value_same, temp);
+				if(temp.size()!=1){
+					compareTimes(indexlist, value_same, temp);
+					}
+				
 
 			}
+			temp.clear();
 		}
 	}
 
@@ -274,7 +278,7 @@ public class Logic {
 		int index = 0;
 		for (int i = 1; i < datelist.size(); i++) {
 
-			if (tmp > datelist.get(i).day) {
+			if (tmp > datelist.get(i).day ) {
 				tmp = datelist.get(i).day;
 				index = i;
 			}
@@ -308,8 +312,17 @@ public class Logic {
 				indexlist.add(temp_obj.index);
 			} else {
 				value_same = false;
+				if(temp.size()>1){
 				compareDay(indexlist, value_same, temp);
+				
+				}
+				
 			}
+			temp.clear();
+				
+
+
+			
 		}
 	}
 
@@ -357,10 +370,14 @@ public class Logic {
 
 			} else {
 				value_same = false;
-				compareMonth(indexlist, value_same, temp);
+				if(temp.size()!=1){
+					compareMonth(indexlist, value_same, temp);
+					}
+				
 
 
 			}
+			temp.clear();
 		}
 	}
 
@@ -512,9 +529,10 @@ public class Logic {
 	}
 
 	private void replaceItem(ArrayList<Tasks> list, Tasks cmd, int index) {
-		list.add(index - 1, cmd);
+		
 
-		list.remove(index);
+		list.remove(index-1);
+		list.add(cmd);
 
 	}
 
