@@ -144,16 +144,15 @@ public class Logic {
 		sorter = new DateSorter();
 
 		sorter.index = i;
-		sorter.year = Integer.parseInt(date.substring(
-				24, date.length()));
+		//sorter.year = Integer.parseInt(date.substring(
+			//	24, date.length()));
 		sorter.month = returnNumMonth(date.substring(4,
 				7));
 		sorter.day = Integer.parseInt(date.substring(8,
 				10));
 		sorter.time = Integer.parseInt(date.substring(
 				11, 13)
-				+ date.substring(14, 16)
-				+ date.substring(17, 19));
+				+ date.substring(14, 16));
 		return sorter;
 	}
 
