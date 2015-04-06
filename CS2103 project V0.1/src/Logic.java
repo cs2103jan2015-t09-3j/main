@@ -252,16 +252,6 @@ public class Logic {
 		list.addAll(markSort);
 	}
 	
-	public Date getDate(String date_input){
-		DateGroup group= new DateGroup();
-		
-		group = p.getNattyDateGroup(date_input);
-		List<Date> dates = group.getDates();
-		Date date = dates.get(0);
-		
-		return date;
-	}
-	
 	private ArrayList<Task> getFloatTasks(ArrayList<Task> list){
 		ArrayList<Task> floating = new ArrayList<Task>();
 		
@@ -297,5 +287,15 @@ public class Logic {
 					Collections.swap(list, j, j+1);
 			}
 		}
+	}
+	
+	public Date getDate(String date_input){
+		DateGroup group= new DateGroup();
+		
+		group = p.getNattyDateGroup(date_input);
+		List<Date> dates = group.getDates();
+		Date date = dates.get(0);
+		
+		return date;
 	}
 }
