@@ -113,6 +113,7 @@ public class UI extends JFrame {
 		// table.setDefaultRenderer(String.class, new edittablerenderer());
 		final TableColumnModel columnModel = table.getColumnModel();
 		columnModel.getColumn(0).setMaxWidth(50);
+		columnModel.getColumn(0).setMinWidth(49);
 		columnModel.getColumn(1).setMinWidth(340);
 
 		String name = tableModel.getColumnName(0);
