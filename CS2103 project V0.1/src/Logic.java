@@ -298,43 +298,4 @@ public class Logic {
 			}
 		}
 	}
-
-	private ArrayList<Tasks> getTaskWithRange(ArrayList<Tasks> list, Date dateScope){
-		ArrayList<Tasks> temp = new ArrayList<Tasks>();	
-		Date today = getDate("23:59:59 today");
-		Date yesterday = getDate("23:59:59 yesterday");
-		
-		for(int i=0; i<list.size(); i++){
-			String date_input = list.get(i).endDate;
-			Date date = getDate(date_input);
-			
-			// get today's todo tasks
-			if(dateScope.equals(today)){
-				if(date.before(today) && date.after(yesterday))
-					temp.add(list.get(i));
-			}
-			
-			else{
-				if(!date.after(dateScope))
-					temp.add(list.get(i));
-			}
-		}
-		return temp;
-	}
-	
-	public ArrayList<Tasks> displayTasks(ArrayList<Tasks> list, String dateStr){
-		ArrayList<Tasks> floating = new ArrayList<Tasks>();	
-		ArrayList<Tasks> timed = new ArrayList<Tasks>();	
-		Date date = getDate(dateStr);
-		
-		floating.addAll(getFloatTasks(list));
-		timed.addAll(getTimedTasks(list));
-		floating.addAll(getTaskWithRange(timed, date));
-		
-		list.clear();
-		list.addAll(floating);
-		sortList(list);
-	
-		return list;
-	}
 }
