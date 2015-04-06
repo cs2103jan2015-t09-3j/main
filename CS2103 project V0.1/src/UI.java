@@ -52,7 +52,7 @@ public class UI extends JFrame {
 	static String input = DEFAULT_STRING;
 	static JTable table;
 	static BufferedImage image;
-	static final String[] columns = { "Task no.", "Task Description",
+	static final String[] columns = { "Task", "Task Description",
 			"Start Date", "End Date" };
 	protected static String print_what = "all";
 	static DefaultTableModel tableModel = new DefaultTableModel(columns, 0);
