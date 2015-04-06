@@ -1,6 +1,12 @@
 
 
+import java.text.Format;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+
+import org.junit.runners.model.FrameworkField;
 
 import com.joestelmach.natty.DateGroup;
 public class Parser {
@@ -45,17 +51,16 @@ public class Parser {
 			
 			group=getNattyDateGroup(date_input);
 			String date = group.getDates().toString();
-			int start = date.indexOf(",");
-			if(start!=-1){
-				cmd.startDate = date.substring(1, start);
-				cmd.startDate = trimDate(cmd.startDate);
-				cmd.endDate = date.substring(start+2, date.length()-1);
-				cmd.endDate = trimDate(cmd.endDate);
+			int pos = date.indexOf(",");
+			if(pos!=-1){
+				String start = date.substring(1, pos); 
+				cmd.startDate = formattedDate(start);
+				String end = date.substring(pos+2, date.length()-1);
+				cmd.endDate = formattedDate(end);
 			}
 			else{
-				cmd.startDate="";
-				cmd.endDate = date.substring(1, date.length()-1);
-				cmd.endDate = trimDate(cmd.endDate);
+				String due =  date.substring(1, date.length()-1);
+				cmd.endDate = formattedDate(due);
 			}
 	}
 	
@@ -74,10 +79,23 @@ public class Parser {
 			return null;
 		}
 	}
-	public String trimDate(String temp){
-		int first = temp.indexOf("SGT");
-		temp = temp.substring(0, first-4);
-		return temp;
+	
+	public Date getDate(String date_input){
+		DateGroup group= new DateGroup();
+		
+		group = getNattyDateGroup(date_input);
+		List<Date> dates = group.getDates();
+		Date date = dates.get(0);
+		
+		return date;
+	}
+	
+	public String formattedDate (String date_input){
+		Date date = getDate(date_input);
+		Format formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm EEE");
+		String s = formatter.format(date);
+		
+		return s;
 	}
 	
 }

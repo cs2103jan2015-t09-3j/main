@@ -1,12 +1,10 @@
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
-import java.util.Iterator;
 import java.util.List;
 
 import com.joestelmach.natty.DateGroup;
+import com.joestelmach.natty.generated.DateParser.parse_return;
 
 public class Logic {
 	private static final String DEFAULT_STRING = "none";
@@ -232,15 +230,34 @@ public class Logic {
 	}
 	
 	private void sortList(ArrayList<Tasks> list) {
-		sortByMark(list);
-	}
+		ArrayList<Tasks> todo = new ArrayList<Tasks>();
+		ArrayList<Tasks> todoSort = new ArrayList<Tasks>();
+		ArrayList<Tasks> mark = new ArrayList<Tasks>();
+		ArrayList<Tasks> markSort = new ArrayList<Tasks>();
 
+		for (int i = 0; i < list.size(); i++) {
+			if (list.get(i).detail.contains("(completed)")) 
+				mark.add(list.get(i));
+			else 
+				todo.add(list.get(i));
+		}
+		
+		todoSort.addAll(getFloatTasks(todo));
+		todoSort.addAll(getTimedTasks(todo));
+		markSort.addAll(getFloatTasks(mark));
+		markSort.addAll(getTimedTasks(mark));
+		
+		list.clear();
+		list.addAll(todoSort);
+		list.addAll(markSort);
+	}
+	
 	public Date getDate(String date_input){
 		DateGroup group= new DateGroup();
 		
 		group = p.getNattyDateGroup(date_input);
-		Date date = new Date();
-		date = group.getDates().get(0);
+		List<Date> dates = group.getDates();
+		Date date = dates.get(0);
 		
 		return date;
 	}
@@ -271,39 +288,15 @@ public class Logic {
 		for(int i=1; i<list.size();i++){
 			for(int j=0; j<list.size()-i; j++){
 				String date_input1 = list.get(j).endDate.toString();
-				Date date1 = getDate(date_input1);
+				Date date1 = p.getDate(date_input1);
 				
 				String date_input2 = list.get(j+1).endDate.toString();
-				Date date2 = getDate(date_input2);
+				Date date2 = p.getDate(date_input2);
 				
 				if(date2.before(date1))
 					Collections.swap(list, j, j+1);
 			}
 		}
-	}
-	
-	private void sortByMark(ArrayList<Tasks> list) {
-		ArrayList<Tasks> todo = new ArrayList<Tasks>();
-		ArrayList<Tasks> todoSort = new ArrayList<Tasks>();
-		ArrayList<Tasks> mark = new ArrayList<Tasks>();
-		ArrayList<Tasks> markSort = new ArrayList<Tasks>();
-
-		for (int i = 0; i < list.size(); i++) {
-			if (list.get(i).detail.contains("(completed)")) 
-				mark.add(list.get(i));
-			else 
-				todo.add(list.get(i));
-		}
-		
-		todoSort.addAll(getFloatTasks(todo));
-		todoSort.addAll(getTimedTasks(todo));
-		markSort.addAll(getFloatTasks(mark));
-		markSort.addAll(getTimedTasks(mark));
-		
-		list.clear();
-		list.addAll(todoSort);
-		list.addAll(markSort);
-
 	}
 
 	private ArrayList<Tasks> getTaskWithRange(ArrayList<Tasks> list, Date dateScope){
@@ -330,13 +323,18 @@ public class Logic {
 	}
 	
 	public ArrayList<Tasks> displayTasks(ArrayList<Tasks> list, String dateStr){
-		ArrayList<Tasks> temp = new ArrayList<Tasks>();	
-		temp.addAll(list);
-		
+		ArrayList<Tasks> floating = new ArrayList<Tasks>();	
+		ArrayList<Tasks> timed = new ArrayList<Tasks>();	
 		Date date = getDate(dateStr);
-		temp.addAll(getTaskWithRange(temp, date));
-		sortList(temp);
+		
+		floating.addAll(getFloatTasks(list));
+		timed.addAll(getTimedTasks(list));
+		floating.addAll(getTaskWithRange(timed, date));
+		
+		list.clear();
+		list.addAll(floating);
+		sortList(list);
 	
-		return temp;
+		return list;
 	}
 }
