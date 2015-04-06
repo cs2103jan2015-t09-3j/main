@@ -6,8 +6,6 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
-import org.junit.runners.model.FrameworkField;
-
 import com.joestelmach.natty.DateGroup;
 public class Parser {
 	DateGroup group= new DateGroup();
@@ -92,7 +90,7 @@ public class Parser {
 	
 	public String formattedDate (String date_input){
 		Date date = getDate(date_input);
-		Format formatter = new SimpleDateFormat("yyyy-MM-dd HH:mm EEE");
+		Format formatter = new SimpleDateFormat("dd-MMM HH:mm EEE");
 		String s = formatter.format(date);
 		
 		return s;
