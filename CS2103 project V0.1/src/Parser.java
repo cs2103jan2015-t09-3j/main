@@ -5,7 +5,6 @@ import java.util.List;
 import com.joestelmach.natty.DateGroup;
 public class Parser {
 	DateGroup group= new DateGroup();
-	DateGroup eg = new DateGroup();
 	static String command_type;
 	
 	//Parser part -- LIQI
@@ -45,22 +44,18 @@ public class Parser {
 			date_input=input.substring(index2+2, input.length());	
 			
 			group=getNattyDateGroup(date_input);
-			
 			String date = group.getDates().toString();
 			int start = date.indexOf(",");
-			
-			String startDate, endDate;
-			
 			if(start!=-1){
-				startDate = date.substring(1, start);
-				cmd.startDate = trimDate(startDate);
-				
-				endDate = date.substring(start+2, date.length()-1);
-				cmd.endDate = trimDate(endDate);
+				cmd.startDate = date.substring(1, start);
+				cmd.startDate = trimDate(cmd.startDate);
+				cmd.endDate = date.substring(start+2, date.length()-1);
+				cmd.endDate = trimDate(cmd.endDate);
 			}
 			else{
-				endDate = date.substring(1, date.length()-1);
-				cmd.endDate = trimDate(endDate);
+				cmd.startDate="";
+				cmd.endDate = date.substring(1, date.length()-1);
+				cmd.endDate = trimDate(cmd.endDate);
 			}
 	}
 	
@@ -69,7 +64,6 @@ public class Parser {
 			cmd.detail = input.substring(index+1, input.length());
 		
 	}
-	
 	public DateGroup getNattyDateGroup(String date_input) {
 		com.joestelmach.natty.Parser parser = new com.joestelmach.natty.Parser();
 		List<DateGroup> groups = parser.parse(date_input);
@@ -80,7 +74,6 @@ public class Parser {
 			return null;
 		}
 	}
-	
 	public String trimDate(String temp){
 		int first = temp.indexOf("SGT");
 		temp = temp.substring(0, first-4);

@@ -15,6 +15,7 @@ import java.awt.image.BufferedImage;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.Date;
 
 import javax.imageio.ImageIO;
 import javax.swing.JButton;
@@ -32,6 +33,7 @@ import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableModel;
+
 
 @SuppressWarnings("serial")
 public class UI extends JFrame {
@@ -193,7 +195,7 @@ public class UI extends JFrame {
 				image.getHeight(), BufferedImage.TYPE_INT_ARGB);
 
 		Graphics2D g2d = (Graphics2D) tmpImg.getGraphics();
-		g2d.setComposite(AlphaComposite.SrcOver.derive(0.15f));
+		g2d.setComposite(AlphaComposite.SrcOver.derive(0.3f));
 		// set the transparency level in range 0.0f - 1.0f
 		g2d.drawImage(image, 0, 0, null);
 		return tmpImg;
@@ -290,26 +292,24 @@ public class UI extends JFrame {
 		}
 	}
 
-	protected static void printWhat(String printWhat, ArrayList<Tasks> list,
-			String keyword) {
+	protected static void printWhat(String printWhat, ArrayList<Tasks> list, String keyword) {
+		
+		ArrayList<Tasks> displayList = new ArrayList<Tasks>();
+		
 		switch (printWhat) {
 		case "weeks": {
-			
-			printList_weeks(list, keyword);
+			printList_weeks(displayList, keyword);
 			break;
 		}
 		case "today": {
-			
-			printList_today(list, keyword);
+			printList_today(displayList, keyword);
 			break;
 		}
 		case "month": {
-			
-			printList_month(list, keyword);
+			printList_month(displayList, keyword);
 			break;
 		}
 		case "entire": {
-			
 			printList_entire(list, keyword);
 			break;
 		}
@@ -317,105 +317,38 @@ public class UI extends JFrame {
 
 	}
 
-	private static void printList_month(ArrayList<Tasks> list, String keyword) {
-
-		String today = l.parseDate("today");
-		today = today.substring(1, today.length() - 1);
-		String next_month = l.parseDate("next month");
-		next_month = next_month.substring(1, next_month.length() - 1);
-		clearTable();
-		DateSorter sorter_today = l.initializeDateSorter(today, -1);
-		DateSorter sorter_next_month = l.initializeDateSorter(next_month, -1);
-		DateSorter sorter_list;
-		for (int i = 0; i < list.size(); i++) {
-			
-			if (!list.get(i).endDate.equals(DEFAULT_STRING)) {
-				sorter_list = new DateSorter();
-				sorter_list = l.initializeDateSorter(list.get(i).endDate, i);
-				if (l.sameMonth(sorter_today, sorter_list)
-						|| l.sameMonth(sorter_next_month, sorter_list)) {
-					if (list.get(i).detail.contains(keyword)
-							|| list.get(i).startDate.contains(keyword)
-							|| list.get(i).endDate.contains(keyword)) {
-						int taskNum = i + 1;
-						String task = list.get(i).detail;
-						String startDate = list.get(i).startDate;
-						String endDate = list.get(i).endDate;
-						Object[] data = { taskNum, task, startDate, endDate };
-						tableModel.addRow(data);
-					}
-
-				}
-			}
-
-		}
-
-	}
-
 	private static void printList_today(ArrayList<Tasks> list, String keyword) {
-		String today = l.parseDate("today");
-		today = today.substring(1, today.length() - 1);
-		clearTable();
-		DateSorter sorter_today = l.initializeDateSorter(today, -1);
-		DateSorter sorter_list;
-		for (int i = 0; i < list.size(); i++) {
-			
-			if (!list.get(i).endDate.equals(DEFAULT_STRING)) {
-				sorter_list = new DateSorter();
-				sorter_list = l.initializeDateSorter(list.get(i).endDate, i);
-				if (l.sameDay(sorter_today, sorter_list)) {
-					if (list.get(i).detail.contains(keyword)
-							|| list.get(i).startDate.contains(keyword)
-							|| list.get(i).endDate.contains(keyword)) {
-						int taskNum = i + 1;
-						String task = list.get(i).detail;
-						String startDate = list.get(i).startDate;
-						String endDate = list.get(i).endDate;
-						Object[] data = { taskNum, task, startDate, endDate };
-						tableModel.addRow(data);
-					}
-
-				}
-			}
-
+		ArrayList<Tasks> sortedListD = new ArrayList<Tasks>();
+		String key = keyword;
+		Date today = l.getDate("23:59:59 today");
+		Date yesterday = l.getDate("23:59:59 yesterday");
+		
+		for (int i=0;i<list.size();i++) {
+			String dateStr = list.get(i).endDate;
+			Date date = l.getDate(dateStr);
+			if(date.after(yesterday) && date.before(today))
+				sortedListD.add(list.get(i));
 		}
-
+		printList(sortedListD, key);		
 	}
 
 	private static void printList_weeks(ArrayList<Tasks> list, String keyword) {
-		String today = l.parseDate("today");
-		today = today.substring(1, today.length() - 1);
-		String next_week = l.parseDate("next week");
-		next_week = next_week.substring(1, next_week.length() - 1);
-		clearTable();
-		DateSorter sorter_today = l.initializeDateSorter(today, -1);
-		DateSorter sorter_next_week = l.initializeDateSorter(next_week, -1);
-		DateSorter sorter_list;
-		for (int i = 0; i < list.size(); i++) {
-			
-			if (!list.get(i).endDate.equals(DEFAULT_STRING)) {
-				sorter_list = new DateSorter();
-				sorter_list = l.initializeDateSorter(list.get(i).endDate, i);
-				if (l.sameWeek(sorter_today, sorter_list,sorter_next_week)) {
-					if (list.get(i).detail.contains(keyword)
-							|| list.get(i).startDate.contains(keyword)
-							|| list.get(i).endDate.contains(keyword)) {
-						int taskNum = i + 1;
-						String task = list.get(i).detail;
-						String startDate = list.get(i).startDate;
-						String endDate = list.get(i).endDate;
-						Object[] data = { taskNum, task, startDate, endDate };
-						tableModel.addRow(data);
-					}
-
-				}
-			}
-
-		}
-
+		ArrayList<Tasks> sortedListW = new ArrayList<Tasks>();
+		sortedListW.addAll(l.displayTasks(list, "23:59:59 in 1 week" ));
+		printList(sortedListW, keyword);
+	}
+	
+	private static void printList_month(ArrayList<Tasks> list, String keyword) {
+		ArrayList<Tasks> sortedList = new ArrayList<Tasks>();
+		sortedList.addAll(l.displayTasks(list, "23:59:59 next month" ));
+		printList(sortedList, keyword);
+	}
+	
+	private static void printList_entire(ArrayList<Tasks> list, String keyword) {
+		printList(list, keyword);
 	}
 
-	protected static void printList_entire(ArrayList<Tasks> list, String keyword) {
+	protected static void printList(ArrayList<Tasks> list, String keyword) {
 		clearTable();
 		for (int i = 0; i < list.size(); i++) {
 			if (list.get(i).detail.contains(keyword)

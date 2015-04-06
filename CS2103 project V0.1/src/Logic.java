@@ -1,8 +1,11 @@
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+
+import com.joestelmach.natty.DateGroup;
 
 public class Logic {
 	private static final String DEFAULT_STRING = "none";
@@ -38,9 +41,7 @@ public class Logic {
 		cmd = new Tasks();
 		command_type = p.parse(input, cmd);
 		feedback = implementCommand(command_type, cmd, list, feedback);
-		if(edit==0){
 		sortList(list);
-		}
 		return feedback;
 	}
 
@@ -84,319 +85,8 @@ public class Logic {
 		}
 	}
 
-	void sortList(ArrayList<Tasks> list) {
-		
-		sortByDate(list);
-		sortByMark(list);
-	}
-
-	private void sortByMark(ArrayList<Tasks> list) {
-		ArrayList<Tasks> temp = new ArrayList<Tasks>();
-
-		for (int i = 0; i < list.size(); i++) {
-			if (list.get(i).detail.contains("(completed)")) {
-				temp.add(list.get(i));
-			}
-		}
-		for (int i = 0; i < list.size(); i++) {
-			if (!list.get(i).detail.contains("(completed)")) {
-				temp.add(list.get(i));
-			}
-		}
-		list.clear();
-		list.addAll(temp);
-
-	}
-
-	private void sortByDate(ArrayList<Tasks> list) {
-		DateSorter sorter ;
-		ArrayList<Integer> indexlist = new ArrayList<Integer>();
-		ArrayList<Tasks> nodatelist = new ArrayList<Tasks>();
-		ArrayList<DateSorter> datelist = new ArrayList<DateSorter>();
-
-		for (int i = 0; i < list.size(); i++) {
-			
-			if (list.get(i).endDate.equals("none")) {
-				nodatelist.add(list.get(i));
-				
-				
-			} 
-			else {
-				sorter = new DateSorter();
-				sorter = initializeDateSorter(list.get(i).endDate,i);
-				datelist.add(sorter);
-			}
-			
-			
-		}
-			
-			boolean value_same = false;
-			compareYear(indexlist, value_same, datelist);
-			
-			
-			modifyList(indexlist, list, nodatelist);
-			
-
-	}
-
-	public DateSorter initializeDateSorter(String date, int i) {
-		DateSorter sorter;
-		sorter = new DateSorter();
-
-		sorter.index = i;
-//		sorter.year = Integer.parseInt(date.substring(
-//				24, date.length()));
-		sorter.month = returnNumMonth(date.substring(4,
-				7));
-		sorter.day = Integer.parseInt(date.substring(8,
-				10));
-		sorter.time = Integer.parseInt(date.substring(
-				11, 13)
-				+ date.substring(14, 16));
-		return sorter;
-	}
-
-	private int returnNumMonth(String month) {
-		if (month.equals("Jan")) {
-			return 1;
-		}
-		if (month.equals("Feb")) {
-			return 2;
-		}
-		if (month.equals("Mar")) {
-			return 3;
-		}
-		if (month.equals("Apr")) {
-			return 4;
-		}
-		if (month.equals("May")) {
-			return 5;
-		}
-		if (month.equals("Jun")) {
-			return 6;
-		}
-		if (month.equals("Jul")) {
-			return 7;
-		}
-		if (month.equals("Aug")) {
-			return 8;
-		}
-		if (month.equals("Sep")) {
-			return 9;
-		}
-		if (month.equals("Oct")) {
-			return 10;
-		}
-		if (month.equals("Nov")) {
-			return 11;
-		}
-		if (month.equals("Dec")) {
-			return 12;
-		} else {
-			return 0;
-		}
-
-	}
-
-	private void modifyList(ArrayList<Integer> indexlist,
-			ArrayList<Tasks> list, ArrayList<Tasks> nodatelist) {
-		ArrayList<Tasks> temp = new ArrayList<Tasks>();
-		for (int i = 0; i < indexlist.size(); i++) {
-			temp.add(list.get(indexlist.get(i)));
-		}
-		if (!nodatelist.isEmpty()) {
-			for (int i = 0; i < nodatelist.size(); i++) {
-				temp.add(nodatelist.get(i));
-			}
-		}
-		list.clear();
-		list.addAll(temp);
-	}
-
-	private void compareTimes(ArrayList<Integer> indexlist, boolean value_same,
-			ArrayList<DateSorter> datelist) {
-		while (!datelist.isEmpty()) {
-			int index = findSmallestTime(datelist);
-			indexlist.add(datelist.get(index).index);
-			datelist.remove(index);
-			
-
-		}
-	}
-
-	public int findSmallestTime(ArrayList<DateSorter> datelist) {
-		int tmp = datelist.get(0).time;
-		int index = 0;
-		for (int i = 1; i < datelist.size(); i++) {
-
-			if (tmp > datelist.get(i).time) {
-				tmp = datelist.get(i).time;
-				index = i;
-			}
-
-		}
-		return index;
-	}
-
-	private void compareDay(ArrayList<Integer> indexlist, boolean value_same,
-			ArrayList<DateSorter> datelist) {
-		ArrayList<DateSorter> temp = new ArrayList<DateSorter>();
-		while (!datelist.isEmpty()) {
-			int index = findSmallestDay(datelist);
-			DateSorter temp_obj = datelist.get(index);
-			temp.add(temp_obj);
-			int tmp = datelist.get(index).day;
-			datelist.remove(index);
-			for (int i = 0; i < datelist.size(); i++) {
-
-				if (datelist.get(i).day==tmp) {
-					value_same = true;
-					temp.add(datelist.get(i));
-					datelist.remove(i);
-					i--;
-				}
-
-			}
-			if (value_same == false) {
-				indexlist.add(temp_obj.index);
-
-			} else {
-				value_same = false;
-				if(temp.size()!=1){
-					compareTimes(indexlist, value_same, temp);
-					}
-				
-
-			}
-			temp.clear();
-		}
-	}
-
-	public int findSmallestDay(ArrayList<DateSorter> datelist) {
-		int tmp = datelist.get(0).day;
-		int index = 0;
-		for (int i = 1; i < datelist.size(); i++) {
-
-			if (tmp > datelist.get(i).day ) {
-				tmp = datelist.get(i).day;
-				index = i;
-			}
-
-		}
-		return index;
-	}
-
-	private void compareMonth(ArrayList<Integer> indexlist, boolean value_same,
-			ArrayList<DateSorter> datelist) {
-		ArrayList<DateSorter> temp = new ArrayList<DateSorter>();
-		while (!datelist.isEmpty()) {
-			
-			int index =findSmallestMonth(datelist);
-			DateSorter temp_obj = datelist.get(index);
-			temp.add(temp_obj);
-			int tmp = datelist.get(index).month;
-			datelist.remove(index);
-			
-			for (int i = 0; i < datelist.size(); i++) {
-
-				if (datelist.get(i).month==tmp) {
-					value_same = true;
-					temp.add(datelist.get(i));
-					datelist.remove(i);
-					i--;
-				}
-
-			}
-			if (value_same == false) {
-				indexlist.add(temp_obj.index);
-			} else {
-				value_same = false;
-				if(temp.size()>1){
-				compareDay(indexlist, value_same, temp);
-				
-				}
-				
-			}
-			temp.clear();
-				
-
-
-			
-		}
-	}
-
-	public int findSmallestMonth(ArrayList<DateSorter> datelist) {
-		int tmp = datelist.get(0).month;
-		int index = 0;
-		
-		for (int i = 1; i < datelist.size(); i++) {
-
-			if (tmp > datelist.get(i).month) {
-				tmp = datelist.get(i).month;
-				index = i;
-			}
-
-		}
-		return index;
-	}
-
-	private void compareYear(ArrayList<Integer> indexlist, boolean value_same,
-			ArrayList<DateSorter> datelist) {
-		ArrayList<DateSorter> temp = new ArrayList<DateSorter>();
-
-		while (!datelist.isEmpty()) {
-			int index = findSmallestYear(datelist);
-			DateSorter temp_obj = datelist.get(index);
-			temp.add(temp_obj);
-			int tmp = datelist.get(index).year;
-			
-			datelist.remove(index);
-
-			for (int i = 0; i < datelist.size(); i++) {
-
-				if (datelist.get(i).year == tmp ) {
-					value_same = true;
-					temp.add(datelist.get(i));
-					datelist.remove(i);
-					i--;
-
-				}
-
-			}
-
-			if (value_same == false) {
-				indexlist.add(temp_obj.index);
-
-			} else {
-				value_same = false;
-				if(temp.size()!=1){
-					compareMonth(indexlist, value_same, temp);
-					}
-				
-
-
-			}
-			temp.clear();
-		}
-	}
-
-	public int findSmallestYear(ArrayList<DateSorter> datelist) {
-		int tmp = datelist.get(0).year;
-		int index = 0;
 	
-		for (int i = 1; i < datelist.size(); i++) {
-
-			if (tmp > datelist.get(i).year) {
-				tmp = datelist.get(i).year;
-				index = i;
-			}
-
-		}
-		
-		
-		return index;
-	}
-
+	
 	/**
 	 * This method imports items in the text file currently saved in same
 	 * directory and put them in the array list.
@@ -437,13 +127,10 @@ public class Logic {
 			list.add(cmd);
 			return cmd.detail + " has been successfully added!";
 		} else {
-			String msg = list.get(edit-1).detail;
 
 			replaceItem(list, cmd, edit);
-			
 			edit = 0;
-			
-			return msg + " has been successfully edited!";
+			return list.get(edit).detail + " has been successfully edited!";
 		}
 
 	}
@@ -455,9 +142,8 @@ public class Logic {
 
 		int index;
 		index = Integer.parseInt(cmd.detail);
-		String msg = cmd.detail;
 		list.remove(index - 1);
-		return msg + " has been deleted successfully!";
+		return cmd.detail + "has been deleted successfully!";
 	}
 
 	private String saveCommand(ArrayList<Tasks> list) {
@@ -528,10 +214,9 @@ public class Logic {
 	}
 
 	private void replaceItem(ArrayList<Tasks> list, Tasks cmd, int index) {
-		
+		list.add(index - 1, cmd);
 
-		list.remove(index-1);
-		list.add(cmd);
+		list.remove(index);
 
 	}
 
@@ -544,53 +229,113 @@ public class Logic {
 		return (p.getNattyDateGroup(date)).getDates().toString();
 		
 	}
-	public boolean sameTime(DateSorter sorter_today, DateSorter sorter_list){
-		if(sameDay(sorter_today, sorter_list)){
-			if(sorter_today.time==sorter_list.time){
-				return true;
-			}
-		}
-		return false;
+	
+	private void sortList(ArrayList<Tasks> list) {
+		sortByMark(list);
 	}
 
-	public boolean sameDay(DateSorter sorter_today, DateSorter sorter_list) {
-		if(sameMonth(sorter_today,sorter_list)){
-			if(sorter_today.day == sorter_list.day){
-				return true;
+	public Date getDate(String date_input){
+		DateGroup group= new DateGroup();
+		
+		group = p.getNattyDateGroup(date_input);
+		List<Date> dates = group.getDates();
+		Date date = dates.get(0);
+		
+		return date;
+	}
+	
+	private ArrayList<Tasks> getFloatTasks(ArrayList<Tasks> list){
+		ArrayList<Tasks> floating = new ArrayList<Tasks>();
+		
+		for(int k=0; k<list.size();k++){
+			if(list.get(k).endDate.equals(DEFAULT_STRING))
+				floating.add(list.get(k));
+		}
+		return floating;
+	}
+	
+	private ArrayList<Tasks> getTimedTasks(ArrayList<Tasks> list){
+		ArrayList<Tasks> timed = new ArrayList<Tasks>();
+		
+		for(int k=0; k<list.size();k++){
+			if(!list.get(k).endDate.equals(DEFAULT_STRING))
+				timed.add(list.get(k));
+		}
+		
+		sortByDate(timed);
+		return timed;
+	}
+	
+	private void sortByDate(ArrayList<Tasks> list) {
+		for(int i=1; i<list.size();i++){
+			for(int j=0; j<list.size()-i; j++){
+				String date_input1 = list.get(j).endDate.toString();
+				Date date1 = getDate(date_input1);
+				
+				String date_input2 = list.get(j+1).endDate.toString();
+				Date date2 = getDate(date_input2);
+				
+				if(date2.before(date1))
+					Collections.swap(list, j, j+1);
 			}
 		}
-		return false;
+	}
+	
+	private void sortByMark(ArrayList<Tasks> list) {
+		ArrayList<Tasks> todo = new ArrayList<Tasks>();
+		ArrayList<Tasks> todoSort = new ArrayList<Tasks>();
+		ArrayList<Tasks> mark = new ArrayList<Tasks>();
+		ArrayList<Tasks> markSort = new ArrayList<Tasks>();
+
+		for (int i = 0; i < list.size(); i++) {
+			if (list.get(i).detail.contains("(completed)")) 
+				mark.add(list.get(i));
+			else 
+				todo.add(list.get(i));
+		}
+		
+		todoSort.addAll(getFloatTasks(todo));
+		todoSort.addAll(getTimedTasks(todo));
+		markSort.addAll(getFloatTasks(mark));
+		markSort.addAll(getTimedTasks(mark));
+		
+		list.clear();
+		list.addAll(todoSort);
+		list.addAll(markSort);
+
 	}
 
-	public boolean sameMonth(DateSorter sorter_today, DateSorter sorter_list) {
-		if(sameYear(sorter_today,sorter_list)){
-			if(sorter_today.month==sorter_list.month){
-				return true;
-			}
-		}
-		return false;
-	}
-
-	public boolean sameYear(DateSorter sorter_today, DateSorter sorter_list) {
-		if(sorter_today.year==sorter_list.year){
-			return true;
-		}
-		return false;
-	}
-
-	public boolean sameWeek(DateSorter sorter_today, DateSorter sorter_list, DateSorter sorter_next_week) {
-		if(sameMonth(sorter_today, sorter_list)){
-			if(sorter_list.day-sorter_today.day<=7){
-				return true;
-			}
-		}
-		else if(sameMonth(sorter_next_week,sorter_list)) {
-			if(sorter_next_week.day-sorter_list.day <=6){
-				return true;
+	private ArrayList<Tasks> getTaskWithRange(ArrayList<Tasks> list, Date dateScope){
+		ArrayList<Tasks> temp = new ArrayList<Tasks>();	
+		Date today = getDate("23:59:59 today");
+		Date yesterday = getDate("23:59:59 yesterday");
+		
+		for(int i=0; i<list.size(); i++){
+			String date_input = list.get(i).endDate;
+			Date date = getDate(date_input);
+			
+			// get today's todo tasks
+			if(dateScope.equals(today)){
+				if(date.before(today) && date.after(yesterday))
+					temp.add(list.get(i));
 			}
 			
+			else{
+				if(!date.after(dateScope))
+					temp.add(list.get(i));
+			}
 		}
-		return false;
+		return temp;
 	}
-
+	
+	public ArrayList<Tasks> displayTasks(ArrayList<Tasks> list, String dateStr){
+		ArrayList<Tasks> temp = new ArrayList<Tasks>();	
+		temp.addAll(list);
+		
+		Date date = getDate(dateStr);
+		temp.addAll(getTaskWithRange(temp, date));
+		sortList(temp);
+	
+		return temp;
+	}
 }

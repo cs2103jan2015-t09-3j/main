@@ -22,6 +22,7 @@ public class Storage {
 			return temp_list;
 		}
 		try {
+			@SuppressWarnings("resource")
 			BufferedReader br = new BufferedReader(new FileReader(file));
 			String line;
 
@@ -52,7 +53,7 @@ public class Storage {
 	}
 
 	// this method should delete whatever is in the file and then write the
-	// contents of arraylist in to the file
+	// contents of ArrayList in to the file
 	public void writeToFile(ArrayList<Tasks> list) {
 
 		try {

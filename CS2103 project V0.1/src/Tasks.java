@@ -1,9 +1,7 @@
 
 
-
-
-
 //UI part -- Kim
+
 public class Tasks {
 	
 	private static final String DEFAULT_STRING = "none";
