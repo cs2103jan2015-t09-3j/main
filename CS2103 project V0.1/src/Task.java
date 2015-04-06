@@ -2,7 +2,7 @@
 
 //UI part -- Kim
 
-public class Tasks {
+public class Task {
 	
 	private static final String DEFAULT_STRING = "none";
 	public String detail = DEFAULT_STRING;
