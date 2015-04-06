@@ -11,11 +11,11 @@ public class Logic {
 	private static final String FAILURE = "OPERATION FAILED!!";
 	Parser p = new Parser();
 	Storage s = new Storage();
-	Tasks cmd = new Tasks();
+	Task cmd = new Task();
 
-	ArrayList<Tasks> list = new ArrayList<Tasks>();
-	ArrayList<Tasks> tempList = new ArrayList<Tasks>();
-	ArrayList<Tasks> currList = new ArrayList<Tasks>();
+	ArrayList<Task> list = new ArrayList<Task>();
+	ArrayList<Task> tempList = new ArrayList<Task>();
+	ArrayList<Task> currList = new ArrayList<Task>();
 	static String command_type = DEFAULT_STRING;
 
 
@@ -34,18 +34,18 @@ public class Logic {
 	 * @param gUI
 	 * @return
 	 */
-	public String executeCommand(String input, ArrayList<Tasks> list) {
+	public String executeCommand(String input, ArrayList<Task> list) {
 		String feedback = DEFAULT_STRING;
 		assert list != null;
-		cmd = new Tasks();
+		cmd = new Task();
 		command_type = p.parse(input, cmd);
 		feedback = implementCommand(command_type, cmd, list, feedback);
 		sortList(list);
 		return feedback;
 	}
 
-	public String implementCommand(String command_type, Tasks cmd,
-			ArrayList<Tasks> list, String feedback) {
+	public String implementCommand(String command_type, Task cmd,
+			ArrayList<Task> list, String feedback) {
 		switch (command_type) {
 		case "cd": {
 			s.changeDirectory(cmd.detail);
@@ -94,7 +94,7 @@ public class Logic {
 	 *            This is list of Tasks object. each element contains different
 	 *            commands entered by user
 	 */
-	public ArrayList<Tasks> import_From_File(ArrayList<Tasks> list) {
+	public ArrayList<Task> import_From_File(ArrayList<Task> list) {
 		list = s.readFromFile();
 		return list;
 	}
@@ -113,13 +113,13 @@ public class Logic {
 	 * @return
 	 */
 
-	private String redoCommand(ArrayList<Tasks> list) {
+	private String redoCommand(ArrayList<Task> list) {
 		list.clear();
 		list.addAll(currList);
 		return " Redo to latest 1 undo(s)!";
 	}
 
-	private String addCommand(Tasks cmd, ArrayList<Tasks> list) {
+	private String addCommand(Task cmd, ArrayList<Task> list) {
 		tempList.clear();
 		tempList.addAll(list);
 		if (edit == 0) {
@@ -134,7 +134,7 @@ public class Logic {
 
 	}
 
-	private String deleteCommand(Tasks cmd, ArrayList<Tasks> list) {
+	private String deleteCommand(Task cmd, ArrayList<Task> list) {
 
 		tempList.clear();
 		tempList.addAll(list);
@@ -145,13 +145,13 @@ public class Logic {
 		return cmd.detail + "has been deleted successfully!";
 	}
 
-	private String saveCommand(ArrayList<Tasks> list) {
+	private String saveCommand(ArrayList<Task> list) {
 
 		s.writeToFile(list);
 		return "All changes saved!";
 	}
 
-	private String clearCommand(ArrayList<Tasks> list) {
+	private String clearCommand(ArrayList<Task> list) {
 		tempList.clear();
 		tempList.addAll(list);
 
@@ -159,7 +159,7 @@ public class Logic {
 		return "All contents are cleared";
 	}
 
-	private String undoCommand(ArrayList<Tasks> list) {
+	private String undoCommand(ArrayList<Task> list) {
 
 		currList.clear();
 		currList.addAll(list);
@@ -168,7 +168,7 @@ public class Logic {
 		return " Undo to latest 1 change(s)!";
 	}
 
-	private String editCommand(Tasks cmd, ArrayList<Tasks> list) {
+	private String editCommand(Task cmd, ArrayList<Task> list) {
 
 		tempList.clear();
 		tempList.addAll(list);
@@ -180,7 +180,7 @@ public class Logic {
 
 	}
 
-	private String markCommand(Tasks cmd, ArrayList<Tasks> list) {
+	private String markCommand(Task cmd, ArrayList<Task> list) {
 
 		tempList.clear();
 		tempList.addAll(list);
@@ -198,7 +198,7 @@ public class Logic {
 		}
 	}
 
-	private String searchCommand(ArrayList<Tasks> list, String detail) {
+	private String searchCommand(ArrayList<Task> list, String detail) {
 
 		for (int i = 0; i < list.size(); i++) {
 			if (list.get(i).detail.toLowerCase().contains(cmd.detail)
@@ -212,7 +212,7 @@ public class Logic {
 
 	}
 
-	private void replaceItem(ArrayList<Tasks> list, Tasks cmd, int index) {
+	private void replaceItem(ArrayList<Task> list, Task cmd, int index) {
 		list.add(index - 1, cmd);
 
 		list.remove(index);
@@ -229,11 +229,11 @@ public class Logic {
 		
 	}
 	
-	private void sortList(ArrayList<Tasks> list) {
-		ArrayList<Tasks> todo = new ArrayList<Tasks>();
-		ArrayList<Tasks> todoSort = new ArrayList<Tasks>();
-		ArrayList<Tasks> mark = new ArrayList<Tasks>();
-		ArrayList<Tasks> markSort = new ArrayList<Tasks>();
+	private void sortList(ArrayList<Task> list) {
+		ArrayList<Task> todo = new ArrayList<Task>();
+		ArrayList<Task> todoSort = new ArrayList<Task>();
+		ArrayList<Task> mark = new ArrayList<Task>();
+		ArrayList<Task> markSort = new ArrayList<Task>();
 
 		for (int i = 0; i < list.size(); i++) {
 			if (list.get(i).detail.contains("(completed)")) 
@@ -262,8 +262,8 @@ public class Logic {
 		return date;
 	}
 	
-	private ArrayList<Tasks> getFloatTasks(ArrayList<Tasks> list){
-		ArrayList<Tasks> floating = new ArrayList<Tasks>();
+	private ArrayList<Task> getFloatTasks(ArrayList<Task> list){
+		ArrayList<Task> floating = new ArrayList<Task>();
 		
 		for(int k=0; k<list.size();k++){
 			if(list.get(k).endDate.equals(DEFAULT_STRING))
@@ -272,8 +272,8 @@ public class Logic {
 		return floating;
 	}
 	
-	private ArrayList<Tasks> getTimedTasks(ArrayList<Tasks> list){
-		ArrayList<Tasks> timed = new ArrayList<Tasks>();
+	private ArrayList<Task> getTimedTasks(ArrayList<Task> list){
+		ArrayList<Task> timed = new ArrayList<Task>();
 		
 		for(int k=0; k<list.size();k++){
 			if(!list.get(k).endDate.equals(DEFAULT_STRING))
@@ -284,7 +284,7 @@ public class Logic {
 		return timed;
 	}
 	
-	private void sortByDate(ArrayList<Tasks> list) {
+	private void sortByDate(ArrayList<Task> list) {
 		for(int i=1; i<list.size();i++){
 			for(int j=0; j<list.size()-i; j++){
 				String date_input1 = list.get(j).endDate.toString();

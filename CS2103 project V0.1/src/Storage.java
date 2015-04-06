@@ -9,14 +9,14 @@ import java.util.*;
 
 public class Storage {
 	static File file = new File("Cone.txt");
-	ArrayList<Tasks> temp_list = new ArrayList<Tasks>();
+	ArrayList<Task> temp_list = new ArrayList<Task>();
 	
 	public void changeDirectory(String directory){
 		file = new File(directory+ "\\Cone.txt");
 	}
 	
-	public ArrayList<Tasks> readFromFile() {
-		Tasks temp = new Tasks();
+	public ArrayList<Task> readFromFile() {
+		Task temp = new Task();
 		// if file is empty, return the default Tasks
 		if ((file.length() == 0)) {
 			return temp_list;
@@ -30,7 +30,7 @@ public class Storage {
 			// at the Tasks.detail && .date
 
 			while (null != (line = br.readLine())) {
-				temp = new Tasks();
+				temp = new Task();
 				temp.detail = line;
 				temp.startDate = br.readLine();
 				temp.endDate = br.readLine();
@@ -54,7 +54,7 @@ public class Storage {
 
 	// this method should delete whatever is in the file and then write the
 	// contents of ArrayList in to the file
-	public void writeToFile(ArrayList<Tasks> list) {
+	public void writeToFile(ArrayList<Task> list) {
 
 		try {
 			// delete the original contents without deleting the file

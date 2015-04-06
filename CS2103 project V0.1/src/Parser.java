@@ -14,7 +14,7 @@ public class Parser {
 	static String command_type;
 	
 	//Parser part -- LIQI
-	public String parse(String input, Tasks cmd) {
+	public String parse(String input, Task cmd) {
 		input.toLowerCase();
 		int index = input.indexOf(' ');
 		if(index!=-1){
@@ -31,7 +31,7 @@ public class Parser {
 		command_type = input;
 	}
 	
-	public void identifyType (String input, Tasks cmd, int index){
+	public void identifyType (String input, Task cmd, int index){
 		command_type = input.substring(0,index);
 		if(input.contains("-")){
 			timed(input, cmd, index);
@@ -41,7 +41,7 @@ public class Parser {
 		}
 	}
 	
-	public void timed(String input, Tasks cmd, int index){
+	public void timed(String input, Task cmd, int index){
 	
 			int index2 = input.indexOf("-");
 			cmd.detail = input.substring(index+1,index2);
@@ -64,7 +64,7 @@ public class Parser {
 			}
 	}
 	
-	public void floating(String input, Tasks cmd, int index){
+	public void floating(String input, Task cmd, int index){
 		
 			cmd.detail = input.substring(index+1, input.length());
 		

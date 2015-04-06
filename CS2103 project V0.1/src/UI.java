@@ -38,7 +38,7 @@ import javax.swing.table.TableModel;
 public class UI extends JFrame {
 	private static final String DEFAULT_STRING = "none";
 	static Logic l = new Logic();
-	static ArrayList<Tasks> list;
+	static ArrayList<Task> list;
 	static JMenuBar menubar = new JMenuBar();
 	static JMenu display;
 	static JMenuItem today, oneweek, onemonth, all;
@@ -290,7 +290,7 @@ public class UI extends JFrame {
 		}
 	}
 
-	protected static void printWhat(String printWhat, ArrayList<Tasks> list,
+	protected static void printWhat(String printWhat, ArrayList<Task> list,
 			String keyword) {
 
 		switch (printWhat) {
@@ -314,7 +314,7 @@ public class UI extends JFrame {
 
 	}
 
-	private static void printList_today(ArrayList<Tasks> list, String keyword) {
+	private static void printList_today(ArrayList<Task> list, String keyword) {
 		clearTable();
 		Date tomorrow = l.getDate("23:59 tomorrow");
 		Date today = l.getDate("00:00 today");
@@ -342,7 +342,7 @@ public class UI extends JFrame {
 
 	}
 
-	private static void printList_weeks(ArrayList<Tasks> list, String keyword) {
+	private static void printList_weeks(ArrayList<Task> list, String keyword) {
 		clearTable();
 		Date next_week = l.getDate("23:59 in 1 week");
 		Date today = l.getDate("00:00 today");
@@ -369,7 +369,7 @@ public class UI extends JFrame {
 
 	}
 
-	private static void printList_month(ArrayList<Tasks> list, String keyword) {
+	private static void printList_month(ArrayList<Task> list, String keyword) {
 		clearTable();
 		Date next_month = l.getDate("23:59 in 1 month");
 		Date today = l.getDate("00:00 today");
@@ -396,7 +396,7 @@ public class UI extends JFrame {
 
 	}
 
-	private static void printList_entire(ArrayList<Tasks> list, String keyword) {
+	private static void printList_entire(ArrayList<Task> list, String keyword) {
 		clearTable();
 		for (int i = 0; i < list.size(); i++) {
 			if (list.get(i).detail.contains(keyword)
