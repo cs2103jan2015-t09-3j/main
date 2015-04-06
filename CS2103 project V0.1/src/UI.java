@@ -32,6 +32,7 @@ import javax.swing.OverlayLayout;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellRenderer;
+import javax.swing.table.TableColumnModel;
 import javax.swing.table.TableModel;
 
 @SuppressWarnings("serial")
@@ -41,10 +42,10 @@ public class UI extends JFrame {
 	static ArrayList<Task> list;
 	static JMenuBar menubar = new JMenuBar();
 	static JMenu display;
-	static JMenuItem today, oneweek, onemonth, all;
+	static JMenuItem today, oneweek, onemonth, all, floating, completed;
 	static JLabel bg;
 	static JLabel feedbacks;
-	static JButton command_reference_button, send_button;
+	static JButton help_button, send_button;
 	static JPanel input_panel;
 	static JPanel bg_panel, feedback_panel, table_panel;
 	static JTextField text_field = new JTextField(40);
@@ -53,7 +54,7 @@ public class UI extends JFrame {
 	static BufferedImage image;
 	static final String[] columns = { "Task no.", "Task Description",
 			"Start Date", "End Date" };
-	protected static String print_what = "entire";
+	protected static String print_what = "all";
 	static DefaultTableModel tableModel = new DefaultTableModel(columns, 0);
 
 	public UI() {
@@ -65,7 +66,7 @@ public class UI extends JFrame {
 
 		input_panel = new JPanel();
 		bg_panel = new JPanel();
-		command_reference_button = new JButton("Reference");
+		help_button = new JButton("Help");
 		send_button = new JButton("send");
 		table = new JTable(tableModel) {
 			{
@@ -84,17 +85,19 @@ public class UI extends JFrame {
 				return false;
 			}
 
+			@Override
 			public Component prepareRenderer(TableCellRenderer r, int data,
 					int columns) {
 				Component c = super.prepareRenderer(r, data, columns);
 
-				if (data % 2 == 0) {
-					c.setBackground(Color.white);
+				if (columns == 1) {
+					c.setFont(new Font("Serif", Font.PLAIN, 17));
 				} else {
 					c.setBackground(Color.LIGHT_GRAY);
 				}
 				if (isCellSelected(data, columns)) {
-					c.setBackground(Color.green);
+					// text_field.setText(c.getComponentAt(0,1).toString());
+					// text_field.setText("lol");
 				}
 				return c;
 			}
@@ -104,6 +107,13 @@ public class UI extends JFrame {
 				super.paintComponent(g);
 			}
 		};
+		table.setShowGrid(false);
+		// table.setFont(new Font("Serif", Font.PLAIN, 17));
+		table.setRowHeight(30);
+		// table.setDefaultRenderer(String.class, new edittablerenderer());
+		final TableColumnModel columnModel = table.getColumnModel();
+		columnModel.getColumn(0).setMaxWidth(50);
+		columnModel.getColumn(1).setMinWidth(340);
 
 		String name = tableModel.getColumnName(0);
 		Font f = table.getFont();
@@ -122,7 +132,7 @@ public class UI extends JFrame {
 		table_panel.setOpaque(false);
 
 		input_panel.setLayout(new FlowLayout(2));
-		input_panel.add(command_reference_button);
+		input_panel.add(help_button);
 		input_panel.add(text_field);
 		input_panel.add(send_button);
 		table_panel.add(scrollbar);
@@ -138,6 +148,8 @@ public class UI extends JFrame {
 		oneweek = new JMenuItem("In 1 week");
 		onemonth = new JMenuItem("In 1 month");
 		all = new JMenuItem("All tasks");
+		floating = new JMenuItem("Floating tasks");
+		completed = new JMenuItem("Completed tasks");
 		display.add(today);
 		display.addSeparator();
 		display.add(oneweek);
@@ -145,13 +157,16 @@ public class UI extends JFrame {
 		display.add(onemonth);
 		display.addSeparator();
 		display.add(all);
+		display.addSeparator();
+		display.add(floating);
+		display.add(completed);
 
 		revalidate();
 		repaint();
 
 	}
 
-	public static void printFeedback(String text) {
+	public static void processFeedback(String text) {
 		clearFeedback();
 		feedbacks = new JLabel();
 		feedback_panel.add(feedbacks);
@@ -169,10 +184,41 @@ public class UI extends JFrame {
 					text.length());
 			printWhat(print_what, list, keyword);
 			feedbacks.setText("Search Results: ");
-		} else {
+		} else if (text.contains("display")) {
+			int index = text.indexOf(" ");
+			print_what = text.substring(index + 1);
+			printWhat(print_what, list, "");
+
+		} else if (text.equals("help")) {
+			summonHelpScreen();
+		}
+
+		else {
 			feedbacks.setText(text);
 		}
 
+	}
+
+	private static void summonHelpScreen() {
+		final JFrame reference = new JFrame("User Help");
+		reference.setVisible(true);
+		reference.setSize(700, 500);
+		reference.setLayout(new FlowLayout(3));
+		final JPanel reference_panel = new JPanel();
+		reference_panel.setLayout(new GridLayout(20, 1));
+		ArrayList<String> texts = new ArrayList<String>();
+		l.import_instruction(texts);
+		for (int i = 0; i < texts.size(); i++) {
+
+			JLabel content = new JLabel();
+			content.setText(texts.get(i));
+			reference_panel.add(content);
+
+		}
+
+		reference.add(reference_panel);
+		reference.revalidate();
+		reference.repaint();
 	}
 
 	public static void main(String[] args) throws IOException {
@@ -181,7 +227,7 @@ public class UI extends JFrame {
 
 		UI GUI = new UI();
 		list = l.import_From_File(list);
-		printFeedback("Displaying All Tasks:");
+		processFeedback("Displaying All Task:");
 		printWhat(print_what, list, "");
 
 		takeInputs(GUI);
@@ -193,7 +239,7 @@ public class UI extends JFrame {
 				image.getHeight(), BufferedImage.TYPE_INT_ARGB);
 
 		Graphics2D g2d = (Graphics2D) tmpImg.getGraphics();
-		g2d.setComposite(AlphaComposite.SrcOver.derive(0.3f));
+		g2d.setComposite(AlphaComposite.SrcOver.derive(0.1f));
 		// set the transparency level in range 0.0f - 1.0f
 		g2d.drawImage(image, 0, 0, null);
 		return tmpImg;
@@ -212,7 +258,7 @@ public class UI extends JFrame {
 					String feedback = DEFAULT_STRING;
 					feedback = l.executeCommand(input, list);
 					printWhat(print_what, list, "");
-					printFeedback(feedback);
+					processFeedback(feedback);
 				}
 
 			});
@@ -222,15 +268,13 @@ public class UI extends JFrame {
 				public void actionPerformed(ActionEvent e) {
 					print_what = "today";
 					printWhat(print_what, list, "");
-					printFeedback("Displaying today's Tasks:");
 
 				}
 			});
 			oneweek.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
-					print_what = "weeks";
+					print_what = "week";
 					printWhat(print_what, list, "");
-					printFeedback("Displaying Tasks in one week:");
 
 				}
 			});
@@ -238,15 +282,27 @@ public class UI extends JFrame {
 				public void actionPerformed(ActionEvent e) {
 					print_what = "month";
 					printWhat(print_what, list, "");
-					printFeedback("Displaying Tasks in one month:");
 
 				}
 			});
 			all.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
-					print_what = "entire";
+					print_what = "all";
 					printWhat(print_what, list, "");
-					printFeedback("Displaying All Tasks:");
+
+				}
+			});
+			floating.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					print_what = "floating";
+					printWhat(print_what, list, "");
+
+				}
+			});
+			completed.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					print_what = "completed";
+					printWhat(print_what, list, "");
 
 				}
 			});
@@ -258,31 +314,13 @@ public class UI extends JFrame {
 					String feedback = DEFAULT_STRING;
 					feedback = l.executeCommand(input, list);
 					printWhat(print_what, list, "");
-					printFeedback(feedback);
+					processFeedback(feedback);
 
 				}
 			});
-			command_reference_button.addActionListener(new ActionListener() {
+			help_button.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
-					final JFrame reference = new JFrame("Command Reference");
-					reference.setVisible(true);
-					reference.setSize(700, 500);
-					reference.setLayout(new FlowLayout(3));
-					final JPanel reference_panel = new JPanel();
-					reference_panel.setLayout(new GridLayout(20, 1));
-					ArrayList<String> text = new ArrayList<String>();
-					l.import_instruction(text);
-					for (int i = 0; i < text.size(); i++) {
-
-						JLabel content = new JLabel();
-						content.setText(text.get(i));
-						reference_panel.add(content);
-
-					}
-
-					reference.add(reference_panel);
-					reference.revalidate();
-					reference.repaint();
+					summonHelpScreen();
 
 				}
 			});
@@ -294,7 +332,7 @@ public class UI extends JFrame {
 			String keyword) {
 
 		switch (printWhat) {
-		case "weeks": {
+		case "week": {
 			printList_weeks(list, keyword);
 			break;
 		}
@@ -306,7 +344,19 @@ public class UI extends JFrame {
 			printList_month(list, keyword);
 			break;
 		}
-		case "entire": {
+		case "all": {
+			printList_entire(list, keyword);
+			break;
+		}
+		case "floating": {
+			printList_floating(list, keyword);
+			break;
+		}
+		case "completed": {
+			printList_completed(list,keyword);
+			break;
+		}
+		default: {
 			printList_entire(list, keyword);
 			break;
 		}
@@ -314,7 +364,67 @@ public class UI extends JFrame {
 
 	}
 
+	private static void printList_completed(ArrayList<Task> list2,
+			String keyword) {
+		processFeedback("Displaying all completed tasks");
+		clearTable();
+		for (int i = 0; i < list.size(); i++) {
+			if (list.get(i).detail.contains("(completed)")) {
+				if (list.get(i).detail.contains(keyword)
+						|| list.get(i).startDate.contains(keyword)
+						|| list.get(i).endDate.contains(keyword)) {
+					int taskNum = i + 1;
+					String task = list.get(i).detail;
+					if (task.contains("(completed)")) {
+						paintBold(i);
+					}
+					String startDate = list.get(i).startDate;
+					if (startDate.equals(DEFAULT_STRING)) {
+						startDate = "";
+					}
+					String endDate = list.get(i).endDate;
+					if (endDate.equals(DEFAULT_STRING)) {
+						endDate = "";
+					}
+					Object[] data = { taskNum, task, startDate, endDate };
+					tableModel.addRow(data);
+				}
+			}
+		}
+		
+	}
+
+	private static void printList_floating(ArrayList<Task> list, String keyword) {
+		processFeedback("Displaying all floating tasks");
+		clearTable();
+		for (int i = 0; i < list.size(); i++) {
+			if (list.get(i).endDate.equals(DEFAULT_STRING)) {
+				if (list.get(i).detail.contains(keyword)
+						|| list.get(i).startDate.contains(keyword)
+						|| list.get(i).endDate.contains(keyword)) {
+					int taskNum = i + 1;
+					String task = list.get(i).detail;
+					if (task.contains("(completed)")) {
+						paintBold(i);
+					}
+					String startDate = list.get(i).startDate;
+					if (startDate.equals(DEFAULT_STRING)) {
+						startDate = "";
+					}
+					String endDate = list.get(i).endDate;
+					if (endDate.equals(DEFAULT_STRING)) {
+						endDate = "";
+					}
+					Object[] data = { taskNum, task, startDate, endDate };
+					tableModel.addRow(data);
+				}
+			}
+		}
+
+	}
+
 	private static void printList_today(ArrayList<Task> list, String keyword) {
+		processFeedback("Displaying today's tasks");
 		clearTable();
 		Date tomorrow = l.getDate("23:59 tomorrow");
 		Date today = l.getDate("00:00 today");
@@ -322,7 +432,7 @@ public class UI extends JFrame {
 		for (int i = 0; i < list.size(); i++) {
 			String task_date = list.get(i).endDate;
 
-			if (!task_date.equals( DEFAULT_STRING)) {
+			if (!task_date.equals(DEFAULT_STRING)) {
 
 				Date taskdate = l.getDate(task_date);
 				if (taskdate.before(tomorrow) && taskdate.after(today)) {
@@ -332,7 +442,13 @@ public class UI extends JFrame {
 						int taskNum = i + 1;
 						String task = list.get(i).detail;
 						String startDate = list.get(i).startDate;
+						if (startDate.equals(DEFAULT_STRING)) {
+							startDate = "";
+						}
 						String endDate = list.get(i).endDate;
+						if (endDate.equals(DEFAULT_STRING)) {
+							endDate = "";
+						}
 						Object[] data = { taskNum, task, startDate, endDate };
 						tableModel.addRow(data);
 					}
@@ -343,13 +459,14 @@ public class UI extends JFrame {
 	}
 
 	private static void printList_weeks(ArrayList<Task> list, String keyword) {
+		processFeedback("Displaying this week's tasks");
 		clearTable();
 		Date next_week = l.getDate("23:59 in 1 week");
 		Date today = l.getDate("00:00 today");
 		for (int i = 0; i < list.size(); i++) {
 			String task_date = list.get(i).endDate;
 
-			if (!task_date.equals( DEFAULT_STRING)) {
+			if (!task_date.equals(DEFAULT_STRING)) {
 
 				Date taskdate = l.getDate(task_date);
 				if (taskdate.before(next_week) && taskdate.after(today)) {
@@ -359,9 +476,16 @@ public class UI extends JFrame {
 						int taskNum = i + 1;
 						String task = list.get(i).detail;
 						String startDate = list.get(i).startDate;
+						if (startDate.equals(DEFAULT_STRING)) {
+							startDate = "";
+						}
 						String endDate = list.get(i).endDate;
+						if (endDate.equals(DEFAULT_STRING)) {
+							endDate = "";
+						}
 						Object[] data = { taskNum, task, startDate, endDate };
 						tableModel.addRow(data);
+
 					}
 				}
 			}
@@ -370,13 +494,14 @@ public class UI extends JFrame {
 	}
 
 	private static void printList_month(ArrayList<Task> list, String keyword) {
+		processFeedback("Displaying this month's tasks");
 		clearTable();
 		Date next_month = l.getDate("23:59 in 1 month");
 		Date today = l.getDate("00:00 today");
 		for (int i = 0; i < list.size(); i++) {
 			String task_date = list.get(i).endDate;
 
-			if (!task_date.equals( DEFAULT_STRING)) {
+			if (!task_date.equals(DEFAULT_STRING)) {
 
 				Date taskdate = l.getDate(task_date);
 				if (taskdate.before(next_month) && taskdate.after(today)) {
@@ -386,7 +511,13 @@ public class UI extends JFrame {
 						int taskNum = i + 1;
 						String task = list.get(i).detail;
 						String startDate = list.get(i).startDate;
+						if (startDate.equals(DEFAULT_STRING)) {
+							startDate = "";
+						}
 						String endDate = list.get(i).endDate;
+						if (endDate.equals(DEFAULT_STRING)) {
+							endDate = "";
+						}
 						Object[] data = { taskNum, task, startDate, endDate };
 						tableModel.addRow(data);
 					}
@@ -397,6 +528,7 @@ public class UI extends JFrame {
 	}
 
 	private static void printList_entire(ArrayList<Task> list, String keyword) {
+		processFeedback("Displaying all tasks");
 		clearTable();
 		for (int i = 0; i < list.size(); i++) {
 			if (list.get(i).detail.contains(keyword)
@@ -404,12 +536,25 @@ public class UI extends JFrame {
 					|| list.get(i).endDate.contains(keyword)) {
 				int taskNum = i + 1;
 				String task = list.get(i).detail;
+				if (task.contains("(completed)")) {
+					paintBold(i);
+				}
 				String startDate = list.get(i).startDate;
+				if (startDate.equals(DEFAULT_STRING)) {
+					startDate = "";
+				}
 				String endDate = list.get(i).endDate;
+				if (endDate.equals(DEFAULT_STRING)) {
+					endDate = "";
+				}
 				Object[] data = { taskNum, task, startDate, endDate };
 				tableModel.addRow(data);
 			}
 		}
+	}
+
+	private static void paintBold(int i) {
+
 	}
 
 	private static void clearTable() {
@@ -428,3 +573,23 @@ public class UI extends JFrame {
 
 	}
 }
+/*
+ * @SuppressWarnings("serial") class edittablerenderer extends
+ * DefaultTableCellRenderer {
+ * 
+ * 
+ * 
+ * 
+ * public Component getedittablerendererComponent(JTable table, Object value,
+ * boolean isSelected, boolean hasFocus, int row, int col) {
+ * 
+ * Component c = super.getTableCellRendererComponent(table, value, isSelected,
+ * hasFocus, row, col); Object valueAt = table.getModel().getValueAt(row, col);
+ * String s = ""; if (valueAt != null) { s = valueAt.toString(); }
+ * 
+ * if (s.equalsIgnoreCase("yellow")) { c.setForeground(Color.YELLOW);
+ * c.setBackground(Color.gray); } else { c.setForeground(Color.black);
+ * c.setBackground(Color.WHITE); }
+ * 
+ * return c; } }
+ */

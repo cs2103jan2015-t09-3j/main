@@ -1,10 +1,12 @@
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 
 import com.joestelmach.natty.DateGroup;
-import com.joestelmach.natty.generated.DateParser.parse_return;
 
 public class Logic {
 	private static final String DEFAULT_STRING = "none";
@@ -29,7 +31,7 @@ public class Logic {
 	 *            This initially contains user input and will be containing
 	 *            command type and details after parser
 	 * @param list
-	 *            This is list of Tasks object. each element contains different
+	 *            This is list of Task object. each element contains different
 	 *            commands entered by user
 	 * @param gUI
 	 * @return
@@ -66,8 +68,8 @@ public class Logic {
 		case "save": {
 			return saveCommand(list);
 		}
-		case "mark": {
-			return markCommand(cmd, list);
+		case "done": {
+			return doneCommand(cmd, list);
 		}
 		case "undo": {
 			return undoCommand(list);
@@ -77,6 +79,12 @@ public class Logic {
 		}
 		case "search": {
 			return searchCommand(list, cmd.detail);
+		}
+		case "display" :{
+			return "display " + cmd.detail;
+		}
+		case "help": {
+			return "help";
 		}
 		default: {
 			return "Invalid Command";
@@ -91,7 +99,7 @@ public class Logic {
 	 * directory and put them in the array list.
 	 * 
 	 * @param list
-	 *            This is list of Tasks object. each element contains different
+	 *            This is list of Task object. each element contains different
 	 *            commands entered by user
 	 */
 	public ArrayList<Task> import_From_File(ArrayList<Task> list) {
@@ -107,7 +115,7 @@ public class Logic {
 	 * @param cmd
 	 *            The current command that is being processed
 	 * @param list
-	 *            This is list of Tasks object. each element contains different
+	 *            This is list of Task object. each element contains different
 	 *            commands entered by user
 	 * @param GUI
 	 * @return
@@ -180,7 +188,7 @@ public class Logic {
 
 	}
 
-	private String markCommand(Task cmd, ArrayList<Task> list) {
+	private String doneCommand(Task cmd, ArrayList<Task> list) {
 
 		tempList.clear();
 		tempList.addAll(list);
@@ -230,29 +238,20 @@ public class Logic {
 	}
 	
 	private void sortList(ArrayList<Task> list) {
-		ArrayList<Task> todo = new ArrayList<Task>();
-		ArrayList<Task> todoSort = new ArrayList<Task>();
-		ArrayList<Task> mark = new ArrayList<Task>();
-		ArrayList<Task> markSort = new ArrayList<Task>();
+		sortByMark(list);
+	}
 
-		for (int i = 0; i < list.size(); i++) {
-			if (list.get(i).detail.contains("(completed)")) 
-				mark.add(list.get(i));
-			else 
-				todo.add(list.get(i));
-		}
+	public Date getDate(String date_input){
+		DateGroup group= new DateGroup();
 		
-		todoSort.addAll(getFloatTasks(todo));
-		todoSort.addAll(getTimedTasks(todo));
-		markSort.addAll(getFloatTasks(mark));
-		markSort.addAll(getTimedTasks(mark));
+		group = p.getNattyDateGroup(date_input);
+		Date date = new Date();
+		date = group.getDates().get(0);
 		
-		list.clear();
-		list.addAll(todoSort);
-		list.addAll(markSort);
+		return date;
 	}
 	
-	private ArrayList<Task> getFloatTasks(ArrayList<Task> list){
+	private ArrayList<Task> getFloatTask(ArrayList<Task> list){
 		ArrayList<Task> floating = new ArrayList<Task>();
 		
 		for(int k=0; k<list.size();k++){
@@ -262,7 +261,7 @@ public class Logic {
 		return floating;
 	}
 	
-	private ArrayList<Task> getTimedTasks(ArrayList<Task> list){
+	private ArrayList<Task> getTimedTask(ArrayList<Task> list){
 		ArrayList<Task> timed = new ArrayList<Task>();
 		
 		for(int k=0; k<list.size();k++){
@@ -278,10 +277,10 @@ public class Logic {
 		for(int i=1; i<list.size();i++){
 			for(int j=0; j<list.size()-i; j++){
 				String date_input1 = list.get(j).endDate.toString();
-				Date date1 = p.getDate(date_input1);
+				Date date1 = getDate(date_input1);
 				
 				String date_input2 = list.get(j+1).endDate.toString();
-				Date date2 = p.getDate(date_input2);
+				Date date2 = getDate(date_input2);
 				
 				if(date2.before(date1))
 					Collections.swap(list, j, j+1);
@@ -289,13 +288,61 @@ public class Logic {
 		}
 	}
 	
-	public Date getDate(String date_input){
-		DateGroup group= new DateGroup();
+	private void sortByMark(ArrayList<Task> list) {
+		ArrayList<Task> todo = new ArrayList<Task>();
+		ArrayList<Task> todoSort = new ArrayList<Task>();
+		ArrayList<Task> mark = new ArrayList<Task>();
+		ArrayList<Task> markSort = new ArrayList<Task>();
+
+		for (int i = 0; i < list.size(); i++) {
+			if (list.get(i).detail.contains("(completed)")) 
+				mark.add(list.get(i));
+			else 
+				todo.add(list.get(i));
+		}
 		
-		group = p.getNattyDateGroup(date_input);
-		List<Date> dates = group.getDates();
-		Date date = dates.get(0);
+		todoSort.addAll(getFloatTask(todo));
+		todoSort.addAll(getTimedTask(todo));
+		markSort.addAll(getFloatTask(mark));
+		markSort.addAll(getTimedTask(mark));
 		
-		return date;
+		list.clear();
+		list.addAll(todoSort);
+		list.addAll(markSort);
+
+	}
+
+	private ArrayList<Task> getTaskWithRange(ArrayList<Task> list, Date dateScope){
+		ArrayList<Task> temp = new ArrayList<Task>();	
+		Date today = getDate("23:59:59 today");
+		Date yesterday = getDate("23:59:59 yesterday");
+		
+		for(int i=0; i<list.size(); i++){
+			String date_input = list.get(i).endDate;
+			Date date = getDate(date_input);
+			
+			// get today's todo tasks
+			if(dateScope.equals(today)){
+				if(date.before(today) && date.after(yesterday))
+					temp.add(list.get(i));
+			}
+			
+			else{
+				if(!date.after(dateScope))
+					temp.add(list.get(i));
+			}
+		}
+		return temp;
+	}
+	
+	public ArrayList<Task> displayTask(ArrayList<Task> list, String dateStr){
+		ArrayList<Task> temp = new ArrayList<Task>();	
+		temp.addAll(list);
+		
+		Date date = getDate(dateStr);
+		temp.addAll(getTaskWithRange(temp, date));
+		sortList(temp);
+	
+		return temp;
 	}
 }
