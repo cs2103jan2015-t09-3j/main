@@ -115,6 +115,9 @@ public class UI extends JFrame {
 		columnModel.getColumn(0).setMaxWidth(50);
 		columnModel.getColumn(0).setMinWidth(49);
 		columnModel.getColumn(1).setMinWidth(340);
+		columnModel.getColumn(2).setMinWidth(130);
+		columnModel.getColumn(3).setMinWidth(130);
+		
 
 		String name = tableModel.getColumnName(0);
 		Font f = table.getFont();
