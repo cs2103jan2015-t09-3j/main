@@ -426,8 +426,8 @@ public class UI extends JFrame {
 	private static void printList_today(ArrayList<Task> list, String keyword) {
 		processFeedback("Displaying today's tasks");
 		clearTable();
-		Date tomorrow = l.getDate("23:59 tomorrow");
-		Date today = l.getDate("00:00 today");
+		Date today_start = l.getDate("00:00 today");
+		Date today_end = l.getDate("23:59 today");
 
 		for (int i = 0; i < list.size(); i++) {
 			String task_date = list.get(i).endDate;
@@ -435,7 +435,7 @@ public class UI extends JFrame {
 			if (!task_date.equals(DEFAULT_STRING)) {
 
 				Date taskdate = l.getDate(task_date);
-				if (taskdate.before(tomorrow) && taskdate.after(today)) {
+				if (taskdate.after(today_start) && taskdate.before(today_end)) {
 					if (list.get(i).detail.contains(keyword)
 							|| list.get(i).startDate.contains(keyword)
 							|| list.get(i).endDate.contains(keyword)) {
