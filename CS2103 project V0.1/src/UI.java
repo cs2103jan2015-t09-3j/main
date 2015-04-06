@@ -34,7 +34,6 @@ import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableModel;
 
-
 @SuppressWarnings("serial")
 public class UI extends JFrame {
 	private static final String DEFAULT_STRING = "none";
@@ -42,7 +41,7 @@ public class UI extends JFrame {
 	static ArrayList<Tasks> list;
 	static JMenuBar menubar = new JMenuBar();
 	static JMenu display;
-	static JMenuItem today,oneweek, onemonth,all;
+	static JMenuItem today, oneweek, onemonth, all;
 	static JLabel bg;
 	static JLabel feedbacks;
 	static JButton command_reference_button, send_button;
@@ -131,7 +130,7 @@ public class UI extends JFrame {
 		add(input_panel, BorderLayout.SOUTH);
 		add(feedback_panel, BorderLayout.NORTH);
 		add(table_panel);
-		
+
 		setJMenuBar(menubar);
 		display = new JMenu("display");
 		menubar.add(display);
@@ -146,7 +145,6 @@ public class UI extends JFrame {
 		display.add(onemonth);
 		display.addSeparator();
 		display.add(all);
-
 
 		revalidate();
 		repaint();
@@ -184,7 +182,7 @@ public class UI extends JFrame {
 		UI GUI = new UI();
 		list = l.import_From_File(list);
 		printFeedback("Displaying All Tasks:");
-		printWhat(print_what,list,"");
+		printWhat(print_what, list, "");
 
 		takeInputs(GUI);
 
@@ -218,36 +216,36 @@ public class UI extends JFrame {
 				}
 
 			});
-			
-			//When menu is clicked
+
+			// When menu is clicked
 			today.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
-					print_what="today";
-					printWhat(print_what,list,"");
+					print_what = "today";
+					printWhat(print_what, list, "");
 					printFeedback("Displaying today's Tasks:");
 
 				}
 			});
 			oneweek.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
-					print_what="weeks";
-					printWhat(print_what,list,"");
+					print_what = "weeks";
+					printWhat(print_what, list, "");
 					printFeedback("Displaying Tasks in one week:");
 
 				}
 			});
 			onemonth.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
-					print_what="month";
-					printWhat(print_what,list,"");
+					print_what = "month";
+					printWhat(print_what, list, "");
 					printFeedback("Displaying Tasks in one month:");
 
 				}
 			});
 			all.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
-					print_what="entire";
-					printWhat(print_what,list,"");
+					print_what = "entire";
+					printWhat(print_what, list, "");
 					printFeedback("Displaying All Tasks:");
 
 				}
@@ -292,21 +290,20 @@ public class UI extends JFrame {
 		}
 	}
 
-	protected static void printWhat(String printWhat, ArrayList<Tasks> list, String keyword) {
-		
-		ArrayList<Tasks> displayList = new ArrayList<Tasks>();
-		
+	protected static void printWhat(String printWhat, ArrayList<Tasks> list,
+			String keyword) {
+
 		switch (printWhat) {
 		case "weeks": {
-			printList_weeks(displayList, keyword);
+			printList_weeks(list, keyword);
 			break;
 		}
 		case "today": {
-			printList_today(displayList, keyword);
+			printList_today(list, keyword);
 			break;
 		}
 		case "month": {
-			printList_month(displayList, keyword);
+			printList_month(list, keyword);
 			break;
 		}
 		case "entire": {
@@ -318,37 +315,88 @@ public class UI extends JFrame {
 	}
 
 	private static void printList_today(ArrayList<Tasks> list, String keyword) {
-		ArrayList<Tasks> sortedListD = new ArrayList<Tasks>();
-		String key = keyword;
-		Date today = l.getDate("23:59:59 today");
-		Date yesterday = l.getDate("23:59:59 yesterday");
-		
-		for (int i=0;i<list.size();i++) {
-			String dateStr = list.get(i).endDate;
-			Date date = l.getDate(dateStr);
-			if(date.after(yesterday) && date.before(today))
-				sortedListD.add(list.get(i));
+		clearTable();
+		Date tomorrow = l.getDate("23:59 tomorrow");
+		Date today = l.getDate("00:00 today");
+
+		for (int i = 0; i < list.size(); i++) {
+			String task_date = list.get(i).endDate;
+
+			if (!task_date.equals( DEFAULT_STRING)) {
+
+				Date taskdate = l.getDate(task_date);
+				if (taskdate.before(tomorrow) && taskdate.after(today)) {
+					if (list.get(i).detail.contains(keyword)
+							|| list.get(i).startDate.contains(keyword)
+							|| list.get(i).endDate.contains(keyword)) {
+						int taskNum = i + 1;
+						String task = list.get(i).detail;
+						String startDate = list.get(i).startDate;
+						String endDate = list.get(i).endDate;
+						Object[] data = { taskNum, task, startDate, endDate };
+						tableModel.addRow(data);
+					}
+				}
+			}
 		}
-		printList(sortedListD, key);		
+
 	}
 
 	private static void printList_weeks(ArrayList<Tasks> list, String keyword) {
-		ArrayList<Tasks> sortedListW = new ArrayList<Tasks>();
-		sortedListW.addAll(l.displayTasks(list, "23:59:59 in 1 week" ));
-		printList(sortedListW, keyword);
-	}
-	
-	private static void printList_month(ArrayList<Tasks> list, String keyword) {
-		ArrayList<Tasks> sortedList = new ArrayList<Tasks>();
-		sortedList.addAll(l.displayTasks(list, "23:59:59 next month" ));
-		printList(sortedList, keyword);
-	}
-	
-	private static void printList_entire(ArrayList<Tasks> list, String keyword) {
-		printList(list, keyword);
+		clearTable();
+		Date next_week = l.getDate("23:59 in 1 week");
+		Date today = l.getDate("00:00 today");
+		for (int i = 0; i < list.size(); i++) {
+			String task_date = list.get(i).endDate;
+
+			if (!task_date.equals( DEFAULT_STRING)) {
+
+				Date taskdate = l.getDate(task_date);
+				if (taskdate.before(next_week) && taskdate.after(today)) {
+					if (list.get(i).detail.contains(keyword)
+							|| list.get(i).startDate.contains(keyword)
+							|| list.get(i).endDate.contains(keyword)) {
+						int taskNum = i + 1;
+						String task = list.get(i).detail;
+						String startDate = list.get(i).startDate;
+						String endDate = list.get(i).endDate;
+						Object[] data = { taskNum, task, startDate, endDate };
+						tableModel.addRow(data);
+					}
+				}
+			}
+		}
+
 	}
 
-	protected static void printList(ArrayList<Tasks> list, String keyword) {
+	private static void printList_month(ArrayList<Tasks> list, String keyword) {
+		clearTable();
+		Date next_month = l.getDate("23:59 in 1 month");
+		Date today = l.getDate("00:00 today");
+		for (int i = 0; i < list.size(); i++) {
+			String task_date = list.get(i).endDate;
+
+			if (!task_date.equals( DEFAULT_STRING)) {
+
+				Date taskdate = l.getDate(task_date);
+				if (taskdate.before(next_month) && taskdate.after(today)) {
+					if (list.get(i).detail.contains(keyword)
+							|| list.get(i).startDate.contains(keyword)
+							|| list.get(i).endDate.contains(keyword)) {
+						int taskNum = i + 1;
+						String task = list.get(i).detail;
+						String startDate = list.get(i).startDate;
+						String endDate = list.get(i).endDate;
+						Object[] data = { taskNum, task, startDate, endDate };
+						tableModel.addRow(data);
+					}
+				}
+			}
+		}
+
+	}
+
+	private static void printList_entire(ArrayList<Tasks> list, String keyword) {
 		clearTable();
 		for (int i = 0; i < list.size(); i++) {
 			if (list.get(i).detail.contains(keyword)

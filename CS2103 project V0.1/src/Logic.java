@@ -3,6 +3,7 @@ import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
+import java.util.Iterator;
 import java.util.List;
 
 import com.joestelmach.natty.DateGroup;
@@ -238,8 +239,8 @@ public class Logic {
 		DateGroup group= new DateGroup();
 		
 		group = p.getNattyDateGroup(date_input);
-		List<Date> dates = group.getDates();
-		Date date = dates.get(0);
+		Date date = new Date();
+		date = group.getDates().get(0);
 		
 		return date;
 	}
