@@ -32,6 +32,7 @@ import javax.swing.OverlayLayout;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.table.TableCellRenderer;
+import javax.swing.table.TableColumn;
 import javax.swing.table.TableColumnModel;
 import javax.swing.table.TableModel;
 
@@ -42,7 +43,7 @@ public class UI extends JFrame {
 	static ArrayList<Task> list;
 	static JMenuBar menubar = new JMenuBar();
 	static JMenu display;
-	static JMenuItem today, oneweek, onemonth, all, floating, completed;
+	static JMenuItem today, oneweek, onemonth, all, floating, completed, recurring;
 	static JLabel bg;
 	static JLabel feedbacks;
 	static JButton help_button, send_button;
@@ -52,8 +53,8 @@ public class UI extends JFrame {
 	static String input = DEFAULT_STRING;
 	static JTable table;
 	static BufferedImage image;
-	static final String[] columns = { "Task", "Task Description",
-			"Start Date", "End Date" };
+	static final String[] columns = { "Task", "Task Description", "Start Date",
+			"End Date" };
 	protected static String print_what = "all";
 	static DefaultTableModel tableModel = new DefaultTableModel(columns, 0);
 
@@ -85,23 +86,19 @@ public class UI extends JFrame {
 				return false;
 			}
 
-			@Override
-			public Component prepareRenderer(TableCellRenderer r, int data,
-					int columns) {
-				Component c = super.prepareRenderer(r, data, columns);
-
-				if (columns == 1) {
-					c.setFont(new Font("Serif", Font.PLAIN, 17));
-				} else {
-					c.setBackground(Color.LIGHT_GRAY);
-				}
-				if (isCellSelected(data, columns)) {
-					// text_field.setText(c.getComponentAt(0,1).toString());
-					// text_field.setText("lol");
-				}
-				return c;
-			}
-
+			/*
+			 * public Component prepareRenderer(TableCellRenderer r, int data,
+			 * int columns) {
+			 * 
+			 * Component c = super.prepareRenderer(r, data, columns);
+			 * 
+			 * if (columns == 1 ) { c.setFont(new Font("Serif", Font.PLAIN,
+			 * 17)); } if (isCellSelected(data, columns)) { //
+			 * text_field.setText(c.getComponentAt(0,1).toString()); //
+			 * text_field.setText("lol"); }
+			 * 
+			 * return c; }
+			 */
 			protected void paintComponent(Graphics g) {
 				g.drawImage(image, 0, 0, getWidth(), getHeight(), null);
 				super.paintComponent(g);
@@ -117,7 +114,6 @@ public class UI extends JFrame {
 		columnModel.getColumn(1).setMinWidth(340);
 		columnModel.getColumn(2).setMinWidth(130);
 		columnModel.getColumn(3).setMinWidth(130);
-		
 
 		String name = tableModel.getColumnName(0);
 		Font f = table.getFont();
@@ -154,6 +150,7 @@ public class UI extends JFrame {
 		all = new JMenuItem("All tasks");
 		floating = new JMenuItem("Floating tasks");
 		completed = new JMenuItem("Completed tasks");
+		recurring= new JMenuItem("Recurring tasks");
 		display.add(today);
 		display.addSeparator();
 		display.add(oneweek);
@@ -164,6 +161,7 @@ public class UI extends JFrame {
 		display.addSeparator();
 		display.add(floating);
 		display.add(completed);
+		display.add(recurring);
 
 		revalidate();
 		repaint();
@@ -206,10 +204,18 @@ public class UI extends JFrame {
 	private static void summonHelpScreen() {
 		final JFrame reference = new JFrame("User Help");
 		reference.setVisible(true);
-		reference.setSize(700, 500);
+		reference.setSize(700, 800);
 		reference.setLayout(new FlowLayout(3));
 		final JPanel reference_panel = new JPanel();
-		reference_panel.setLayout(new GridLayout(20, 1));
+		reference_panel.setLayout(new GridLayout(70, 1));
+//		reference_panel.setPreferredSize(new Dimension( 700,500));
+		JScrollPane scrollFrame = new JScrollPane(reference_panel);
+		reference_panel.setAutoscrolls(true);
+		scrollFrame.setPreferredSize(new Dimension( 680,800));
+
+
+
+//		reference.pack();
 		ArrayList<String> texts = new ArrayList<String>();
 		l.import_instruction(texts);
 		for (int i = 0; i < texts.size(); i++) {
@@ -220,7 +226,7 @@ public class UI extends JFrame {
 
 		}
 
-		reference.add(reference_panel);
+		reference.add(scrollFrame, reference_panel);
 		reference.revalidate();
 		reference.repaint();
 	}
@@ -310,6 +316,13 @@ public class UI extends JFrame {
 
 				}
 			});
+			recurring.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					print_what = "recurring";
+					printWhat(print_what, list, "");
+
+				}
+			});
 			// When button is pressed
 			send_button.addActionListener(new ActionListener() {
 				public void actionPerformed(ActionEvent e) {
@@ -357,7 +370,11 @@ public class UI extends JFrame {
 			break;
 		}
 		case "completed": {
-			printList_completed(list,keyword);
+			printList_completed(list, keyword);
+			break;
+		}
+		case "recurring": {
+			printList_recurring(list, keyword);
 			break;
 		}
 		default: {
@@ -368,10 +385,52 @@ public class UI extends JFrame {
 
 	}
 
+	private static void printList_recurring(ArrayList<Task> list,
+			String keyword) {
+		processFeedback("Displaying all recurring tasks");
+		clearTable();
+		int row_count=0;
+		for (int i = 0; i < list.size(); i++) {
+			if (list.get(i).recurring_interval!=0) {
+				if (list.get(i).detail.contains(keyword)
+						|| list.get(i).startDate.contains(keyword)
+						|| list.get(i).endDate.contains(keyword)) {
+					int taskNum = i + 1;
+					String task = list.get(i).detail;
+
+					String startDate = list.get(i).startDate;
+					if (startDate.equals(DEFAULT_STRING)) {
+						startDate = "";
+					}
+					String endDate = list.get(i).endDate;
+					if (endDate.equals(DEFAULT_STRING)) {
+						endDate = "";
+					}
+		//			collapseRecurring(list);
+					checkCompleted(row_count, taskNum, task, startDate, endDate);
+					row_count++;
+				}
+			}
+		}
+		
+	}
+
+	private static void collapseRecurring(ArrayList<Task> list) {
+		String temp=DEFAULT_STRING;
+		for(int i=0; i<list.size(); i++){
+			if(list.get(i).recurring_interval!=0){
+				temp=list.get(i).detail;
+				
+			}
+		}
+		
+	}
+
 	private static void printList_completed(ArrayList<Task> list2,
 			String keyword) {
 		processFeedback("Displaying all completed tasks");
 		clearTable();
+		int row_count=0;
 		for (int i = 0; i < list.size(); i++) {
 			if (list.get(i).detail.contains("(completed)")) {
 				if (list.get(i).detail.contains(keyword)
@@ -379,9 +438,7 @@ public class UI extends JFrame {
 						|| list.get(i).endDate.contains(keyword)) {
 					int taskNum = i + 1;
 					String task = list.get(i).detail;
-					if (task.contains("(completed)")) {
-						paintBold(i);
-					}
+
 					String startDate = list.get(i).startDate;
 					if (startDate.equals(DEFAULT_STRING)) {
 						startDate = "";
@@ -390,17 +447,18 @@ public class UI extends JFrame {
 					if (endDate.equals(DEFAULT_STRING)) {
 						endDate = "";
 					}
-					Object[] data = { taskNum, task, startDate, endDate };
-					tableModel.addRow(data);
+					checkCompleted(row_count, taskNum, task, startDate, endDate);
+					row_count++;
 				}
 			}
 		}
-		
+
 	}
 
 	private static void printList_floating(ArrayList<Task> list, String keyword) {
 		processFeedback("Displaying all floating tasks");
 		clearTable();
+		int row_count=0;
 		for (int i = 0; i < list.size(); i++) {
 			if (list.get(i).endDate.equals(DEFAULT_STRING)) {
 				if (list.get(i).detail.contains(keyword)
@@ -408,9 +466,7 @@ public class UI extends JFrame {
 						|| list.get(i).endDate.contains(keyword)) {
 					int taskNum = i + 1;
 					String task = list.get(i).detail;
-					if (task.contains("(completed)")) {
-						paintBold(i);
-					}
+
 					String startDate = list.get(i).startDate;
 					if (startDate.equals(DEFAULT_STRING)) {
 						startDate = "";
@@ -419,8 +475,8 @@ public class UI extends JFrame {
 					if (endDate.equals(DEFAULT_STRING)) {
 						endDate = "";
 					}
-					Object[] data = { taskNum, task, startDate, endDate };
-					tableModel.addRow(data);
+					checkCompleted(row_count, taskNum, task, startDate, endDate);
+					row_count++;
 				}
 			}
 		}
@@ -432,6 +488,7 @@ public class UI extends JFrame {
 		clearTable();
 		Date today_start = l.getDate("00:00 today");
 		Date today_end = l.getDate("23:59 today");
+		int row_count=0;
 
 		for (int i = 0; i < list.size(); i++) {
 			String task_date = list.get(i).endDate;
@@ -453,8 +510,8 @@ public class UI extends JFrame {
 						if (endDate.equals(DEFAULT_STRING)) {
 							endDate = "";
 						}
-						Object[] data = { taskNum, task, startDate, endDate };
-						tableModel.addRow(data);
+						checkCompleted(row_count, taskNum, task, startDate, endDate);
+						row_count++;
 					}
 				}
 			}
@@ -467,6 +524,7 @@ public class UI extends JFrame {
 		clearTable();
 		Date next_week = l.getDate("23:59 in 1 week");
 		Date today = l.getDate("00:00 today");
+		int row_count=0;
 		for (int i = 0; i < list.size(); i++) {
 			String task_date = list.get(i).endDate;
 
@@ -487,9 +545,8 @@ public class UI extends JFrame {
 						if (endDate.equals(DEFAULT_STRING)) {
 							endDate = "";
 						}
-						Object[] data = { taskNum, task, startDate, endDate };
-						tableModel.addRow(data);
-
+						checkCompleted(row_count, taskNum, task, startDate, endDate);
+						row_count++;
 					}
 				}
 			}
@@ -502,6 +559,7 @@ public class UI extends JFrame {
 		clearTable();
 		Date next_month = l.getDate("23:59 in 1 month");
 		Date today = l.getDate("00:00 today");
+		int row_count=0;
 		for (int i = 0; i < list.size(); i++) {
 			String task_date = list.get(i).endDate;
 
@@ -522,8 +580,8 @@ public class UI extends JFrame {
 						if (endDate.equals(DEFAULT_STRING)) {
 							endDate = "";
 						}
-						Object[] data = { taskNum, task, startDate, endDate };
-						tableModel.addRow(data);
+						checkCompleted(row_count, taskNum, task, startDate, endDate);
+						row_count++;
 					}
 				}
 			}
@@ -531,18 +589,33 @@ public class UI extends JFrame {
 
 	}
 
+	private static void checkCompleted(int i, int taskNum, String task,
+			String startDate, String endDate) {
+		if (task.contains("(completed)")) {
+			Object[] data = { taskNum, task, startDate, endDate };
+
+			tableModel.addRow(data);
+
+			paintTable(i, "bold");
+
+		} else {
+			Object[] data = { taskNum, task, startDate, endDate };
+			tableModel.addRow(data);
+			paintTable(i, "plain");
+		}
+	}
+
 	private static void printList_entire(ArrayList<Task> list, String keyword) {
 		processFeedback("Displaying all tasks");
 		clearTable();
+		int row_count=0;
+		
 		for (int i = 0; i < list.size(); i++) {
 			if (list.get(i).detail.contains(keyword)
 					|| list.get(i).startDate.contains(keyword)
 					|| list.get(i).endDate.contains(keyword)) {
 				int taskNum = i + 1;
 				String task = list.get(i).detail;
-				if (task.contains("(completed)")) {
-					paintBold(i);
-				}
 				String startDate = list.get(i).startDate;
 				if (startDate.equals(DEFAULT_STRING)) {
 					startDate = "";
@@ -551,13 +624,48 @@ public class UI extends JFrame {
 				if (endDate.equals(DEFAULT_STRING)) {
 					endDate = "";
 				}
-				Object[] data = { taskNum, task, startDate, endDate };
-				tableModel.addRow(data);
+				checkCompleted(row_count, taskNum, task, startDate, endDate);
+				row_count++;
 			}
 		}
 	}
 
-	private static void paintBold(int i) {
+	private static void paintTable(int i, String font) {
+
+		final TableCellRenderer renderer = table
+				.getDefaultRenderer(Object.class);
+
+		table.setDefaultRenderer(Object.class, new TableCellRenderer() {
+
+			public Component getTableCellRendererComponent(JTable table,
+					Object value,
+
+					boolean isSelected, boolean hasFocus, int row, int column)
+
+			{
+
+				Component c = renderer.getTableCellRendererComponent(table,
+						value, isSelected,
+
+						hasFocus, row, column);
+				if(font.equals("plain")){
+					c.setFont(new Font("Serif", Font.PLAIN, 17));
+				}
+				
+
+				if (row == i) {
+					
+					if(font.equals("bold")){
+						c.setFont(new Font("Serif", Font.BOLD, 17));
+					}
+
+				}
+
+				return c;
+
+			}
+
+		});
 
 	}
 
@@ -577,23 +685,3 @@ public class UI extends JFrame {
 
 	}
 }
-/*
- * @SuppressWarnings("serial") class edittablerenderer extends
- * DefaultTableCellRenderer {
- * 
- * 
- * 
- * 
- * public Component getedittablerendererComponent(JTable table, Object value,
- * boolean isSelected, boolean hasFocus, int row, int col) {
- * 
- * Component c = super.getTableCellRendererComponent(table, value, isSelected,
- * hasFocus, row, col); Object valueAt = table.getModel().getValueAt(row, col);
- * String s = ""; if (valueAt != null) { s = valueAt.toString(); }
- * 
- * if (s.equalsIgnoreCase("yellow")) { c.setForeground(Color.YELLOW);
- * c.setBackground(Color.gray); } else { c.setForeground(Color.black);
- * c.setBackground(Color.WHITE); }
- * 
- * return c; } }
- */

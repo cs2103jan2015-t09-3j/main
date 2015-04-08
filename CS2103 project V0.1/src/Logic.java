@@ -20,7 +20,6 @@ public class Logic {
 	ArrayList<Task> currList = new ArrayList<Task>();
 	static String command_type = DEFAULT_STRING;
 
-
 	int edit = 0;
 
 	/**
@@ -80,11 +79,14 @@ public class Logic {
 		case "search": {
 			return searchCommand(list, cmd.detail);
 		}
-		case "display" :{
+		case "display": {
 			return "display " + cmd.detail;
 		}
 		case "help": {
 			return "help";
+		}
+		case "recur" :{
+			return recurCommand(list, cmd);
 		}
 		default: {
 			return "Invalid Command";
@@ -92,8 +94,14 @@ public class Logic {
 		}
 	}
 
-	
-	
+	private String recurCommand(ArrayList<Task> list, Task cmd) {
+		int index = Integer.parseInt(cmd.detail.trim());
+		cmd.detail = list.get(index).detail;
+		addRecurring( cmd, list);
+		list.remove(index);
+		return "The task no. "+index + " has been changed to the recurring task!";
+	}
+
 	/**
 	 * This method imports items in the text file currently saved in same
 	 * directory and put them in the array list.
@@ -130,7 +138,11 @@ public class Logic {
 	private String addCommand(Task cmd, ArrayList<Task> list) {
 		tempList.clear();
 		tempList.addAll(list);
-		if (edit == 0) {
+		if (cmd.recurring_interval != 0) {
+			addRecurring(cmd, list);
+			return "Recurring task " + cmd.detail
+					+ " has been successfully added!";
+		} else if (edit == 0) {
 			list.add(cmd);
 			return cmd.detail + " has been successfully added!";
 		} else {
@@ -138,6 +150,50 @@ public class Logic {
 			replaceItem(list, cmd, edit);
 			edit = 0;
 			return list.get(edit).detail + " has been successfully edited!";
+		}
+
+	}
+
+	private void addRecurring(Task cmd, ArrayList<Task> list) {
+
+		Integer intt = 0;
+		if (cmd.recurring_until != DEFAULT_STRING) {
+			Task t = new Task();
+			t.endDate = "today";
+
+			while (getDate(t.endDate).before(getDate(cmd.recurring_until))) {
+				t = new Task();
+				
+				t.detail = cmd.detail;
+				t.recurring_interval=cmd.recurring_interval;
+
+				String date = getDate(
+						intt.toString() + " " + cmd.recurring_period + " after "+cmd.recurring_from)
+						.toString();
+				date = date.substring(0, date.length() - 1);
+				t.endDate = p.trimDate(date);
+				intt += cmd.recurring_interval;
+				
+				if (getDate(t.endDate).before(getDate("23:59 "+cmd.recurring_until))) {
+					
+					list.add(t);
+				}
+
+			}
+
+		} else {
+			for (int i = 0; i < 10; i++) {
+				Task t = new Task();
+				t.detail = cmd.detail;
+				intt += cmd.recurring_interval;
+				t.recurring_interval=cmd.recurring_interval;
+				t.endDate = getDate(
+						intt.toString() + " " + cmd.recurring_period + " after "+cmd.recurring_from)
+						.toString();
+				t.endDate = p.trimDate(t.endDate);
+				list.add(t);
+
+			}
 		}
 
 	}
@@ -234,60 +290,60 @@ public class Logic {
 
 	public String parseDate(String date) {
 		return (p.getNattyDateGroup(date)).getDates().toString();
-		
+
 	}
-	
+
 	private void sortList(ArrayList<Task> list) {
 		sortByMark(list);
 	}
 
-	public Date getDate(String date_input){
-		DateGroup group= new DateGroup();
-		
+	public Date getDate(String date_input) {
+		DateGroup group = new DateGroup();
+
 		group = p.getNattyDateGroup(date_input);
 		Date date = new Date();
 		date = group.getDates().get(0);
-		
+
 		return date;
 	}
-	
-	private ArrayList<Task> getFloatTask(ArrayList<Task> list){
+
+	private ArrayList<Task> getFloatTask(ArrayList<Task> list) {
 		ArrayList<Task> floating = new ArrayList<Task>();
-		
-		for(int k=0; k<list.size();k++){
-			if(list.get(k).endDate.equals(DEFAULT_STRING))
+
+		for (int k = 0; k < list.size(); k++) {
+			if (list.get(k).endDate.equals(DEFAULT_STRING))
 				floating.add(list.get(k));
 		}
 		return floating;
 	}
-	
-	private ArrayList<Task> getTimedTask(ArrayList<Task> list){
+
+	private ArrayList<Task> getTimedTask(ArrayList<Task> list) {
 		ArrayList<Task> timed = new ArrayList<Task>();
-		
-		for(int k=0; k<list.size();k++){
-			if(!list.get(k).endDate.equals(DEFAULT_STRING))
+
+		for (int k = 0; k < list.size(); k++) {
+			if (!list.get(k).endDate.equals(DEFAULT_STRING))
 				timed.add(list.get(k));
 		}
-		
+
 		sortByDate(timed);
 		return timed;
 	}
-	
+
 	private void sortByDate(ArrayList<Task> list) {
-		for(int i=1; i<list.size();i++){
-			for(int j=0; j<list.size()-i; j++){
+		for (int i = 1; i < list.size(); i++) {
+			for (int j = 0; j < list.size() - i; j++) {
 				String date_input1 = list.get(j).endDate.toString();
 				Date date1 = getDate(date_input1);
-				
-				String date_input2 = list.get(j+1).endDate.toString();
+
+				String date_input2 = list.get(j + 1).endDate.toString();
 				Date date2 = getDate(date_input2);
-				
-				if(date2.before(date1))
-					Collections.swap(list, j, j+1);
+
+				if (date2.before(date1))
+					Collections.swap(list, j, j + 1);
 			}
 		}
 	}
-	
+
 	private void sortByMark(ArrayList<Task> list) {
 		ArrayList<Task> todo = new ArrayList<Task>();
 		ArrayList<Task> todoSort = new ArrayList<Task>();
@@ -295,54 +351,55 @@ public class Logic {
 		ArrayList<Task> markSort = new ArrayList<Task>();
 
 		for (int i = 0; i < list.size(); i++) {
-			if (list.get(i).detail.contains("(completed)")) 
+			if (list.get(i).detail.contains("(completed)"))
 				mark.add(list.get(i));
-			else 
+			else
 				todo.add(list.get(i));
 		}
-		
+
 		todoSort.addAll(getFloatTask(todo));
 		todoSort.addAll(getTimedTask(todo));
 		markSort.addAll(getFloatTask(mark));
 		markSort.addAll(getTimedTask(mark));
-		
+
 		list.clear();
 		list.addAll(todoSort);
 		list.addAll(markSort);
 
 	}
 
-	private ArrayList<Task> getTaskWithRange(ArrayList<Task> list, Date dateScope){
-		ArrayList<Task> temp = new ArrayList<Task>();	
+	private ArrayList<Task> getTaskWithRange(ArrayList<Task> list,
+			Date dateScope) {
+		ArrayList<Task> temp = new ArrayList<Task>();
 		Date today = getDate("23:59:59 today");
 		Date yesterday = getDate("23:59:59 yesterday");
-		
-		for(int i=0; i<list.size(); i++){
+
+		for (int i = 0; i < list.size(); i++) {
 			String date_input = list.get(i).endDate;
 			Date date = getDate(date_input);
-			
+
 			// get today's todo tasks
-			if(dateScope.equals(today)){
-				if(date.before(today) && date.after(yesterday))
+			if (dateScope.equals(today)) {
+				if (date.before(today) && date.after(yesterday))
 					temp.add(list.get(i));
 			}
-			
-			else{
-				if(!date.after(dateScope))
+
+			else {
+				if (!date.after(dateScope))
 					temp.add(list.get(i));
 			}
 		}
 		return temp;
 	}
-	
-	public ArrayList<Task> displayTask(ArrayList<Task> list, String dateStr){
-		ArrayList<Task> temp = new ArrayList<Task>();	
+
+	public ArrayList<Task> displayTask(ArrayList<Task> list, String dateStr) {
+		ArrayList<Task> temp = new ArrayList<Task>();
 		temp.addAll(list);
-		
+
 		Date date = getDate(dateStr);
 		temp.addAll(getTaskWithRange(temp, date));
 		sortList(temp);
-	
+
 		return temp;
 	}
 }
