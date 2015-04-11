@@ -49,9 +49,11 @@ public class Logic {
 	public String implementCommand(String command_type, Task cmd,
 			ArrayList<Task> list, String feedback) {
 		switch (command_type) {
-		case "cd": {
-			s.changeDirectory(cmd.detail);
-			return saveCommand(list);
+		case "import": {
+			return importCommand(list,cmd);
+		}
+		case "export" :{
+			return exportCommand(list,cmd);
 		}
 		case "add": {
 			return addCommand(cmd, list);
@@ -96,10 +98,31 @@ public class Logic {
 		case "expand":{
 			return expandCommand(list);
 		}
+		case "background":{
+			return backgroundChange(cmd);
+		}
 		default: {
 			return "Invalid Command";
 		}
 		}
+	}
+
+	private String exportCommand(ArrayList<Task> list, Task cmd) {
+		s.changeDirectory(cmd.detail);
+		s.writeToFile(list);
+		return "The output textfile has been saved at: "+cmd.detail;
+	}
+
+	private String importCommand(ArrayList<Task> list, Task cmd) {
+		s.changeDirectory(cmd.detail);
+		list.clear();
+		list=s.readFromFile();
+		return "Imported the existing Cone.txt file from: "+cmd.detail;
+	}
+
+	private String backgroundChange(Task cmd) {
+		
+		return "background " +cmd.detail;
 	}
 
 	private String expandCommand(ArrayList<Task> list) {
@@ -305,7 +328,7 @@ public class Logic {
 	private String saveCommand(ArrayList<Task> list) {
 
 		s.writeToFile(list);
-		return "All changes saved!";
+		return "All changes saved at !";
 	}
 
 	private String clearCommand(ArrayList<Task> list, Task cmd) {

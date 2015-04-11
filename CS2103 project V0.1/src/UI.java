@@ -57,6 +57,7 @@ public class UI extends JFrame {
 			"End Date" };
 	protected static String print_what = "all";
 	static DefaultTableModel tableModel = new DefaultTableModel(columns, 0);
+	static String bgfile = "background.png";
 
 	public UI() {
 		setTitle("Cone Organizer V0.4");
@@ -168,7 +169,7 @@ public class UI extends JFrame {
 
 	}
 
-	public static void processFeedback(String text) {
+	public static void processFeedback(String text)  {
 		clearFeedback();
 		feedbacks = new JLabel();
 		feedback_panel.add(feedbacks);
@@ -202,6 +203,18 @@ public class UI extends JFrame {
 
 		} else if (text.equals("help")) {
 			summonHelpScreen();
+		}
+		else if(text.contains("background ")){
+			bgfile = text.substring(text.indexOf(' ') + 1,
+					text.length());
+			feedbacks.setText("background picture has been changed to "+bgfile);
+			try {
+				image = ImageIO.read(new File(bgfile));
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			image = makeTransparent();
 		}
 
 		else {
@@ -241,7 +254,8 @@ public class UI extends JFrame {
 	}
 
 	public static void main(String[] args) throws IOException {
-		image = ImageIO.read(new File("background.png"));
+
+		image = ImageIO.read(new File(bgfile));
 		image = makeTransparent();
 
 		UI GUI = new UI();
@@ -387,11 +401,54 @@ public class UI extends JFrame {
 			break;
 		}
 		default: {
-			printList_entire(list, keyword);
+			if(printWhat.length()<1){
+				printList_entire(list, keyword);
+				break;
+			}
+			else{
+			printList_custom(list,printWhat, keyword);
 			break;
+			}
 		}
 		}
 
+	}
+
+	private static void printList_custom(ArrayList<Task> list,
+			String printWhat, String keyword) {
+		processFeedback("Displaying tasks in "+printWhat);
+		clearTable();
+		Date end = l.getDate(printWhat+" after today 23:59");
+		Date today = l.getDate("00:00 today");
+		int row_count=0;
+		for (int i = 0; i < list.size(); i++) {
+			String task_date = list.get(i).endDate;
+
+			if (!task_date.equals(DEFAULT_STRING)) {
+
+				Date taskdate = l.getDate(task_date);
+				if (taskdate.before(end) && taskdate.after(today)) {
+					if (list.get(i).detail.contains(keyword)
+							|| list.get(i).startDate.contains(keyword)
+							|| list.get(i).endDate.contains(keyword)) {
+						int taskNum = i + 1;
+						String task = list.get(i).detail;
+						String startDate = list.get(i).startDate;
+						if (startDate.equals(DEFAULT_STRING)) {
+							startDate = "";
+						}
+						String endDate = list.get(i).endDate;
+						if (endDate.equals(DEFAULT_STRING)) {
+							endDate = "";
+						}
+						checkCompleted(row_count, taskNum, task, startDate, endDate);
+						row_count++;
+					}
+				}
+			}
+		}
+		
+		
 	}
 
 	private static void printList_recurring(ArrayList<Task> list,
@@ -424,16 +481,7 @@ public class UI extends JFrame {
 		
 	}
 
-	private static void collapseRecurring(ArrayList<Task> list) {
-		String temp=DEFAULT_STRING;
-		for(int i=0; i<list.size(); i++){
-			if(list.get(i).recurring_interval!=0){
-				temp=list.get(i).detail;
-				
-			}
-		}
-		
-	}
+
 
 	private static void printList_completed(ArrayList<Task> list2,
 			String keyword) {
