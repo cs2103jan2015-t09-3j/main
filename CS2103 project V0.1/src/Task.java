@@ -13,6 +13,7 @@ public class Task {
 	public String recurring_until=DEFAULT_STRING;
 	public String recurring_from = DEFAULT_STRING;
 	public String recurring_time = DEFAULT_STRING;
+	public boolean isPrimaryRecurringTask = false;
 	
 
 	

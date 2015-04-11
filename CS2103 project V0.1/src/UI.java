@@ -172,7 +172,15 @@ public class UI extends JFrame {
 		clearFeedback();
 		feedbacks = new JLabel();
 		feedback_panel.add(feedbacks);
-		if (text.contains("edit ")) {
+		if(text.contains("edit recur ")){
+			int index = Integer.parseInt(text.substring(text.lastIndexOf(' ') + 1,
+					text.length()));
+			
+			text_field.setText("add " + list.get(index - 1).detail);
+			list.remove(index-1);
+			feedbacks.setText("editing recurring task");
+		}
+		else if (text.contains("edit ")) {
 			int index = Integer.parseInt(text.substring(text.indexOf(' ') + 1,
 					text.length()));
 			text_field.setText("add " + list.get(index - 1).detail + " - from "
@@ -181,7 +189,8 @@ public class UI extends JFrame {
 			feedbacks.setText("Old task : " + list.get(index - 1).detail
 					+ "       Old Date : " + list.get(index - 1).startDate
 					+ " ~ " + list.get(index - 1).endDate);
-		} else if (text.contains("search ")) {
+		}
+		else if (text.contains("search ")) {
 			String keyword = text.substring(text.indexOf(' ') + 1,
 					text.length());
 			printWhat(print_what, list, keyword);

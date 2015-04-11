@@ -90,10 +90,48 @@ public class Logic {
 		case "recur": {
 			return recurCommand(list, cmd);
 		}
+		case "collapse":{
+			return collapseCommand(list);
+		}
+		case "expand":{
+			return expandCommand(list);
+		}
 		default: {
 			return "Invalid Command";
 		}
 		}
+	}
+
+	private String expandCommand(ArrayList<Task> list) {
+		for(int i=0; i<list.size(); i++){
+			if(list.get(i).isPrimaryRecurringTask==true){
+				int index = list.get(i).detail.indexOf("- every");
+				if(index!=-1){
+				list.get(i).detail = list.get(i).detail.substring(0,index);
+				Task cmd = new Task();
+				cmd = list.get(i);
+				list.remove(i);
+				addRecurring(cmd, list);
+				}
+			}
+		}
+		return "All recurring tasks are expanded";
+	}
+
+	private String collapseCommand(ArrayList<Task> list) {
+		tempList = cloneToTempList(list);
+		for(int i =0; i<list.size(); i++){
+			if(list.get(i).isPrimaryRecurringTask==true){
+				list.get(i).detail = list.get(i).detail + " - every "+list.get(i).recurring_interval+" "+list.get(i).recurring_period+" from "+list.get(i).recurring_from+" until "+list.get(i).recurring_until;
+			}
+			if(list.get(i).recurring_interval!=0){
+				if(list.get(i).isPrimaryRecurringTask==false){
+					list.remove(i);
+					i--;
+				}
+			}
+		}
+		return "All recurring tasks are collapsed!";
 	}
 
 	private String recurCommand(ArrayList<Task> list, Task cmd) {
@@ -165,6 +203,10 @@ public class Logic {
 			t.detail = cmd.detail;
 			t.endDate = cmd.recurring_from;
 			t.recurring_interval = cmd.recurring_interval;
+			t.recurring_period= cmd.recurring_period;
+			t.recurring_until = cmd.recurring_until;
+			t.recurring_from = cmd.recurring_from;
+			t.isPrimaryRecurringTask=true;
 			list.add(t);
 
 
@@ -194,6 +236,10 @@ public class Logic {
 			t.detail = cmd.detail;
 			t.endDate = cmd.recurring_from;
 			t.recurring_interval = cmd.recurring_interval;
+			t.recurring_period= cmd.recurring_period;
+			t.recurring_until = cmd.recurring_until;
+			t.recurring_from = cmd.recurring_from;
+			t.isPrimaryRecurringTask=true;
 			list.add(t);
 
 			for (int i = 1; i < 10; i++) {
@@ -320,7 +366,7 @@ public class Logic {
 		int index;
 		index = Integer.parseInt(cmd.detail);
 		edit = index;
-		return "edit " + index;
+		return "edit recur " + index;
 
 	}
 
