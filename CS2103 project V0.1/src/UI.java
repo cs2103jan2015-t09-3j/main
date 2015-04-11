@@ -59,8 +59,8 @@ public class UI extends JFrame {
 	static DefaultTableModel tableModel = new DefaultTableModel(columns, 0);
 
 	public UI() {
-		setTitle("test Program");
-		setSize(700, 500);
+		setTitle("Cone Organizer V0.4");
+		setSize(800, 700);
 		setVisible(true);
 		setDefaultCloseOperation(EXIT_ON_CLOSE);
 		setResizable(false);
@@ -124,7 +124,7 @@ public class UI extends JFrame {
 		table.setPreferredScrollableViewportSize(new Dimension(700, 100));
 		table.setFillsViewportHeight(true);
 		JScrollPane scrollbar = new JScrollPane(table);
-		scrollbar.setMaximumSize(new Dimension(700, 500));
+		scrollbar.setMaximumSize(new Dimension(800, 700));
 
 		feedback_panel = new JPanel();
 		table_panel = new JPanel(new BorderLayout());
@@ -249,7 +249,7 @@ public class UI extends JFrame {
 				image.getHeight(), BufferedImage.TYPE_INT_ARGB);
 
 		Graphics2D g2d = (Graphics2D) tmpImg.getGraphics();
-		g2d.setComposite(AlphaComposite.SrcOver.derive(0.1f));
+		g2d.setComposite(AlphaComposite.SrcOver.derive(0.4f));
 		// set the transparency level in range 0.0f - 1.0f
 		g2d.drawImage(image, 0, 0, null);
 		return tmpImg;

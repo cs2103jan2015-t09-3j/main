@@ -71,9 +71,6 @@ public class Parser {
 		if(recurringperiod.contains(" day")||recurringperiod.contains(" days")){
 			cmd.recurring_period="day";
 		}
-		else if(recurringperiod.contains(" hour")||recurringperiod.contains(" hours")){
-			cmd.recurring_period="hour";
-		}
 		else if(recurringperiod.contains(" week")||recurringperiod.contains(" weeks")){
 			cmd.recurring_period="week";
 		}
@@ -149,6 +146,17 @@ public class Parser {
 		int first = temp.indexOf("SGT");
 		temp = temp.substring(0, first - 4);
 		return temp;
+	}
+
+	public int takeoutFirstInt(String detail) {
+		int index = detail.indexOf(' ');
+		if(index!=-1){
+		return Integer.parseInt(detail.substring(0, detail.indexOf(' ')));
+		}
+		else{
+			return -1;
+			
+		}
 	}
 
 }

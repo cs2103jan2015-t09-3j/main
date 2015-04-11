@@ -41,6 +41,7 @@ public class Logic {
 		cmd = new Task();
 		command_type = p.parse(input, cmd);
 		feedback = implementCommand(command_type, cmd, list, feedback);
+		
 		sortList(list);
 		return feedback;
 	}
@@ -56,13 +57,14 @@ public class Logic {
 			return addCommand(cmd, list);
 		}
 		case "delete": {
+			
 			return deleteCommand(cmd, list);
 		}
 		case "edit": {
 			return editCommand(cmd, list);
 		}
 		case "clear": {
-			return clearCommand(list);
+			return clearCommand(list, cmd);
 		}
 		case "save": {
 			return saveCommand(list);
@@ -85,7 +87,7 @@ public class Logic {
 		case "help": {
 			return "help";
 		}
-		case "recur" :{
+		case "recur": {
 			return recurCommand(list, cmd);
 		}
 		default: {
@@ -97,9 +99,10 @@ public class Logic {
 	private String recurCommand(ArrayList<Task> list, Task cmd) {
 		int index = Integer.parseInt(cmd.detail.trim());
 		cmd.detail = list.get(index).detail;
-		addRecurring( cmd, list);
+		addRecurring(cmd, list);
 		list.remove(index);
-		return "The task no. "+index + " has been changed to the recurring task!";
+		return "The task no. " + index
+				+ " has been changed to the recurring task!";
 	}
 
 	/**
@@ -136,8 +139,8 @@ public class Logic {
 	}
 
 	private String addCommand(Task cmd, ArrayList<Task> list) {
-		tempList.clear();
-		tempList.addAll(list);
+		tempList = cloneToTempList(list);
+		
 		if (cmd.recurring_interval != 0) {
 			addRecurring(cmd, list);
 			return "Recurring task " + cmd.detail
@@ -156,41 +159,50 @@ public class Logic {
 
 	private void addRecurring(Task cmd, ArrayList<Task> list) {
 
-		Integer intt = 0;
+
 		if (cmd.recurring_until != DEFAULT_STRING) {
 			Task t = new Task();
-			t.endDate = "today";
+			t.detail = cmd.detail;
+			t.endDate = cmd.recurring_from;
+			t.recurring_interval = cmd.recurring_interval;
+			list.add(t);
 
-			while (getDate(t.endDate).before(getDate(cmd.recurring_until))) {
-				t = new Task();
-				
-				t.detail = cmd.detail;
-				t.recurring_interval=cmd.recurring_interval;
 
+			while (getDate(t.endDate).before(
+					getDate("one day after "+cmd.recurring_until))) {
+			
 				String date = getDate(
-						intt.toString() + " " + cmd.recurring_period + " after "+cmd.recurring_from)
-						.toString();
-				date = date.substring(0, date.length() - 1);
+						cmd.recurring_interval + " " + cmd.recurring_period
+								+ " after " + t.endDate).toString();
+				date = date.substring(0, date.length());
+				t = new Task();
+				t.detail = cmd.detail;
+				t.recurring_interval = cmd.recurring_interval;
 				t.endDate = p.trimDate(date);
-				intt += cmd.recurring_interval;
 				
-				if (getDate(t.endDate).before(getDate("23:59 "+cmd.recurring_until))) {
-					
+
+				if (getDate(t.endDate).before(
+						getDate("23:59 " + cmd.recurring_until))) {
+
 					list.add(t);
 				}
 
 			}
 
 		} else {
-			for (int i = 0; i < 10; i++) {
-				Task t = new Task();
+			Task t = new Task();
+			t.detail = cmd.detail;
+			t.endDate = cmd.recurring_from;
+			t.recurring_interval = cmd.recurring_interval;
+			list.add(t);
+
+			for (int i = 1; i < 10; i++) {
+				String date = getDate(cmd.recurring_interval + " " + cmd.recurring_period+ " after " + t.endDate).toString();
+				date = date.substring(0, date.length());
+				t = new Task();
 				t.detail = cmd.detail;
-				intt += cmd.recurring_interval;
-				t.recurring_interval=cmd.recurring_interval;
-				t.endDate = getDate(
-						intt.toString() + " " + cmd.recurring_period + " after "+cmd.recurring_from)
-						.toString();
-				t.endDate = p.trimDate(t.endDate);
+				t.recurring_interval = cmd.recurring_interval;
+				t.endDate = p.trimDate(date);
 				list.add(t);
 
 			}
@@ -200,14 +212,49 @@ public class Logic {
 
 	private String deleteCommand(Task cmd, ArrayList<Task> list) {
 
-		tempList.clear();
-		tempList.addAll(list);
-
-		int index;
-		index = Integer.parseInt(cmd.detail);
-		list.remove(index - 1);
-		return cmd.detail + "has been deleted successfully!";
+		tempList = cloneToTempList(list);
+		
+		String temp = cmd.detail;
+		String deleting = DEFAULT_STRING;
+		int index=1;
+		while (index != -1) {
+			index = p.takeoutFirstInt(temp);
+			
+			
+			if (index != -1) {
+				deleting = list.get(index-1).detail;
+				temp = temp.substring(temp.indexOf(" ") + 1, temp.length());
+				removeFromList(list, deleting);
+			}
+			else{
+				index = Integer.parseInt(temp);
+				deleting = list.get(index-1).detail;
+				removeFromList(list, deleting);
+				index =-1;
+			}
+			
+			
+		}
+		
+		return "taks number " + cmd.detail + "have been deleted successfully!";
 	}
+
+	private void removeFromList(ArrayList<Task> list, String deleting) {
+		for(int i =0; i<list.size(); i++){
+			if(list.get(i).detail.equals(deleting)){
+				list.remove(i);
+				i--;
+			}
+		}
+		
+	}
+
+	private ArrayList<Task> cloneToTempList(ArrayList<Task> list) {
+		tempList = new ArrayList<Task>();
+		tempList.addAll(list);
+		return tempList;
+	}
+
 
 	private String saveCommand(ArrayList<Task> list) {
 
@@ -215,12 +262,46 @@ public class Logic {
 		return "All changes saved!";
 	}
 
-	private String clearCommand(ArrayList<Task> list) {
-		tempList.clear();
-		tempList.addAll(list);
+	private String clearCommand(ArrayList<Task> list, Task cmd) {
+		tempList = cloneToTempList(list);
+		if(cmd.detail==DEFAULT_STRING){
+			
 
 		list.clear();
 		return "All contents are cleared";
+		}
+		else{
+			if(cmd.detail.equals("completed")){
+				clearCompleted(list);
+				return "All completed contents are cleared";
+				
+			}
+			else if(cmd.detail.equals("recurring")){
+				clearRecurring(list);
+				return "All recurring contents are cleared";
+			}
+		}
+		return FAILURE;
+	}
+
+	private void clearRecurring(ArrayList<Task> list) {
+		for (int i=0; i<list.size(); i++){
+			if(list.get(i).recurring_interval!=0){
+				list.remove(i);
+				i--;
+			}
+		}
+		
+	}
+
+	private void clearCompleted(ArrayList<Task> list) {
+		for (int i=0; i<list.size(); i++){
+			if(list.get(i).detail.contains("(completed)")){
+				list.remove(i);
+				i--;
+			}
+		}
+		
 	}
 
 	private String undoCommand(ArrayList<Task> list) {
@@ -234,8 +315,7 @@ public class Logic {
 
 	private String editCommand(Task cmd, ArrayList<Task> list) {
 
-		tempList.clear();
-		tempList.addAll(list);
+		tempList = cloneToTempList(list);
 
 		int index;
 		index = Integer.parseInt(cmd.detail);
@@ -246,8 +326,7 @@ public class Logic {
 
 	private String doneCommand(Task cmd, ArrayList<Task> list) {
 
-		tempList.clear();
-		tempList.addAll(list);
+		tempList = cloneToTempList(list);
 
 		int index;
 		index = Integer.parseInt(cmd.detail);
@@ -366,40 +445,5 @@ public class Logic {
 		list.addAll(todoSort);
 		list.addAll(markSort);
 
-	}
-
-	private ArrayList<Task> getTaskWithRange(ArrayList<Task> list,
-			Date dateScope) {
-		ArrayList<Task> temp = new ArrayList<Task>();
-		Date today = getDate("23:59:59 today");
-		Date yesterday = getDate("23:59:59 yesterday");
-
-		for (int i = 0; i < list.size(); i++) {
-			String date_input = list.get(i).endDate;
-			Date date = getDate(date_input);
-
-			// get today's todo tasks
-			if (dateScope.equals(today)) {
-				if (date.before(today) && date.after(yesterday))
-					temp.add(list.get(i));
-			}
-
-			else {
-				if (!date.after(dateScope))
-					temp.add(list.get(i));
-			}
-		}
-		return temp;
-	}
-
-	public ArrayList<Task> displayTask(ArrayList<Task> list, String dateStr) {
-		ArrayList<Task> temp = new ArrayList<Task>();
-		temp.addAll(list);
-
-		Date date = getDate(dateStr);
-		temp.addAll(getTaskWithRange(temp, date));
-		sortList(temp);
-
-		return temp;
 	}
 }
