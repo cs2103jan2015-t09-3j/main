@@ -43,7 +43,8 @@ public class UI extends JFrame {
 	static ArrayList<Task> list;
 	static JMenuBar menubar = new JMenuBar();
 	static JMenu display;
-	static JMenuItem today, oneweek, onemonth, all, floating, completed, recurring;
+	static JMenuItem today, oneweek, onemonth, all, floating, completed,
+			recurring;
 	static JLabel bg;
 	static JLabel feedbacks;
 	static JButton help_button, send_button;
@@ -59,6 +60,12 @@ public class UI extends JFrame {
 	static DefaultTableModel tableModel = new DefaultTableModel(columns, 0);
 	static String bgfile = "background.png";
 
+	/**
+	 * This method is basic constructor for the user interface of COne-Organizer
+	 * 
+	 * 
+	 * 
+	 */
 	public UI() {
 		setTitle("Cone Organizer V0.4");
 		setSize(800, 700);
@@ -87,19 +94,6 @@ public class UI extends JFrame {
 				return false;
 			}
 
-			/*
-			 * public Component prepareRenderer(TableCellRenderer r, int data,
-			 * int columns) {
-			 * 
-			 * Component c = super.prepareRenderer(r, data, columns);
-			 * 
-			 * if (columns == 1 ) { c.setFont(new Font("Serif", Font.PLAIN,
-			 * 17)); } if (isCellSelected(data, columns)) { //
-			 * text_field.setText(c.getComponentAt(0,1).toString()); //
-			 * text_field.setText("lol"); }
-			 * 
-			 * return c; }
-			 */
 			protected void paintComponent(Graphics g) {
 				g.drawImage(image, 0, 0, getWidth(), getHeight(), null);
 				super.paintComponent(g);
@@ -151,7 +145,7 @@ public class UI extends JFrame {
 		all = new JMenuItem("All tasks");
 		floating = new JMenuItem("Floating tasks");
 		completed = new JMenuItem("Completed tasks");
-		recurring= new JMenuItem("Recurring tasks");
+		recurring = new JMenuItem("Recurring tasks");
 		display.add(today);
 		display.addSeparator();
 		display.add(oneweek);
@@ -169,19 +163,27 @@ public class UI extends JFrame {
 
 	}
 
-	public static void processFeedback(String text)  {
+	/**
+	 * This method will process the feedback given by the logic or other methods
+	 * in UI for printing, and taking necessary actions
+	 * 
+	 * @param text
+	 *            The feedback to by processed
+	 * 
+	 */
+
+	public static void processFeedback(String text) {
 		clearFeedback();
 		feedbacks = new JLabel();
 		feedback_panel.add(feedbacks);
-		if(text.contains("edit recur ")){
-			int index = Integer.parseInt(text.substring(text.lastIndexOf(' ') + 1,
-					text.length()));
-			
+		if (text.contains("edit recur ")) {
+			int index = Integer.parseInt(text.substring(
+					text.lastIndexOf(' ') + 1, text.length()));
+
 			text_field.setText("add " + list.get(index - 1).detail);
-			list.remove(index-1);
+			list.remove(index - 1);
 			feedbacks.setText("editing recurring task");
-		}
-		else if (text.contains("edit ")) {
+		} else if (text.contains("edit ")) {
 			int index = Integer.parseInt(text.substring(text.indexOf(' ') + 1,
 					text.length()));
 			text_field.setText("add " + list.get(index - 1).detail + " - from "
@@ -190,8 +192,7 @@ public class UI extends JFrame {
 			feedbacks.setText("Old task : " + list.get(index - 1).detail
 					+ "       Old Date : " + list.get(index - 1).startDate
 					+ " ~ " + list.get(index - 1).endDate);
-		}
-		else if (text.contains("search ")) {
+		} else if (text.contains("search ")) {
 			String keyword = text.substring(text.indexOf(' ') + 1,
 					text.length());
 			printWhat(print_what, list, keyword);
@@ -203,11 +204,10 @@ public class UI extends JFrame {
 
 		} else if (text.equals("help")) {
 			summonHelpScreen();
-		}
-		else if(text.contains("background ")){
-			bgfile = text.substring(text.indexOf(' ') + 1,
-					text.length());
-			feedbacks.setText("background picture has been changed to "+bgfile);
+		} else if (text.contains("background ")) {
+			bgfile = text.substring(text.indexOf(' ') + 1, text.length());
+			feedbacks.setText("background picture has been changed to "
+					+ bgfile);
 			try {
 				image = ImageIO.read(new File(bgfile));
 			} catch (IOException e) {
@@ -223,6 +223,13 @@ public class UI extends JFrame {
 
 	}
 
+	/**
+	 * This method will pop the new java window that contains the user
+	 * instructions for each and every commands.
+	 * 
+	 *
+	 */
+
 	private static void summonHelpScreen() {
 		final JFrame reference = new JFrame("User Help");
 		reference.setVisible(true);
@@ -230,14 +237,11 @@ public class UI extends JFrame {
 		reference.setLayout(new FlowLayout(3));
 		final JPanel reference_panel = new JPanel();
 		reference_panel.setLayout(new GridLayout(70, 1));
-//		reference_panel.setPreferredSize(new Dimension( 700,500));
 		JScrollPane scrollFrame = new JScrollPane(reference_panel);
 		reference_panel.setAutoscrolls(true);
-		scrollFrame.setPreferredSize(new Dimension( 680,800));
+		scrollFrame.setPreferredSize(new Dimension(680, 800));
 
-
-
-//		reference.pack();
+		// reference.pack();
 		ArrayList<String> texts = new ArrayList<String>();
 		l.import_instruction(texts);
 		for (int i = 0; i < texts.size(); i++) {
@@ -253,6 +257,13 @@ public class UI extends JFrame {
 		reference.repaint();
 	}
 
+	/**
+	 * The main method where the program starts and initiate necessary
+	 * functions.
+	 * 
+	 * 
+	 */
+
 	public static void main(String[] args) throws IOException {
 
 		image = ImageIO.read(new File(bgfile));
@@ -267,6 +278,11 @@ public class UI extends JFrame {
 
 	}
 
+	/**
+	 * This method will draw a transparent imgae onto the jframe. Transparency
+	 * is set to 40% by default
+	 */
+
 	private static BufferedImage makeTransparent() {
 		BufferedImage tmpImg = new BufferedImage(image.getWidth(),
 				image.getHeight(), BufferedImage.TYPE_INT_ARGB);
@@ -277,6 +293,17 @@ public class UI extends JFrame {
 		g2d.drawImage(image, 0, 0, null);
 		return tmpImg;
 	}
+
+	/**
+	 * This method is responsible for processing the user-triggered
+	 * actions/inputs such as typing in text field or pressing buttons, clicking
+	 * on menu
+	 * 
+	 * @param GUI
+	 *            The main user interface which is going to be affected by the
+	 *            triggered events
+	 *
+	 */
 
 	private static void takeInputs(UI GUI) {
 		String temp = "default";
@@ -368,6 +395,24 @@ public class UI extends JFrame {
 		}
 	}
 
+	/**
+	 * This method will decide on what items to be displayed in the table and
+	 * call the appropriate method.
+	 * 
+	 * @param printWhat
+	 *            This string contains the information on which display method
+	 *            to call
+	 * @param list
+	 *            This is list of Task object. each element contains different
+	 *            commands entered by user
+	 * 
+	 * @param keyword
+	 *            The printing method will print out the items on the list that
+	 *            contains this keyword. "" by default
+	 * 
+	 *
+	 */
+
 	protected static void printWhat(String printWhat, ArrayList<Task> list,
 			String keyword) {
 
@@ -401,26 +446,43 @@ public class UI extends JFrame {
 			break;
 		}
 		default: {
-			if(printWhat.length()<1){
+			if (printWhat.length() < 1) {
 				printList_entire(list, keyword);
 				break;
-			}
-			else{
-			printList_custom(list,printWhat, keyword);
-			break;
+			} else {
+				printList_custom(list, printWhat, keyword);
+				break;
 			}
 		}
 		}
 
 	}
 
+	/**
+	 * This method will print the items on the task list onto table, according
+	 * to the custom input typed by user.
+	 * 
+	 * @param printWhat
+	 *            This string contains the information on which display method
+	 *            to call
+	 * @param list
+	 *            This is list of Task object. each element contains different
+	 *            commands entered by user
+	 * 
+	 * @param keyword
+	 *            The printing method will print out the items on the list that
+	 *            contains this keyword. "" by default
+	 * 
+	 *
+	 */
+
 	private static void printList_custom(ArrayList<Task> list,
 			String printWhat, String keyword) {
-		processFeedback("Displaying tasks in "+printWhat);
+		processFeedback("Displaying tasks in " + printWhat);
 		clearTable();
-		Date end = l.getDate(printWhat+" after today 23:59");
+		Date end = l.getDate(printWhat + " after today 23:59");
 		Date today = l.getDate("00:00 today");
-		int row_count=0;
+		int row_count = 0;
 		for (int i = 0; i < list.size(); i++) {
 			String task_date = list.get(i).endDate;
 
@@ -441,23 +503,36 @@ public class UI extends JFrame {
 						if (endDate.equals(DEFAULT_STRING)) {
 							endDate = "";
 						}
-						checkCompleted(row_count, taskNum, task, startDate, endDate);
+						checkCompleted(row_count, taskNum, task, startDate,
+								endDate);
 						row_count++;
 					}
 				}
 			}
 		}
-		
-		
+
 	}
 
-	private static void printList_recurring(ArrayList<Task> list,
-			String keyword) {
+	/**
+	 * This method will print all the recurring tasks in the list
+	 * 
+	 *
+	 * @param list
+	 *            This is list of Task object. each element contains different
+	 *            commands entered by user
+	 * 
+	 * @param keyword
+	 *            The printing method will print out the items on the list that
+	 *            contains this keyword. "" by default
+	 * 
+	 *
+	 */
+	private static void printList_recurring(ArrayList<Task> list, String keyword) {
 		processFeedback("Displaying all recurring tasks");
 		clearTable();
-		int row_count=0;
+		int row_count = 0;
 		for (int i = 0; i < list.size(); i++) {
-			if (list.get(i).recurring_interval!=0) {
+			if (list.get(i).recurring_interval != 0) {
 				if (list.get(i).detail.contains(keyword)
 						|| list.get(i).startDate.contains(keyword)
 						|| list.get(i).endDate.contains(keyword)) {
@@ -472,22 +547,34 @@ public class UI extends JFrame {
 					if (endDate.equals(DEFAULT_STRING)) {
 						endDate = "";
 					}
-		//			collapseRecurring(list);
+					// collapseRecurring(list);
 					checkCompleted(row_count, taskNum, task, startDate, endDate);
 					row_count++;
 				}
 			}
 		}
-		
+
 	}
 
+	/**
+	 * This method will print out all the tasks marked completed by user.
+	 * 
+	 * 
+	 * @param list
+	 *            This is list of Task object. each element contains different
+	 *            commands entered by user
+	 * 
+	 * @param keyword
+	 *            The printing method will print out the items on the list that
+	 *            contains this keyword. "" by default
+	 * 
+	 *
+	 */
 
-
-	private static void printList_completed(ArrayList<Task> list2,
-			String keyword) {
+	private static void printList_completed(ArrayList<Task> list, String keyword) {
 		processFeedback("Displaying all completed tasks");
 		clearTable();
-		int row_count=0;
+		int row_count = 0;
 		for (int i = 0; i < list.size(); i++) {
 			if (list.get(i).detail.contains("(completed)")) {
 				if (list.get(i).detail.contains(keyword)
@@ -512,10 +599,25 @@ public class UI extends JFrame {
 
 	}
 
+	/**
+	 * This method will print out all the floating tasks with no specific
+	 * deadline
+	 * 
+	 * 
+	 * @param list
+	 *            This is list of Task object. each element contains different
+	 *            commands entered by user
+	 * 
+	 * @param keyword
+	 *            The printing method will print out the items on the list that
+	 *            contains this keyword. "" by default
+	 * 
+	 *
+	 */
 	private static void printList_floating(ArrayList<Task> list, String keyword) {
 		processFeedback("Displaying all floating tasks");
 		clearTable();
-		int row_count=0;
+		int row_count = 0;
 		for (int i = 0; i < list.size(); i++) {
 			if (list.get(i).endDate.equals(DEFAULT_STRING)) {
 				if (list.get(i).detail.contains(keyword)
@@ -540,12 +642,26 @@ public class UI extends JFrame {
 
 	}
 
+	/**
+	 * This method will print out all the tasks that is due today
+	 * 
+	 * 
+	 * @param list
+	 *            This is list of Task object. each element contains different
+	 *            commands entered by user
+	 * 
+	 * @param keyword
+	 *            The printing method will print out the items on the list that
+	 *            contains this keyword. "" by default
+	 * 
+	 *
+	 */
 	private static void printList_today(ArrayList<Task> list, String keyword) {
 		processFeedback("Displaying today's tasks");
 		clearTable();
 		Date today_start = l.getDate("00:00 today");
 		Date today_end = l.getDate("23:59 today");
-		int row_count=0;
+		int row_count = 0;
 
 		for (int i = 0; i < list.size(); i++) {
 			String task_date = list.get(i).endDate;
@@ -567,7 +683,8 @@ public class UI extends JFrame {
 						if (endDate.equals(DEFAULT_STRING)) {
 							endDate = "";
 						}
-						checkCompleted(row_count, taskNum, task, startDate, endDate);
+						checkCompleted(row_count, taskNum, task, startDate,
+								endDate);
 						row_count++;
 					}
 				}
@@ -576,12 +693,26 @@ public class UI extends JFrame {
 
 	}
 
+	/**
+	 * This method will print out all the tasks due in one week.
+	 * 
+	 * 
+	 * @param list
+	 *            This is list of Task object. each element contains different
+	 *            commands entered by user
+	 * 
+	 * @param keyword
+	 *            The printing method will print out the items on the list that
+	 *            contains this keyword. "" by default
+	 * 
+	 *
+	 */
 	private static void printList_weeks(ArrayList<Task> list, String keyword) {
 		processFeedback("Displaying this week's tasks");
 		clearTable();
 		Date next_week = l.getDate("23:59 in 1 week");
 		Date today = l.getDate("00:00 today");
-		int row_count=0;
+		int row_count = 0;
 		for (int i = 0; i < list.size(); i++) {
 			String task_date = list.get(i).endDate;
 
@@ -602,7 +733,8 @@ public class UI extends JFrame {
 						if (endDate.equals(DEFAULT_STRING)) {
 							endDate = "";
 						}
-						checkCompleted(row_count, taskNum, task, startDate, endDate);
+						checkCompleted(row_count, taskNum, task, startDate,
+								endDate);
 						row_count++;
 					}
 				}
@@ -611,12 +743,26 @@ public class UI extends JFrame {
 
 	}
 
+	/**
+	 * This method will print out all the tasks due one month from today.
+	 * 
+	 * 
+	 * @param list
+	 *            This is list of Task object. each element contains different
+	 *            commands entered by user
+	 * 
+	 * @param keyword
+	 *            The printing method will print out the items on the list that
+	 *            contains this keyword. "" by default
+	 * 
+	 *
+	 */
 	private static void printList_month(ArrayList<Task> list, String keyword) {
 		processFeedback("Displaying this month's tasks");
 		clearTable();
 		Date next_month = l.getDate("23:59 in 1 month");
 		Date today = l.getDate("00:00 today");
-		int row_count=0;
+		int row_count = 0;
 		for (int i = 0; i < list.size(); i++) {
 			String task_date = list.get(i).endDate;
 
@@ -637,7 +783,8 @@ public class UI extends JFrame {
 						if (endDate.equals(DEFAULT_STRING)) {
 							endDate = "";
 						}
-						checkCompleted(row_count, taskNum, task, startDate, endDate);
+						checkCompleted(row_count, taskNum, task, startDate,
+								endDate);
 						row_count++;
 					}
 				}
@@ -646,27 +793,61 @@ public class UI extends JFrame {
 
 	}
 
-	private static void checkCompleted(int i, int taskNum, String task,
+	/**
+	 * This method checks if the item in the list is marked completed by the
+	 * user.
+	 * 
+	 * 
+	 * @param index
+	 *            This is the position of item in the list to be checked.
+	 * @param taskNum
+	 *            This is the number of the task that is to be displayed in the
+	 *            table
+	 * 
+	 * @param startDate
+	 *            This is the startDate of the task that is to be added into the
+	 *            table
+	 * @param endDate
+	 *            This is the finishing date of the task that is to be added
+	 *            into the table
+	 * 
+	 *
+	 */
+	private static void checkCompleted(int index, int taskNum, String task,
 			String startDate, String endDate) {
 		if (task.contains("(completed)")) {
 			Object[] data = { taskNum, task, startDate, endDate };
 
 			tableModel.addRow(data);
 
-			paintTable(i, "bold");
+			paintTable(index, "bold");
 
 		} else {
 			Object[] data = { taskNum, task, startDate, endDate };
 			tableModel.addRow(data);
-			paintTable(i, "plain");
+			paintTable(index, "plain");
 		}
 	}
 
+	/**
+	 * This method will print out all the tasks including floating tasks.
+	 * 
+	 * 
+	 * @param list
+	 *            This is list of Task object. each element contains different
+	 *            commands entered by user
+	 * 
+	 * @param keyword
+	 *            The printing method will print out the items on the list that
+	 *            contains this keyword. "" by default
+	 * 
+	 *
+	 */
 	private static void printList_entire(ArrayList<Task> list, String keyword) {
 		processFeedback("Displaying all tasks");
 		clearTable();
-		int row_count=0;
-		
+		int row_count = 0;
+
 		for (int i = 0; i < list.size(); i++) {
 			if (list.get(i).detail.contains(keyword)
 					|| list.get(i).startDate.contains(keyword)
@@ -687,7 +868,20 @@ public class UI extends JFrame {
 		}
 	}
 
-	private static void paintTable(int i, String font) {
+	/**
+	 * This method is responsible for design of the table such as fond size of
+	 * items and the column width
+	 * 
+	 * 
+	 * @param rowIndex
+	 *            This is the index of the items in a specific row to be changed
+	 * 
+	 * @param font
+	 *            This string defines the font of the items to be changed.
+	 * 
+	 *
+	 */
+	private static void paintTable(int rowIndex, String font) {
 
 		final TableCellRenderer renderer = table
 				.getDefaultRenderer(Object.class);
@@ -705,14 +899,13 @@ public class UI extends JFrame {
 						value, isSelected,
 
 						hasFocus, row, column);
-				if(font.equals("plain")){
+				if (font.equals("plain")) {
 					c.setFont(new Font("Serif", Font.PLAIN, 17));
 				}
-				
 
-				if (row == i) {
-					
-					if(font.equals("bold")){
+				if (row == rowIndex) {
+
+					if (font.equals("bold")) {
 						c.setFont(new Font("Serif", Font.BOLD, 17));
 					}
 
@@ -726,6 +919,13 @@ public class UI extends JFrame {
 
 	}
 
+	/**
+	 * This method will remove all information in the table for printing updated tasks
+	 * 
+	 * 
+	 *
+	 *
+	 */
 	private static void clearTable() {
 		int size = tableModel.getRowCount();
 		for (int i = 0; i < size; i++) {
@@ -734,6 +934,12 @@ public class UI extends JFrame {
 
 	}
 
+	/**
+	 *This method will clear the current feedback panel for the new feedback.
+	 * 
+	 * 
+	 * 
+	 */
 	protected static void clearFeedback() {
 
 		feedback_panel.removeAll();

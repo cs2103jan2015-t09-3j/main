@@ -32,8 +32,8 @@ public class Logic {
 	 * @param list
 	 *            This is list of Task object. each element contains different
 	 *            commands entered by user
-	 * @param gUI
-	 * @return
+	 *
+	 * @return This method will return the feedback to the UI to be processed.
 	 */
 	public String executeCommand(String input, ArrayList<Task> list) {
 		String feedback = DEFAULT_STRING;
@@ -41,32 +41,54 @@ public class Logic {
 		cmd = new Task();
 		command_type = p.parse(input, cmd);
 		feedback = implementCommand(command_type, cmd, list, feedback);
-		
+
 		sortList(list);
 		return feedback;
 	}
 
+	/**
+	 * This method will process the identified command type and call an
+	 * appropriate method for implementation.
+	 * 
+	 * @param command_type
+	 *            This is the command type that is entered by the user (eg. add,
+	 *            delete)
+	 * 
+	 * @param cmd
+	 *            This is the Task object where the current input details are
+	 *            stored.
+	 * 
+	 * @param list
+	 *            This is list of Task object. each element contains different
+	 *            commands entered by user
+	 * 
+	 * @param keyword
+	 *            The printing method will print out the items on the list that
+	 *            contains this keyword. "" by default
+	 * 
+	 * @return It returns the feedback that is to be processed in UI.
+	 */
 	public String implementCommand(String command_type, Task cmd,
 			ArrayList<Task> list, String feedback) {
 		switch (command_type) {
 		case "import": {
-			return importCommand(list,cmd);
+			return importCommand(list, cmd.detail);
 		}
-		case "export" :{
-			return exportCommand(list,cmd);
+		case "export": {
+			return exportCommand(list, cmd.detail);
 		}
 		case "add": {
 			return addCommand(cmd, list);
 		}
 		case "delete": {
-			
-			return deleteCommand(cmd, list);
+
+			return deleteCommand(cmd.detail, list);
 		}
 		case "edit": {
 			return editCommand(cmd, list);
 		}
 		case "clear": {
-			return clearCommand(list, cmd);
+			return clearCommand(list, cmd.detail);
 		}
 		case "save": {
 			return saveCommand(list);
@@ -92,14 +114,14 @@ public class Logic {
 		case "recur": {
 			return recurCommand(list, cmd);
 		}
-		case "collapse":{
+		case "collapse": {
 			return collapseCommand(list);
 		}
-		case "expand":{
+		case "expand": {
 			return expandCommand(list);
 		}
-		case "background":{
-			return backgroundChange(cmd);
+		case "background": {
+			return backgroundChange(cmd.detail);
 		}
 		default: {
 			return "Invalid Command";
@@ -107,48 +129,121 @@ public class Logic {
 		}
 	}
 
-	private String exportCommand(ArrayList<Task> list, Task cmd) {
-		s.changeDirectory(cmd.detail);
+	/**
+	 * This method export the current list of task into text file
+	 * 
+	 * 
+	 * @param list
+	 *            This is list of Task object. each element contains different
+	 *            commands entered by user
+	 * 
+	 * @param directory
+	 *            The location of text file to be stored.
+	 * 
+	 * 
+	 * @return This method will return the feedback to be processed in UI
+	 *
+	 */
+	private String exportCommand(ArrayList<Task> list, String directory) {
+		s.changeDirectory(directory);
 		s.writeToFile(list);
-		return "The output textfile has been saved at: "+cmd.detail;
+		return "The output textfile has been saved at: " + directory;
 	}
 
-	private String importCommand(ArrayList<Task> list, Task cmd) {
-		s.changeDirectory(cmd.detail);
+	/**
+	 * This method import a list of tasks from text file in a given location to
+	 * the list.
+	 * 
+	 * 
+	 * @param list
+	 *            This is list of Task object. each element contains different
+	 *            commands entered by user
+	 * 
+	 * @param directory
+	 *            The location of text file to be read from.
+	 * 
+	 * 
+	 * @return This method will return the feedback to be processed in UI
+	 *
+	 */
+	private String importCommand(ArrayList<Task> list, String directory) {
+		s.changeDirectory(directory);
 		list.clear();
-		list=s.readFromFile();
-		return "Imported the existing Cone.txt file from: "+cmd.detail;
+		list = s.readFromFile();
+		return "Imported the existing Cone.txt file from: " + directory;
 	}
 
-	private String backgroundChange(Task cmd) {
-		
-		return "background " +cmd.detail;
+	/**
+	 * This method will change the background picture to the specified image
+	 * file
+	 * 
+	 * 
+	 * @param directory
+	 *            This is the directory of image file to be read
+	 * 
+	 * @return This method will return the feedback to be processed in UI
+	 *
+	 */
+	private String backgroundChange(String directory) {
+
+		return "background is set to " + directory;
 	}
 
+	/**
+	 * This method expands the recurring tasks that are collapsed by "collapse"
+	 * command
+	 * 
+	 * 
+	 * @param list
+	 *            This is list of Task object. each element contains different
+	 *            commands entered by user
+	 * 
+	 * 
+	 * @return This method will return the feedback to be processed in UI
+	 *
+	 */
 	private String expandCommand(ArrayList<Task> list) {
-		for(int i=0; i<list.size(); i++){
-			if(list.get(i).isPrimaryRecurringTask==true){
+		for (int i = 0; i < list.size(); i++) {
+			if (list.get(i).isPrimaryRecurringTask == true) {
 				int index = list.get(i).detail.indexOf("- every");
-				if(index!=-1){
-				list.get(i).detail = list.get(i).detail.substring(0,index);
-				Task cmd = new Task();
-				cmd = list.get(i);
-				list.remove(i);
-				addRecurring(cmd, list);
+				if (index != -1) {
+					list.get(i).detail = list.get(i).detail.substring(0, index);
+					Task cmd = new Task();
+					cmd = list.get(i);
+					list.remove(i);
+					addRecurring(cmd, list);
 				}
 			}
 		}
 		return "All recurring tasks are expanded";
 	}
 
+	/**
+	 * This method will compress each recurring tasks in the list into one task
+	 * for editing and display.
+	 * 
+	 * 
+	 * @param list
+	 *            This is list of Task object. each element contains different
+	 *            commands entered by user
+	 * 
+	 * 
+	 * 
+	 * @return This method will return the feedback to be processed in UI
+	 *
+	 */
 	private String collapseCommand(ArrayList<Task> list) {
 		tempList = cloneToTempList(list);
-		for(int i =0; i<list.size(); i++){
-			if(list.get(i).isPrimaryRecurringTask==true){
-				list.get(i).detail = list.get(i).detail + " - every "+list.get(i).recurring_interval+" "+list.get(i).recurring_period+" from "+list.get(i).recurring_from+" until "+list.get(i).recurring_until;
+		for (int i = 0; i < list.size(); i++) {
+			if (list.get(i).isPrimaryRecurringTask == true) {
+				list.get(i).detail = list.get(i).detail + " - every "
+						+ list.get(i).recurring_interval + " "
+						+ list.get(i).recurring_period + " from "
+						+ list.get(i).recurring_from + " until "
+						+ list.get(i).recurring_until;
 			}
-			if(list.get(i).recurring_interval!=0){
-				if(list.get(i).isPrimaryRecurringTask==false){
+			if (list.get(i).recurring_interval != 0) {
+				if (list.get(i).isPrimaryRecurringTask == false) {
 					list.remove(i);
 					i--;
 				}
@@ -157,11 +252,27 @@ public class Logic {
 		return "All recurring tasks are collapsed!";
 	}
 
+	/**
+	 * This method allows user to change any task into recurring task
+	 * 
+	 * 
+	 * @param list
+	 *            This is list of Task object. each element contains different
+	 *            commands entered by user
+	 * 
+	 * @param cmd
+	 *            This Task variable contains the user input
+	 * 
+	 * 
+	 * @return This method will return the feedback to be processed in UI
+	 *
+	 */
 	private String recurCommand(ArrayList<Task> list, Task cmd) {
+		tempList = cloneToTempList(list);
 		int index = Integer.parseInt(cmd.detail.trim());
-		cmd.detail = list.get(index).detail;
+		cmd.detail = list.get(index - 1).detail;
 		addRecurring(cmd, list);
-		list.remove(index);
+		list.remove(index - 1);
 		return "The task no. " + index
 				+ " has been changed to the recurring task!";
 	}
@@ -173,6 +284,7 @@ public class Logic {
 	 * @param list
 	 *            This is list of Task object. each element contains different
 	 *            commands entered by user
+	 * @return It returns the feedback to be processed in UI
 	 */
 	public ArrayList<Task> import_From_File(ArrayList<Task> list) {
 		list = s.readFromFile();
@@ -180,28 +292,34 @@ public class Logic {
 	}
 
 	/**
-	 * This method assess the command type and assign an appropriate method for
-	 * each commandtype for implementation.
+	 * This method will redo the last undo done by user
 	 * 
-	 * @param command_type
-	 * @param cmd
-	 *            The current command that is being processed
 	 * @param list
 	 *            This is list of Task object. each element contains different
 	 *            commands entered by user
-	 * @param GUI
-	 * @return
+	 * @return It returns the feedback to be processed in UI
 	 */
-
 	private String redoCommand(ArrayList<Task> list) {
 		list.clear();
 		list.addAll(currList);
 		return " Redo to latest 1 undo(s)!";
 	}
 
+	/**
+	 * This method adds new task to the list, by calling appropriate method
+	 * depending on the type of task
+	 * 
+	 * @param cmd
+	 *            This variable contains the information of current task to be
+	 *            added
+	 * @param list
+	 *            This is list of Task object. each element contains different
+	 *            commands entered by user
+	 * @return It returns the feedback to be processed in UI
+	 */
 	private String addCommand(Task cmd, ArrayList<Task> list) {
 		tempList = cloneToTempList(list);
-		
+
 		if (cmd.recurring_interval != 0) {
 			addRecurring(cmd, list);
 			return "Recurring task " + cmd.detail
@@ -218,134 +336,224 @@ public class Logic {
 
 	}
 
+	/**
+	 * This method will add the recurring task to the list
+	 * 
+	 * @param cmd
+	 *            This variable contains the information of task such as
+	 *            description and endDate, and recurring information
+	 * @param list
+	 *            This is list of Task object. each element contains different
+	 *            commands entered by user
+	 * 
+	 */
 	private void addRecurring(Task cmd, ArrayList<Task> list) {
 
-
+		Task temp = new Task();
+		temp.detail = cmd.detail;
+		temp.endDate = cmd.recurring_from;
+		temp.recurring_interval = cmd.recurring_interval;
+		temp.recurring_period = cmd.recurring_period;
+		temp.recurring_until = cmd.recurring_until;
+		temp.recurring_from = cmd.recurring_from;
+		temp.isPrimaryRecurringTask = true;
+		list.add(temp);
 		if (cmd.recurring_until != DEFAULT_STRING) {
-			Task t = new Task();
-			t.detail = cmd.detail;
-			t.endDate = cmd.recurring_from;
-			t.recurring_interval = cmd.recurring_interval;
-			t.recurring_period= cmd.recurring_period;
-			t.recurring_until = cmd.recurring_until;
-			t.recurring_from = cmd.recurring_from;
-			t.isPrimaryRecurringTask=true;
-			list.add(t);
-
-
-			while (getDate(t.endDate).before(
-					getDate("one day after "+cmd.recurring_until))) {
-			
-				String date = getDate(
-						cmd.recurring_interval + " " + cmd.recurring_period
-								+ " after " + t.endDate).toString();
-				date = date.substring(0, date.length());
-				t = new Task();
-				t.detail = cmd.detail;
-				t.recurring_interval = cmd.recurring_interval;
-				t.endDate = p.trimDate(date);
-				
-
-				if (getDate(t.endDate).before(
-						getDate("23:59 " + cmd.recurring_until))) {
-
-					list.add(t);
-				}
-
-			}
+			addRecurringGivenUntil(cmd, list, temp);
 
 		} else {
-			Task t = new Task();
-			t.detail = cmd.detail;
-			t.endDate = cmd.recurring_from;
-			t.recurring_interval = cmd.recurring_interval;
-			t.recurring_period= cmd.recurring_period;
-			t.recurring_until = cmd.recurring_until;
-			t.recurring_from = cmd.recurring_from;
-			t.isPrimaryRecurringTask=true;
-			list.add(t);
 
-			for (int i = 1; i < 10; i++) {
-				String date = getDate(cmd.recurring_interval + " " + cmd.recurring_period+ " after " + t.endDate).toString();
-				date = date.substring(0, date.length());
-				t = new Task();
-				t.detail = cmd.detail;
-				t.recurring_interval = cmd.recurring_interval;
-				t.endDate = p.trimDate(date);
-				list.add(t);
-
-			}
+			addRecurringWithoutUntil(cmd, list, temp);
 		}
 
 	}
 
-	private String deleteCommand(Task cmd, ArrayList<Task> list) {
+	/**
+	 * This method will add the recurring without ending date into the list. It
+	 * will add the task 10 times
+	 * 
+	 * @param cmd
+	 *            This variable contains the information of task such as
+	 *            description and endDate, and recurring information
+	 * @param list
+	 *            This is list of Task object. each element contains different
+	 *            commands entered by user
+	 * @param temp
+	 *            this is the temporary task object to be used
+	 * 
+	 */
+	private void addRecurringWithoutUntil(Task cmd, ArrayList<Task> list,
+			Task temp) {
+		for (int i = 1; i < 10; i++) {
+			String date = getDate(
+					cmd.recurring_interval + " " + cmd.recurring_period
+							+ " after " + temp.endDate).toString();
+			date = date.substring(0, date.length());
+			temp = new Task();
+			temp.detail = cmd.detail;
+			temp.recurring_interval = cmd.recurring_interval;
+			temp.endDate = p.trimDate(date);
+			list.add(temp);
 
-		tempList = cloneToTempList(list);
-		
-		String temp = cmd.detail;
-		String deleting = DEFAULT_STRING;
-		int index=1;
-		while (index != -1) {
-			index = p.takeoutFirstInt(temp);
-			
-			
-			if (index != -1) {
-				deleting = list.get(index-1).detail;
-				temp = temp.substring(temp.indexOf(" ") + 1, temp.length());
-				removeFromList(list, deleting);
+		}
+		for(int i=0; i<list.size(); i++){
+			if(list.get(i).isPrimaryRecurringTask==true && list.get(i).detail.equals( temp.detail)){
+				list.get(i).recurring_until = temp.endDate;
 			}
-			else{
-				index = Integer.parseInt(temp);
-				deleting = list.get(index-1).detail;
-				removeFromList(list, deleting);
-				index =-1;
-			}
-			
-			
 		}
 		
+	}
+
+	/**
+	 * This method will add the recurring with ending date into the list
+	 * 
+	 * @param cmd
+	 *            This variable contains the information of task such as
+	 *            description and endDate, and recurring information
+	 * @param list
+	 *            This is list of Task object. each element contains different
+	 *            commands entered by user
+	 * @param temp
+	 *            this is the temporary task object to be used
+	 * 
+	 */
+	private void addRecurringGivenUntil(Task cmd, ArrayList<Task> list,
+			Task temp) {
+		while (getDate(temp.endDate).before(
+				getDate("one day after " + cmd.recurring_until))) {
+
+			String date = getDate(
+					cmd.recurring_interval + " " + cmd.recurring_period
+							+ " after " + temp.endDate).toString();
+			date = date.substring(0, date.length());
+			temp = new Task();
+			temp.detail = cmd.detail;
+			temp.recurring_interval = cmd.recurring_interval;
+			temp.endDate = p.trimDate(date);
+
+			if (getDate(temp.endDate).before(
+					getDate("23:59 " + cmd.recurring_until))) {
+
+				list.add(temp);
+			}
+
+		}
+		
+	}
+
+	/**
+	 * This method will delete the item that is specified by user
+	 * 
+	 * @param indice
+	 *            This String contains all the task numbers to be deleted,
+	 *            separate by one space.
+	 * @param list
+	 *            This is list of Task object. each element contains different
+	 *            commands entered by user
+	 * @return This method will return the feedback to be processed by UI
+	 */
+	private String deleteCommand(String indice, ArrayList<Task> list) {
+
+		tempList = cloneToTempList(list);
+
+		String temp = indice;
+		String deleting = DEFAULT_STRING;
+		int index = 1;
+		while (index != -1) {
+			index = p.takeoutFirstInt(temp);
+
+			if (index != -1) {
+				deleting = list.get(index - 1).detail;
+				temp = temp.substring(temp.indexOf(" ") + 1, temp.length());
+				removeFromList(list, deleting);
+			} else {
+				index = Integer.parseInt(temp);
+				deleting = list.get(index - 1).detail;
+				removeFromList(list, deleting);
+				index = -1;
+			}
+
+		}
+
 		return "taks number " + cmd.detail + "have been deleted successfully!";
 	}
 
+	/**
+	 * This method remove all tasks marked as deleting in deleteCommand()
+	 * 
+	 *
+	 * @param list
+	 *            This is list of Task object. each element contains different
+	 *            commands entered by user
+	 * @param deleting
+	 *            this is the guide for which task to remove from list.
+	 * 
+	 */
 	private void removeFromList(ArrayList<Task> list, String deleting) {
-		for(int i =0; i<list.size(); i++){
-			if(list.get(i).detail.equals(deleting)){
+		for (int i = 0; i < list.size(); i++) {
+			if (list.get(i).detail.equals(deleting)) {
 				list.remove(i);
 				i--;
 			}
 		}
-		
+
 	}
 
+	/**
+	 * This method will create a templist that is containing the information of
+	 * the list, mainly for undoing purpose
+	 * 
+	 *
+	 * @param list
+	 *            This is list of Task object. each element contains different
+	 *            commands entered by user
+	 *
+	 */
 	private ArrayList<Task> cloneToTempList(ArrayList<Task> list) {
 		tempList = new ArrayList<Task>();
 		tempList.addAll(list);
 		return tempList;
 	}
 
-
+	/**
+	 * This method saves all changes to the list into the text file
+	 * 
+	 *
+	 * @param list
+	 *            This is list of Task object. each element contains different
+	 *            commands entered by user
+	 *
+	 */
 	private String saveCommand(ArrayList<Task> list) {
 
 		s.writeToFile(list);
 		return "All changes saved at !";
 	}
 
-	private String clearCommand(ArrayList<Task> list, Task cmd) {
+	/**
+	 * This method will clear all specified items in the list(recurring, all, completed)
+	 * 
+	 * 
+	 * @param list
+	 *            This is list of Task object. each element contains different
+	 *            commands entered by user
+	 * @param cmd
+	 *            This contains information on which tpye of tasks to be cleared
+	 *
+	 * 
+	 */
+	private String clearCommand(ArrayList<Task> list, String cmd) {
 		tempList = cloneToTempList(list);
-		if(cmd.detail==DEFAULT_STRING){
-			
+		if (cmd == DEFAULT_STRING) {
 
-		list.clear();
-		return "All contents are cleared";
-		}
-		else{
-			if(cmd.detail.equals("completed")){
+			list.clear();
+			return "All contents are cleared";
+		} else {
+			if (cmd.equals("completed")) {
 				clearCompleted(list);
 				return "All completed contents are cleared";
-				
-			}
-			else if(cmd.detail.equals("recurring")){
+
+			} else if (cmd.equals("recurring")) {
 				clearRecurring(list);
 				return "All recurring contents are cleared";
 			}
@@ -353,26 +561,55 @@ public class Logic {
 		return FAILURE;
 	}
 
+	/**
+	 * This method will clear All recurring tasks from the list
+	 * 
+	 * 
+	 * @param list
+	 *            This is list of Task object. each element contains different
+	 *            commands entered by user
+	 * 
+	 * 
+	 */
 	private void clearRecurring(ArrayList<Task> list) {
-		for (int i=0; i<list.size(); i++){
-			if(list.get(i).recurring_interval!=0){
+		for (int i = 0; i < list.size(); i++) {
+			if (list.get(i).recurring_interval != 0) {
 				list.remove(i);
 				i--;
 			}
 		}
-		
+
 	}
 
+	/**
+	 * This method will clear all tasks marked as completed by the user
+	 * 
+	 * 
+	 * @param list
+	 *            This is list of Task object. each element contains different
+	 *            commands entered by user
+	 *
+	 * 
+	 */
 	private void clearCompleted(ArrayList<Task> list) {
-		for (int i=0; i<list.size(); i++){
-			if(list.get(i).detail.contains("(completed)")){
+		for (int i = 0; i < list.size(); i++) {
+			if (list.get(i).detail.contains("(completed)")) {
 				list.remove(i);
 				i--;
 			}
 		}
-		
+
 	}
 
+	/**
+	 * This method will undo the last change made to the list
+	 * 
+	 * 
+	 * @param list
+	 *            This is list of Task object. each element contains different
+	 *            commands entered by user
+	 *
+	 */
 	private String undoCommand(ArrayList<Task> list) {
 
 		currList.clear();
@@ -382,17 +619,47 @@ public class Logic {
 		return " Undo to latest 1 change(s)!";
 	}
 
+	/**
+	 * This method will allow user to edit the existing item in the list
+	 * 
+	 *  @param cmd
+	 *            This contains information of new task
+	 *
+	 * @param list
+	 *            This is list of Task object. each element contains different
+	 *            commands entered by user
+	 *
+	 * 
+	 */
 	private String editCommand(Task cmd, ArrayList<Task> list) {
 
 		tempList = cloneToTempList(list);
 
 		int index;
 		index = Integer.parseInt(cmd.detail);
+		
 		edit = index;
+		if(list.get(index-1).isPrimaryRecurringTask==true){
 		return "edit recur " + index;
+		}
+		else{
+			return "edit "+index;
+		}
 
 	}
 
+	/**
+	 * This method will allow user to mark a task as completed
+	 * 
+	 *  @param cmd
+	 *            This contains user command input
+	 *
+	 * @param list
+	 *            This is list of Task object. each element contains different
+	 *            commands entered by user
+	 *
+	 * 
+	 */
 	private String doneCommand(Task cmd, ArrayList<Task> list) {
 
 		tempList = cloneToTempList(list);
@@ -410,6 +677,18 @@ public class Logic {
 		}
 	}
 
+	/**
+	 * This method will allow user to search the existing items in the list by keyword
+	 * 
+	 *  @param cmd
+	 *            This contains information of new task
+	 *
+	 * @param list
+	 *            This is list of Task object. each element contains different
+	 *            commands entered by user
+	 *
+	 * 
+	 */
 	private String searchCommand(ArrayList<Task> list, String detail) {
 
 		for (int i = 0; i < list.size(); i++) {
@@ -424,6 +703,18 @@ public class Logic {
 
 	}
 
+	/**
+	 * This method replaces the old item in the list with the new item
+	 * 
+	 *  @param cmd
+	 *            This contains information of new task
+	 *
+	 * @param list
+	 *            This is list of Task object. each element contains different
+	 *            commands entered by user
+	 *
+	 * 
+	 */
 	private void replaceItem(ArrayList<Task> list, Task cmd, int index) {
 		list.add(index - 1, cmd);
 
@@ -431,20 +722,46 @@ public class Logic {
 
 	}
 
+	/**
+	 * This method will import the instruction file into the program
+	 * 
+	 *  @param cmd
+	 *            This contains information of new task
+	 *
+	 * @param text
+	 * 			this is arraylist of string which contains all the instructions line by line
+	 *
+	 * 
+	 */
 	public void import_instruction(ArrayList<String> text) {
 		s.importInstruction(text);
 
 	}
 
-	public String parseDate(String date) {
-		return (p.getNattyDateGroup(date)).getDates().toString();
-
-	}
+	/**
+	 * This method will sort the list by its date and completion
+	 *
+	 * @param list
+	 *            This is list of Task object. each element contains different
+	 *            commands entered by user
+	 *
+	 * 
+	 */
 
 	private void sortList(ArrayList<Task> list) {
 		sortByMark(list);
 	}
 
+	/**
+	 * This method will return the date object of the given string
+	 * 
+	 *  @param date_input
+	 *            A string containing the date information to be passed into natty parser
+	 *
+	 *@return
+	 *			It returns the date object of the given date input
+	 * 
+	 */
 	public Date getDate(String date_input) {
 		DateGroup group = new DateGroup();
 
@@ -455,6 +772,17 @@ public class Logic {
 		return date;
 	}
 
+	
+	/**
+	 * This method will return arraylist consisting of floating tasks
+	 * 
+	 * @param list
+	 *            This is list of Task object. each element contains different
+	 *            commands entered by user
+	 *
+	 * @return
+	 * 			It returns an arraylist consisting of floating tasks
+	 */
 	private ArrayList<Task> getFloatTask(ArrayList<Task> list) {
 		ArrayList<Task> floating = new ArrayList<Task>();
 
@@ -465,6 +793,16 @@ public class Logic {
 		return floating;
 	}
 
+	/**
+	 * This method will return arraylist consisting of timed tasks
+	 * 
+	 * @param list
+	 *            This is list of Task object. each element contains different
+	 *            commands entered by user
+	 *
+	 * @return
+	 * 			Returns arraylist of tasks consisting only of timed tasks
+	 */
 	private ArrayList<Task> getTimedTask(ArrayList<Task> list) {
 		ArrayList<Task> timed = new ArrayList<Task>();
 
@@ -477,6 +815,15 @@ public class Logic {
 		return timed;
 	}
 
+	/**
+	 * This method will sort the list of tasks in order of date.
+	 * 
+	 * @param list
+	 *            This is list of Task object. each element contains different
+	 *            commands entered by user
+	 *
+	 * 
+	 */
 	private void sortByDate(ArrayList<Task> list) {
 		for (int i = 1; i < list.size(); i++) {
 			for (int j = 0; j < list.size() - i; j++) {
@@ -492,6 +839,16 @@ public class Logic {
 		}
 	}
 
+	
+	/**
+	 * This method will sort the task list and gather all completed tasks together at the end
+	 * 
+	 * @param list
+	 *            This is list of Task object. each element contains different
+	 *            commands entered by user
+	 *
+	 * 
+	 */
 	private void sortByMark(ArrayList<Task> list) {
 		ArrayList<Task> todo = new ArrayList<Task>();
 		ArrayList<Task> todoSort = new ArrayList<Task>();
