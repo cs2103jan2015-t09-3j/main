@@ -151,61 +151,169 @@ public class Parser {
 		int index3 = input.indexOf("every", index2)+6;
 		int recurring_time= Integer.parseInt(input.substring(index3, input.indexOf(' ',index3)));
 		String recurringperiod = input.substring(input.indexOf(' ',input.indexOf(' ',index3)),input.length());
-		if(recurringperiod.contains(" day")||recurringperiod.contains(" days")){
-			cmd.recurring_period="day";
-		}
-		else if(recurringperiod.contains(" week")||recurringperiod.contains(" weeks")){
-			cmd.recurring_period="week";
-		}
-		else if(recurringperiod.contains(" month")||recurringperiod.contains(" months")){
-			cmd.recurring_period="month";
-		}
+		findRecurringPeriod(cmd, recurringperiod);
 		
 		int index4 = recurringperiod.indexOf("until");
 		
 		if(index4!=-1){
-			index4+=6;
-			cmd.recurring_until = recurringperiod.substring(index4,recurringperiod.length());
-			group = getNattyDateGroup(cmd.recurring_until);
-			String date = group.getDates().toString();
-			date = date.substring(1, date.length() - 1);
-			cmd.recurring_until = trimDate(date);
+			index4 = findEndDateRecur(cmd, recurringperiod, index4);
 		}
 		if(recurringperiod.contains("from")||recurringperiod.contains("on")){
 			int index5 = recurringperiod.indexOf("from");
 			if(index5!=-1){
-				index5+=5;
-				String date;
-				if(index4 == -1){
-				cmd.recurring_from = recurringperiod.substring(index5,recurringperiod.length());
-				}
-				else{
-					cmd.recurring_from = recurringperiod.substring(index5,recurringperiod.indexOf("until")-1);
-				}
-				group = getNattyDateGroup(cmd.recurring_from);
-				date = group.getDates().toString();
-				date = date.substring(1, date.length() - 1);
-				cmd.recurring_from = trimDate(date);
+				startingDateFrom(cmd, recurringperiod, index4, index5);
 			}
 			else{
-				index5=recurringperiod.indexOf("on");
-				index5+=3;
-				String date;
-				if(index4 == -1){
-				cmd.recurring_from = recurringperiod.substring(index5,recurringperiod.length());
-				}
-				else{
-					cmd.recurring_from = recurringperiod.substring(index5,recurringperiod.indexOf("until")-1);
-				}
-				group = getNattyDateGroup(cmd.recurring_from);
-				date = group.getDates().toString();
-				date = date.substring(1, date.length() - 1);
-				cmd.recurring_from = trimDate(date);
+				startingDateOn(cmd, recurringperiod, index4);
 			}
+		}
+		else{
+			noStartingDate(cmd);
+			
 		}
 		
 		cmd.recurring_interval = recurring_time;
 		
+	}
+	/**
+	 * This method will find the recurring period of the recurring task (ie. month, day, week)
+	 * 
+	 *
+	 * 
+	 * @param cmd
+	 *            This is the Task object where the current input details are
+	 *            stored.
+	 * 
+	 * @param user_input
+	 *            The user input which contains the recurring period
+	 * 
+	 */
+	private void findRecurringPeriod(Task cmd, String user_input) {
+		if(user_input.contains(" day")||user_input.contains(" days")){
+			cmd.recurring_period="day";
+		}
+		else if(user_input.contains(" week")||user_input.contains(" weeks")){
+			cmd.recurring_period="week";
+		}
+		else if(user_input.contains(" month")||user_input.contains(" months")){
+			cmd.recurring_period="month";
+		}
+	}
+	/**
+	 * This method will find the end of recurring period of the recurring task 
+	 * 
+	 *
+	 * 
+	 * @param cmd
+	 *            This is the Task object where the current input details are
+	 *            stored.
+	 * 
+	 * @param user_input
+	 *            The user input which contains the recurring period
+	 *  @param index4
+	 *  			this contains the index of the string "until" in the user input
+	 * 
+	 */
+
+//when end of recurring task is given by until
+	private int findEndDateRecur(Task cmd, String user_input, int index4) {
+		index4+=6;
+		cmd.recurring_until = user_input.substring(index4,user_input.length());
+		group = getNattyDateGroup(cmd.recurring_until);
+		String date = group.getDates().toString();
+		date = date.substring(1, date.length() - 1);
+		cmd.recurring_until = trimDate(date);
+		return index4;
+	}
+
+	/**
+	 * This method will find the end of recurring period of the recurring task 
+	 * 
+	 *
+	 * 
+	 * @param cmd
+	 *            This is the Task object where the current input details are
+	 *            stored.
+	 * 
+	 * @param user_input
+	 *            The user input which contains the recurring period
+	 *  @param index4
+	 *  			this contains the index of the string "until" in the user input
+	 *  @param index5
+	 *  			This contains the index of the string "from"
+	 * 
+	 */
+	//when "from" is typed by user as starting date of recurring task
+	private void startingDateFrom(Task cmd, String user_input, int index4,
+			int index5) {
+		index5+=5;
+		String date;
+		if(index4 == -1){
+		cmd.recurring_from = user_input.substring(index5,user_input.length());
+		}
+		else{
+			cmd.recurring_from = user_input.substring(index5,user_input.indexOf("until")-1);
+		}
+		group = getNattyDateGroup(cmd.recurring_from);
+		date = group.getDates().toString();
+		date = date.substring(1, date.length() - 1);
+		cmd.recurring_from = trimDate(date);
+	}
+	
+	/**
+	 * This method will find the end of recurring period of the recurring task 
+	 * 
+	 *
+	 * 
+	 * @param cmd
+	 *            This is the Task object where the current input details are
+	 *            stored.
+	 * 
+	 * @param user_input
+	 *            The user input which contains the recurring period
+	 *  @param index4
+	 *  			this contains the index of the string "until" in the user input
+	 *  @param index5
+	 *  			This contains the index of the string "on"
+	 * 
+	 */
+	//when "on" is typed by user as starting date of recurring task
+	private void startingDateOn(Task cmd, String user_input, int index4) {
+		int index5;
+		index5=user_input.indexOf("on");
+		index5+=3;
+		String date;
+		if(index4 == -1){
+		cmd.recurring_from = user_input.substring(index5,user_input.length());
+		}
+		else{
+			cmd.recurring_from = user_input.substring(index5,user_input.indexOf("until")-1);
+		}
+		group = getNattyDateGroup(cmd.recurring_from);
+		date = group.getDates().toString();
+		date = date.substring(1, date.length() - 1);
+		cmd.recurring_from = trimDate(date);
+	}
+
+	
+	/**
+	 * This method will find the end of recurring period of the recurring task 
+	 * 
+	 *
+	 * 
+	 * @param cmd
+	 *            This is the Task object where the current input details are
+	 *            stored.
+	 *
+	 * 
+	 */
+	//When there is no starting date given
+	private void noStartingDate(Task cmd) {
+		String date = "today";
+		group = getNattyDateGroup(date);
+		date = group.getDates().toString();
+		date = date.substring(1, date.length() - 1);
+		cmd.recurring_from = trimDate(date);
 	}
 
 	/**
