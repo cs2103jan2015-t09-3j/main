@@ -178,8 +178,6 @@ public class Parser {
 	/**
 	 * This method will find the recurring period of the recurring task (ie. month, day, week)
 	 * 
-	 *
-	 * 
 	 * @param cmd
 	 *            This is the Task object where the current input details are
 	 *            stored.
@@ -202,14 +200,13 @@ public class Parser {
 	/**
 	 * This method will find the end of recurring period of the recurring task 
 	 * 
-	 *
-	 * 
 	 * @param cmd
 	 *            This is the Task object where the current input details are
 	 *            stored.
 	 * 
 	 * @param user_input
 	 *            The user input which contains the recurring period
+	 *            
 	 *  @param index4
 	 *  			this contains the index of the string "until" in the user input
 	 * 
@@ -229,16 +226,16 @@ public class Parser {
 	/**
 	 * This method will find the end of recurring period of the recurring task 
 	 * 
-	 *
-	 * 
 	 * @param cmd
 	 *            This is the Task object where the current input details are
 	 *            stored.
 	 * 
 	 * @param user_input
 	 *            The user input which contains the recurring period
+	 *            
 	 *  @param index4
 	 *  			this contains the index of the string "until" in the user input
+	 *  
 	 *  @param index5
 	 *  			This contains the index of the string "from"
 	 * 
@@ -263,16 +260,16 @@ public class Parser {
 	/**
 	 * This method will find the end of recurring period of the recurring task 
 	 * 
-	 *
-	 * 
 	 * @param cmd
 	 *            This is the Task object where the current input details are
 	 *            stored.
 	 * 
 	 * @param user_input
 	 *            The user input which contains the recurring period
+	 *            
 	 *  @param index4
 	 *  			this contains the index of the string "until" in the user input
+	 *  
 	 *  @param index5
 	 *  			This contains the index of the string "on"
 	 * 
@@ -299,12 +296,9 @@ public class Parser {
 	/**
 	 * This method will find the end of recurring period of the recurring task 
 	 * 
-	 *
-	 * 
 	 * @param cmd
 	 *            This is the Task object where the current input details are
 	 *            stored.
-	 *
 	 * 
 	 */
 	//When there is no starting date given
