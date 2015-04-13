@@ -5,6 +5,8 @@ import com.joestelmach.natty.DateGroup;
 public class Parser {
 	DateGroup group = new DateGroup();
 	static String command_type;
+
+	// Parser part -- LIQI
 	
 	/**
 	 * This method will process and call the other methods to identify the type
