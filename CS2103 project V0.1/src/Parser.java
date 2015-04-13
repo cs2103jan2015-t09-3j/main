@@ -5,8 +5,20 @@ import com.joestelmach.natty.DateGroup;
 public class Parser {
 	DateGroup group = new DateGroup();
 	static String command_type;
-
-	// Parser part -- LIQI
+	
+	/**
+	 * This method will process and call the other methods to identify the type
+	 * of command and puts the corresponding components inside Task object
+	 * 
+	 * @param input
+	 *            This is the command line entered by the user
+	 * 
+	 * @param cmd
+	 *            This is the Task object where the current input details are
+	 *            stored
+	 * 
+	 * @return It returns the command_type that is to be processed in Logic
+	 */
 	public String parse(String input, Task cmd) {
 		input.toLowerCase();
 		int index = input.indexOf(' ');
@@ -19,10 +31,33 @@ public class Parser {
 		return command_type.toLowerCase();
 	}
 
+	/**
+	 * This method will process user input which contains command only
+	 * 
+	 * @param input
+	 *            This is the command line entered by the user
+	 *            
+	 */
 	public void commandOnly(String input) {
 		command_type = input;
 	}
 
+	/**
+	 * This method will process user input which contains more than command
+	 * only and identify the type of command
+	 * 
+	 * @param input
+	 *            This is the command line entered by the user
+	 * 
+	 * @param cmd
+	 *            This is the Task object where the current input details are
+	 *            stored.
+	 *            
+	 * @param index
+	 *            This is the point in a String whereby before this point, it
+	 *            is the command type
+	 * 
+	 */
 	public void identifyType(String input, Task cmd, int index) {
 		command_type = input.substring(0, index);
 		if (input.contains("-")) {
@@ -32,6 +67,22 @@ public class Parser {
 		}
 	}
 
+	/**
+	 * This method will process timed and deadline tasks and call other functions
+	 * to process recurring tasks
+	 * 
+	 * @param input
+	 *            This is the command line entered by the user
+	 * 
+	 * @param cmd
+	 *            This is the Task object where the current input details are
+	 *            stored.
+	 * 
+	 * @param index
+	 *            This is the point in a String whereby before this point, it
+	 *            is the command type
+	 * 
+	 */
 	public void timed(String input, Task cmd, int index) {
 
 		int index2 = input.indexOf("-");
@@ -45,6 +96,21 @@ public class Parser {
 		}
 	}
 
+	/**
+	 * This method will process non-recurring tasks
+	 * 
+	 * @param input
+	 *            This is the command line entered by the user
+	 * 
+	 * @param cmd
+	 *            This is the Task object where the current input details are
+	 *            stored
+	 * 
+	 * @param index2
+	 *            This is the point in a String whereby after this point, it
+	 *            is time/ and date that the task is to be added to
+	 * 
+	 */
 	private void nonRecurring(String input, Task cmd, int index2) {
 		String date_input;
 		date_input = input.substring(index2 + 2, input.length());
@@ -64,6 +130,21 @@ public class Parser {
 		}
 	}
 
+	/**
+	 * This method will process recurring tasks
+	 * 
+	 * @param input
+	 *            This is the command line entered by the user
+	 * 
+	 * @param cmd
+	 *            This is the Task object where the current input details are
+	 *            stored
+	 * 
+	 * @param index2
+	 *            This is the point in a String whereby after this point, it
+	 *            is time/ and date that the task is to be added to
+	 * 
+	 */
 	private void recurring(String input, Task cmd, int index2) {
 		int index3 = input.indexOf("every", index2)+6;
 		int recurring_time= Integer.parseInt(input.substring(index3, input.indexOf(' ',index3)));
@@ -125,12 +206,38 @@ public class Parser {
 		
 	}
 
+	/**
+	 * This method will process floating tasks
+	 * 
+	 * @param input
+	 *            This is the command line entered by the user
+	 * 
+	 * @param cmd
+	 *            This is the Task object where the current input details are
+	 *            stored.
+	 * 
+	 * @param index
+	 *            This is the point in a String whereby before this point, it
+	 *            is the command type
+	 * 
+	 */
 	public void floating(String input, Task cmd, int index) {
 
 		cmd.detail = input.substring(index + 1, input.length());
 
 	}
 
+	/**
+	 * This method will process the date of the tasks
+	 * 
+	 * @param date_input
+	 *            This is the date extracted from the command line entered by 
+	 *            the user
+	 * 
+	 * @return It returns the DateGroup object if there is date inside the list
+	 * of DateGroup else it will return null
+	 * 
+	 */
 	public DateGroup getNattyDateGroup(String date_input) {
 		com.joestelmach.natty.Parser parser = new com.joestelmach.natty.Parser();
 		List<DateGroup> groups = parser.parse(date_input);
@@ -142,12 +249,29 @@ public class Parser {
 		}
 	}
 
+	/**
+	 * This method will trim the date so that the unnecessary details for our 
+	 * target users (i.e. SGT, seconds, milliseconds) will be removed
+	 * 
+	 * @param temp
+	 *            This is the date and time before removing the unnecessary details
+	 * 
+	 * @return It returns the trimmed date
+	 */
 	public String trimDate(String temp) {
 		int first = temp.indexOf("SGT");
 		temp = temp.substring(0, first - 4);
 		return temp;
 	}
 
+	/**
+	 * This method will take out the first integer to be deleted
+	 * 
+	 * @param detail
+	 *            This is the list of task number to be deleted
+	 * 
+	 * @return It returns the first integer to be deleted in the Logic
+	 */
 	public int takeoutFirstInt(String detail) {
 		int index = detail.indexOf(' ');
 		if(index!=-1){

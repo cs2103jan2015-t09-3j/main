@@ -11,10 +11,23 @@ public class Storage {
 	static File file = new File("Cone.txt");
 	ArrayList<Task> temp_list = new ArrayList<Task>();
 
+	/**
+	 * This method will process the directory that user wants to change to
+	 * and change to that directory
+	 * 
+	 * @param directory
+	 *            This is the directory that user wants to change to
+	 *            
+	 */
 	public void changeDirectory(String directory) {
 		file = new File(directory + "\\Cone.txt");
 	}
 
+	/**
+	 * This method will process and read file contents into the list of tasks 
+	 * 
+	 * @return It returns the list of tasks read from file
+	 */
 	public ArrayList<Task> readFromFile() {
 		Task temp = new Task();
 		// if file is empty, return the default Tasks
@@ -69,8 +82,7 @@ public class Storage {
 				endin = recurinfo.length();
 				tmp = recurinfo.substring(startin, endin);
 				temp.recurring_until = tmp;
-				
-				
+							
 				temp_list.add(temp);
 			}
 			br.close();
@@ -81,8 +93,15 @@ public class Storage {
 		return temp_list;
 	}
 
-	// this method should delete whatever is in the file and then write the
-	// contents of ArrayList in to the file
+	/**
+	 * This method will process and  delete the existing content in file and then
+	 * write the whatever is in the ArrayList into the file
+	 * 
+	 * @param list
+	 *            This is the ArrayList<Task> which contains the most current list
+	 *            of tasks
+	 * 
+	 */
 	public void writeToFile(ArrayList<Task> list) {
 
 		try {
@@ -116,6 +135,15 @@ public class Storage {
 		}
 	}
 
+	/**
+	 * This method will process and import the instructions that contains the
+	 * guide as to how to input the different commands
+	 * 
+	 * @param text
+	 *            This is ArrayList<String> set of instructions to guide the 
+	 *            users on the formats of CO-NE Organizer's command line input
+	 * 
+	 */
 	public void importInstruction(ArrayList<String> text) {
 		String temp = new String();
 
