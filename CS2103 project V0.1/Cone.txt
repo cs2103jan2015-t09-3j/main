@@ -1,27 +1,16 @@
-1. gym 
+1. me
 	none
 	none
-2. lab  
+	false	none	0	none	none
+2. do the cs2101 developer guide!! 
 	
-	Tue Apr 07 09:00
-3. meeting  
-	
-	Tue Apr 07 10:00
-4. dinner with friends  
-	
-	Wed Apr 08 19:00
-5. mug at library  
-	
-	Thu Apr 09 01:00
-6. op2  
-	
-	Thu Apr 09 12:00
-7. swim    
-	Sat Apr 11 18:00
-	Sat Apr 11 19:00
-8. running  
-	
-	Sun Apr 12 00:48
-9. 2103 final  
-	
-	Sat Apr 25 00:47
+	Mon Apr 13 09:00
+	false	none	0	none	none
+3. recurring   - every 3 week from Mon Apr 13 22:00 until Tue Dec 01 02:57
+	none
+	Mon Apr 13 22:00
+	true	Mon Apr 13 22:00	3	week	Tue Dec 01 02:57
+4. (completed)meeting
+	none
+	none
+	false	none	0	none	none
