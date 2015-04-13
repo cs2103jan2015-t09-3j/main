@@ -16,7 +16,7 @@ public class Storage {
 	 * and change to that directory
 	 * 
 	 * @param directory
-	 *            This is the directory that user wants to change to
+	 *            This is the new directory that user wants to change to
 	 *            
 	 */
 	public void changeDirectory(String directory) {

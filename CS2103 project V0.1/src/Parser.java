@@ -17,7 +17,7 @@ public class Parser {
 	 *            This is the Task object where the current input details are
 	 *            stored
 	 * 
-	 * @return It returns the command_type that is to be processed in Logic
+	 * @return It returns the type of command that is to be processed in Logic
 	 */
 	public String parse(String input, Task cmd) {
 		input.toLowerCase();
