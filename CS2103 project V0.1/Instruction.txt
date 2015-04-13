@@ -3,10 +3,66 @@ Welcome to CONE Organizer!!!!!
 Basic Functions:
 
 1. Adding function
-
+--floating task
 -> "add meeting"
+--deadline task
 -> "add meeting - today"
 -> "add meeting - today 5pm"
+--timed task
 -> "add meeting - from today 5pm to tomorrow"
+--recurring tasks
+-> "add meeting - every 1 week from friday"
+-> "add meeting - every 1 week from friday until 8 june"
 
+2. Editing Function
+
+-> "edit (task no.)
+
+3. Delete Function
+-> "delete (task no.)"
+--deleting multiple tasks
+-> "delete (task no.) (task no.)"
+
+4. display function
+->"display (today, week, month, recurring, completed, floating)
+--custom display
+-> "display (number) (date interval) ---eg. "display 3 weeks"
+
+5. Summon help screen
+-> "help"
+
+6. Make task recurring
+-> "recur (task no.) every (interval) from (start date) until (finish date)"
+---> eg. "recur 2 every 5 days from 3 may until 7 july"
+
+7. clear function
+-> "clear"
+-> "clear recurring"
+-> "clear completed"
+
+8. search function
+-> "search (keyword)"
+
+9. save changes into the Cone.txt file in same directory
+->"save"
+
+10. undo/redo changes
+->"undo"
+->"redo"
+
+
+11.changing directory for saved file
+->" export (new directory)"
+
+12.Changing the backgroud
+-> "background (new directory)"
+
+13.Collapsing all recuring tasks
+-> "collapse"
+
+14.Expanding collapsed recurring tasks
+->"expand"
+
+15.Importing the tasks from a compatible text file
+-> "import (directory)"
 end.
