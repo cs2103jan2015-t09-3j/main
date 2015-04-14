@@ -1,0 +1,307 @@
+//@author: a0115431w
+
+
+
+	/**
+	 * origin: C:\Collate\sample-source\input\Parser.java
+	 */
+
+	public String parse(String input, Task cmd) {
+		
+		input.toLowerCase();
+		int index = input.indexOf(' ');
+		if (index != -1) {
+			identifyType(input, cmd, index);
+
+		} else 
+		{
+			commandOnly(input);
+		}
+		return command_type.toLowerCase();
+	}
+
+	// End of segment: C:\Collate\sample-source\input\Parser.java
+
+
+
+
+
+	/**
+	 * origin: C:\Collate\sample-source\input\Parser.java
+	 */
+
+	public void commandOnly(String input) {
+		
+		command_type = input;
+	}
+
+	// End of segment: C:\Collate\sample-source\input\Parser.java
+
+
+
+
+
+	/**
+	 * origin: C:\Collate\sample-source\input\Parser.java
+	 */
+
+	public void identifyType(String input, Task cmd, int index) {
+		command_type = input.substring(0, index);
+		if (input.contains("-")) {
+			timed(input, cmd, index);
+		} else if (index != input.length() - 1) 
+		{
+			floating(input, cmd, index);
+		}
+	}
+
+	// End of segment: C:\Collate\sample-source\input\Parser.java
+
+
+
+
+
+	/**
+	 * origin: C:\Collate\sample-source\input\Parser.java
+	 */
+
+	public void timed(String input, Task cmd, int index) {
+		
+		int index2 = input.indexOf("-");
+		cmd.detail = input.substring(index + 1, index2);
+		if (input.contains("every")) {
+			recurring(input, cmd, index2);
+		} 
+		else 
+		{
+			nonRecurring(input, cmd, index2);
+		}
+	}
+
+	// End of segment: C:\Collate\sample-source\input\Parser.java
+
+
+
+
+
+	/**
+	 * origin: C:\Collate\sample-source\input\Parser.java
+	 */
+
+	private void nonRecurring(String input, Task cmd, int index2) {
+		
+		String date_input;
+		date_input = input.substring(index2 + 2, input.length());
+
+		group = getNattyDateGroup(date_input);
+		String date = group.getDates().toString();
+		int start = date.indexOf(",");
+		if (start != -1) {
+			cmd.startDate = date.substring(1, start);
+			cmd.startDate = trimDate(cmd.startDate);
+			cmd.endDate = date.substring(start + 2, date.length() - 1);
+			cmd.endDate = trimDate(cmd.endDate);
+		} else 
+		{
+			cmd.startDate = "";
+			cmd.endDate = date.substring(1, date.length() - 1);
+			cmd.endDate = trimDate(cmd.endDate);
+		}
+	}
+
+	// End of segment: C:\Collate\sample-source\input\Parser.java
+
+
+
+
+
+
+
+
+	/**
+	 * origin: C:\Collate\sample-source\input\Parser.java
+	 */
+
+	private void findRecurringPeriod(Task cmd, String user_input) {
+		
+		if(user_input.contains(" day")||user_input.contains(" days")){
+			cmd.recurring_period="day";
+		}
+		else if(user_input.contains(" week")||user_input.contains(" weeks"))
+		{
+			cmd.recurring_period="week";
+		}
+		else if(user_input.contains(" month")||user_input.contains(" months"))
+		{
+			cmd.recurring_period="month";
+		}
+	}
+
+	// End of segment: C:\Collate\sample-source\input\Parser.java
+
+
+
+
+
+	/**
+	 * origin: C:\Collate\sample-source\input\Parser.java
+	 */
+
+	private int findEndDateRecur(Task cmd, String user_input, int index4) {
+		
+		index4+=6;
+		cmd.recurring_until = user_input.substring(index4,user_input.length());
+		group = getNattyDateGroup(cmd.recurring_until);
+		String date = group.getDates().toString();
+		date = date.substring(1, date.length() - 1);
+		cmd.recurring_until = trimDate(date);
+		return index4;
+	}
+
+	private void startingDateFrom(Task cmd, String user_input, int index4,
+			int index5) {
+		index5+=5;
+		String date;
+		if(index4 == -1){
+		cmd.recurring_from = user_input.substring(index5,user_input.length());
+		}
+		else
+		{
+			cmd.recurring_from = user_input.substring(index5,user_input.indexOf("until")-1);
+		}
+		group = getNattyDateGroup(cmd.recurring_from);
+		date = group.getDates().toString();
+		date = date.substring(1, date.length() - 1);
+		cmd.recurring_from = trimDate(date);
+	}
+	
+	
+	private void startingDateOn(Task cmd, String user_input, int index4) {
+		int index5;
+		index5=user_input.indexOf("on");
+		index5+=3;
+		String date;
+		if(index4 == -1){
+		cmd.recurring_from = user_input.substring(index5,user_input.length());
+		}
+		else
+		{
+			cmd.recurring_from = user_input.substring(index5,user_input.indexOf("until")-1);
+		}
+		group = getNattyDateGroup(cmd.recurring_from);
+		date = group.getDates().toString();
+		date = date.substring(1, date.length() - 1);
+		cmd.recurring_from = trimDate(date);
+	}
+
+	
+	private void noStartingDate(Task cmd) {
+		String date = "today";
+		group = getNattyDateGroup(date);
+		date = group.getDates().toString();
+		date = date.substring(1, date.length() - 1);
+		cmd.recurring_from = trimDate(date);
+	}
+
+	// End of segment: C:\Collate\sample-source\input\Parser.java
+
+
+
+
+
+	/**
+	 * origin: C:\Collate\sample-source\input\Parser.java
+	 */
+
+	public void floating(String input, Task cmd, int index) {
+
+		cmd.detail = input.substring(index + 1, input.length());
+
+	}
+
+	// End of segment: C:\Collate\sample-source\input\Parser.java
+
+
+
+
+
+	/**
+	 * origin: C:\Collate\sample-source\input\Parser.java
+	 */
+
+	public DateGroup getNattyDateGroup(String date_input) {
+		
+		com.joestelmach.natty.Parser parser = new com.joestelmach.natty.Parser();
+		List<DateGroup> groups = parser.parse(date_input);
+		if (!groups.isEmpty()) {
+			DateGroup group = groups.get(0);
+			return group;
+		} else 
+		{
+			return null;
+		}
+	}
+
+	// End of segment: C:\Collate\sample-source\input\Parser.java
+
+
+
+
+
+	/**
+	 * origin: C:\Collate\sample-source\input\Parser.java
+	 */
+
+	public String trimDate(String temp) {
+		
+		int first = temp.indexOf("SGT");
+		temp = temp.substring(0, first - 4);
+		return temp;
+	}
+
+	// End of segment: C:\Collate\sample-source\input\Parser.java
+
+
+
+
+
+	/**
+	 * origin: C:\Collate\sample-source\input\Parser.java
+	 */
+
+	public int takeoutFirstInt(String detail) {
+		
+		int index = detail.indexOf(' ');
+		if(index!=-1){
+		return Integer.parseInt(detail.substring(0, detail.indexOf(' ')));
+		}
+		else
+		{
+			return -1;
+			
+		}
+	}
+
+}
+
+	// End of segment: C:\Collate\sample-source\input\Parser.java
+
+
+
+
+
+	/**
+	 * origin: C:\Collate\sample-source\input\Storage.java
+	 */
+
+	public void changeDirectory(String directory) {
+		
+		file = new File(directory + "\\Cone.txt");
+	}
+
+	// End of segment: C:\Collate\sample-source\input\Storage.java
+
+
+
+
+
