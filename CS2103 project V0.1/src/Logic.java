@@ -186,7 +186,7 @@ public class Logic {
 	 */
 	private String backgroundChange(String directory) {
 
-		return "background is set to " + directory;
+		return "background__ " + directory;
 	}
 
 	/**
@@ -212,6 +212,7 @@ public class Logic {
 					cmd = list.get(i);
 					list.remove(i);
 					addRecurring(cmd, list);
+					i--;
 				}
 			}
 		}
@@ -239,8 +240,8 @@ public class Logic {
 				list.get(i).detail = list.get(i).detail + " - every "
 						+ list.get(i).recurring_interval + " "
 						+ list.get(i).recurring_period + " from "
-						+ list.get(i).recurring_from + " until "
-						+ list.get(i).recurring_until;
+						+ list.get(i).recurring_from;
+				list.get(i).endDate = list.get(i).recurring_until;
 			}
 			if (list.get(i).recurring_interval != 0) {
 				if (list.get(i).isPrimaryRecurringTask == false) {
@@ -455,27 +456,34 @@ public class Logic {
 	private String deleteCommand(String indice, ArrayList<Task> list) {
 
 		tempList = cloneToTempList(list);
+		ArrayList<Task> deleteList = new ArrayList<Task>(list);
+		
 
 		String temp = indice;
-		String deleting = DEFAULT_STRING;
+		String deleting_detail = DEFAULT_STRING;
+		String deleting_date = DEFAULT_STRING;
 		int index = 1;
 		while (index != -1) {
 			index = p.takeoutFirstInt(temp);
 
 			if (index != -1) {
-				deleting = list.get(index - 1).detail;
+				deleting_detail = list.get(index - 1).detail;
+				deleting_date = list.get(index-1).endDate;
 				temp = temp.substring(temp.indexOf(" ") + 1, temp.length());
-				removeFromList(list, deleting);
+				removeFromList(deleteList, deleting_detail,deleting_date);
 			} else {
 				index = Integer.parseInt(temp);
-				deleting = list.get(index - 1).detail;
-				removeFromList(list, deleting);
+				deleting_detail = list.get(index - 1).detail;
+				deleting_date = list.get(index-1).endDate;
+				removeFromList(deleteList, deleting_detail,deleting_date);
 				index = -1;
 			}
 
 		}
+		list.clear();
+		list.addAll(deleteList);
 
-		return "taks number " + cmd.detail + "have been deleted successfully!";
+		return "taks number " + indice + "have been deleted successfully!";
 	}
 
 	/**
@@ -487,11 +495,12 @@ public class Logic {
 	 *            commands entered by user
 	 * @param deleting
 	 *            this is the guide for which task to remove from list.
+	 * @param deleting_date 
 	 * 
 	 */
-	private void removeFromList(ArrayList<Task> list, String deleting) {
+	private void removeFromList(ArrayList<Task> list, String deleting, String deleting_date) {
 		for (int i = 0; i < list.size(); i++) {
-			if (list.get(i).detail.equals(deleting)) {
+			if (list.get(i).detail.equals(deleting) && list.get(i).endDate.equals(deleting_date)) {
 				list.remove(i);
 				i--;
 			}

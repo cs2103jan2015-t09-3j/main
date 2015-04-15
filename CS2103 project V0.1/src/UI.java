@@ -67,7 +67,7 @@ public class UI extends JFrame {
 	 * 
 	 */
 	public UI() {
-		setTitle("Cone Organizer V0.4");
+		setTitle("Cone Organizer V0.5");
 		setSize(800, 700);
 		setVisible(true);
 		setDefaultCloseOperation(EXIT_ON_CLOSE);
@@ -85,6 +85,7 @@ public class UI extends JFrame {
 						new DefaultTableCellRenderer() {
 							{
 								setOpaque(false);
+								
 							}
 						});
 
@@ -93,6 +94,7 @@ public class UI extends JFrame {
 			public boolean isCellEditable(int data, int columns) {
 				return false;
 			}
+			
 
 			protected void paintComponent(Graphics g) {
 				g.drawImage(image, 0, 0, getWidth(), getHeight(), null);
@@ -169,10 +171,12 @@ public class UI extends JFrame {
 	 * 
 	 * @param text
 	 *            The feedback to by processed
+	 * @param GUI 
 	 * 
 	 */
 
-	public static void processFeedback(String text) {
+	public static void processFeedback(String text, UI GUI) {
+		assert text!=null;
 		clearFeedback();
 		feedbacks = new JLabel();
 		feedback_panel.add(feedbacks);
@@ -204,17 +208,23 @@ public class UI extends JFrame {
 
 		} else if (text.equals("help")) {
 			summonHelpScreen();
-		} else if (text.contains("background ")) {
+		} else if (text.contains("background__ ")) {
 			bgfile = text.substring(text.indexOf(' ') + 1, text.length());
+			
 			feedbacks.setText("background picture has been changed to "
 					+ bgfile);
 			try {
 				image = ImageIO.read(new File(bgfile));
+				
 			} catch (IOException e) {
 				// TODO Auto-generated catch block
 				e.printStackTrace();
 			}
 			image = makeTransparent();
+			GUI.revalidate();
+			GUI.repaint();
+			
+			
 		}
 
 		else {
@@ -236,7 +246,7 @@ public class UI extends JFrame {
 		reference.setSize(700, 800);
 		reference.setLayout(new FlowLayout(3));
 		final JPanel reference_panel = new JPanel();
-		reference_panel.setLayout(new GridLayout(70, 1));
+		reference_panel.setLayout(new GridLayout(90, 1));
 		JScrollPane scrollFrame = new JScrollPane(reference_panel);
 		reference_panel.setAutoscrolls(true);
 		scrollFrame.setPreferredSize(new Dimension(680, 800));
@@ -268,10 +278,11 @@ public class UI extends JFrame {
 
 		image = ImageIO.read(new File(bgfile));
 		image = makeTransparent();
+	
 
 		UI GUI = new UI();
 		list = l.import_From_File(list);
-		processFeedback("Displaying All Task:");
+		processFeedback("Displaying All Task:", GUI);
 		printWhat(print_what, list, "");
 
 		takeInputs(GUI);
@@ -284,6 +295,7 @@ public class UI extends JFrame {
 	 */
 
 	private static BufferedImage makeTransparent() {
+		assert image != null;
 		BufferedImage tmpImg = new BufferedImage(image.getWidth(),
 				image.getHeight(), BufferedImage.TYPE_INT_ARGB);
 
@@ -291,6 +303,7 @@ public class UI extends JFrame {
 		g2d.setComposite(AlphaComposite.SrcOver.derive(0.4f));
 		// set the transparency level in range 0.0f - 1.0f
 		g2d.drawImage(image, 0, 0, null);
+		
 		return tmpImg;
 	}
 
@@ -305,7 +318,7 @@ public class UI extends JFrame {
 	 *
 	 */
 
-	private static void takeInputs(UI GUI) {
+	public static void takeInputs(UI GUI) {
 		String temp = "default";
 
 		while (temp != input) {
@@ -318,7 +331,7 @@ public class UI extends JFrame {
 					String feedback = DEFAULT_STRING;
 					feedback = l.executeCommand(input, list);
 					printWhat(print_what, list, "");
-					processFeedback(feedback);
+					processFeedback(feedback, GUI);
 				}
 
 			});
@@ -381,7 +394,7 @@ public class UI extends JFrame {
 					String feedback = DEFAULT_STRING;
 					feedback = l.executeCommand(input, list);
 					printWhat(print_what, list, "");
-					processFeedback(feedback);
+					processFeedback(feedback, GUI);
 
 				}
 			});
@@ -446,7 +459,7 @@ public class UI extends JFrame {
 			break;
 		}
 		default: {
-			if (printWhat.length() < 1) {
+			if (printWhat.equals(DEFAULT_STRING)) {
 				printList_entire(list, keyword);
 				break;
 			} else {
@@ -478,7 +491,7 @@ public class UI extends JFrame {
 
 	private static void printList_custom(ArrayList<Task> list,
 			String printWhat, String keyword) {
-		processFeedback("Displaying tasks in " + printWhat);
+		processFeedback("Displaying tasks in " + printWhat, null);
 		clearTable();
 		Date end = l.getDate(printWhat + " after today 23:59");
 		Date today = l.getDate("00:00 today");
@@ -528,7 +541,7 @@ public class UI extends JFrame {
 	 *
 	 */
 	private static void printList_recurring(ArrayList<Task> list, String keyword) {
-		processFeedback("Displaying all recurring tasks");
+		processFeedback("Displaying all recurring tasks", null);
 		clearTable();
 		int row_count = 0;
 		for (int i = 0; i < list.size(); i++) {
@@ -572,7 +585,7 @@ public class UI extends JFrame {
 	 */
 
 	private static void printList_completed(ArrayList<Task> list, String keyword) {
-		processFeedback("Displaying all completed tasks");
+		processFeedback("Displaying all completed tasks", null);
 		clearTable();
 		int row_count = 0;
 		for (int i = 0; i < list.size(); i++) {
@@ -615,7 +628,7 @@ public class UI extends JFrame {
 	 *
 	 */
 	private static void printList_floating(ArrayList<Task> list, String keyword) {
-		processFeedback("Displaying all floating tasks");
+		processFeedback("Displaying all floating tasks", null);
 		clearTable();
 		int row_count = 0;
 		for (int i = 0; i < list.size(); i++) {
@@ -657,7 +670,7 @@ public class UI extends JFrame {
 	 *
 	 */
 	private static void printList_today(ArrayList<Task> list, String keyword) {
-		processFeedback("Displaying today's tasks");
+		processFeedback("Displaying today's tasks", null);
 		clearTable();
 		Date today_start = l.getDate("00:00 today");
 		Date today_end = l.getDate("23:59 today");
@@ -708,7 +721,7 @@ public class UI extends JFrame {
 	 *
 	 */
 	private static void printList_weeks(ArrayList<Task> list, String keyword) {
-		processFeedback("Displaying this week's tasks");
+		processFeedback("Displaying this week's tasks", null);
 		clearTable();
 		Date next_week = l.getDate("23:59 in 1 week");
 		Date today = l.getDate("00:00 today");
@@ -758,7 +771,7 @@ public class UI extends JFrame {
 	 *
 	 */
 	private static void printList_month(ArrayList<Task> list, String keyword) {
-		processFeedback("Displaying this month's tasks");
+		processFeedback("Displaying this month's tasks", null);
 		clearTable();
 		Date next_month = l.getDate("23:59 in 1 month");
 		Date today = l.getDate("00:00 today");
@@ -844,7 +857,7 @@ public class UI extends JFrame {
 	 *
 	 */
 	private static void printList_entire(ArrayList<Task> list, String keyword) {
-		processFeedback("Displaying all tasks");
+		processFeedback("Displaying all tasks", null);
 		clearTable();
 		int row_count = 0;
 
@@ -910,6 +923,8 @@ public class UI extends JFrame {
 					}
 
 				}
+				
+			
 
 				return c;
 
