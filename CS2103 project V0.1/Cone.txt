@@ -2,15 +2,19 @@
 	none
 	none
 	false	none	0	none	none
-2. do the cs2101 developer guide!! 
+2. new 
+	
+	Sun Apr 12 17:31
+	false	none	0	none	none
+3. do the cs2101 developer guide!! 
 	
 	Mon Apr 13 09:00
 	false	none	0	none	none
-3. recurring   - every 3 week from Mon Apr 13 22:00 until Tue Dec 01 02:57
+4. recurring    - every 3 week from Mon Apr 13 22:00 until Tue Dec 01 02:57
 	none
 	Mon Apr 13 22:00
 	true	Mon Apr 13 22:00	3	week	Tue Dec 01 02:57
-4. (completed)meeting
+5. (completed)meeting
 	none
 	none
 	false	none	0	none	none
