@@ -1,0 +1,1897 @@
+//@author: a0113888u
+
+
+
+	/**
+	 * origin: C:\Users\ChongKuk\Documents\NUS docs\CS2013T\Collate V2.0\Collate V2.0\Logic.java
+	 */
+
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Date;
+
+import com.joestelmach.natty.DateGroup;
+
+public class Logic {
+	private static final String DEFAULT_STRING = "none";
+	private static final String FAILURE = "OPERATION FAILED!!";
+	Parser p = new Parser();
+	Storage s = new Storage();
+	Task cmd = new Task();
+
+	ArrayList<Task> list = new ArrayList<Task>();
+	ArrayList<Task> tempList = new ArrayList<Task>();
+	ArrayList<Task> currList = new ArrayList<Task>();
+	static String command_type = DEFAULT_STRING;
+
+	int edit = 0;
+
+	/**
+	 * This method will identify the command type and details from the user
+	 * input and send it to implement command method
+	 * 
+	 * @param cmd
+	 *            This initially contains user input and will be containing
+	 *            command type and details after parser
+	 * @param list
+	 *            This is list of Task object. each element contains different
+	 *            commands entered by user
+	 *
+	 * @return This method will return the feedback to the UI to be processed.
+	 */
+	public String executeCommand(String input, ArrayList<Task> list) {
+		String feedback = DEFAULT_STRING;
+		assert list != null;
+		cmd = new Task();
+		command_type = p.parse(input, cmd);
+		feedback = implementCommand(command_type, cmd, list, feedback);
+
+		sortList(list);
+		return feedback;
+	}
+
+	/**
+	 * This method will process the identified command type and call an
+	 * appropriate method for implementation.
+	 * 
+	 * @param command_type
+	 *            This is the command type that is entered by the user (eg. add,
+	 *            delete)
+	 * 
+	 * @param cmd
+	 *            This is the Task object where the current input details are
+	 *            stored.
+	 * 
+	 * @param list
+	 *            This is list of Task object. each element contains different
+	 *            commands entered by user
+	 * 
+	 * @param keyword
+	 *            The printing method will print out the items on the list that
+	 *            contains this keyword. "" by default
+	 * 
+	 * @return It returns the feedback that is to be processed in UI.
+	 */
+	public String implementCommand(String command_type, Task cmd,
+			ArrayList<Task> list, String feedback) {
+		switch (command_type) {
+		case "import": {
+			return importCommand(list, cmd.detail);
+		}
+		case "export": {
+			return exportCommand(list, cmd.detail);
+		}
+		case "add": {
+			return addCommand(cmd, list);
+		}
+		case "delete": {
+
+			return deleteCommand(cmd.detail, list);
+		}
+		case "edit": {
+			return editCommand(cmd, list);
+		}
+		case "clear": {
+			return clearCommand(list, cmd.detail);
+		}
+		case "save": {
+			return saveCommand(list);
+		}
+		case "done": {
+			return doneCommand(cmd, list);
+		}
+		case "undo": {
+			return undoCommand(list);
+		}
+		case "redo": {
+			return redoCommand(list);
+		}
+		case "search": {
+			return searchCommand(list, cmd.detail);
+		}
+		case "display": {
+			return "display " + cmd.detail;
+		}
+		case "help": {
+			return "help";
+		}
+		case "recur": {
+			return recurCommand(list, cmd);
+		}
+		case "collapse": {
+			return collapseCommand(list);
+		}
+		case "expand": {
+			return expandCommand(list);
+		}
+		case "background": {
+			return backgroundChange(cmd.detail);
+		}
+		default: {
+			return "Invalid Command";
+		}
+		}
+	}
+
+	/**
+	 * This method export the current list of task into text file
+	 * 
+	 * 
+	 * @param list
+	 *            This is list of Task object. each element contains different
+	 *            commands entered by user
+	 * 
+	 * @param directory
+	 *            The location of text file to be stored.
+	 * 
+	 * 
+	 * @return This method will return the feedback to be processed in UI
+	 *
+	 */
+	private String exportCommand(ArrayList<Task> list, String directory) {
+		s.changeDirectory(directory);
+		s.writeToFile(list);
+		return "The output textfile has been saved at: " + directory;
+	}
+
+	/**
+	 * This method import a list of tasks from text file in a given location to
+	 * the list.
+	 * 
+	 * 
+	 * @param list
+	 *            This is list of Task object. each element contains different
+	 *            commands entered by user
+	 * 
+	 * @param directory
+	 *            The location of text file to be read from.
+	 * 
+	 * 
+	 * @return This method will return the feedback to be processed in UI
+	 *
+	 */
+	private String importCommand(ArrayList<Task> list, String directory) {
+		s.changeDirectory(directory);
+		list.clear();
+		list = s.readFromFile();
+		return "Imported the existing Cone.txt file from: " + directory;
+	}
+
+	/**
+	 * This method will change the background picture to the specified image
+	 * file
+	 * 
+	 * 
+	 * @param directory
+	 *            This is the directory of image file to be read
+	 * 
+	 * @return This method will return the feedback to be processed in UI
+	 *
+	 */
+	private String backgroundChange(String directory) {
+
+		return "background__ " + directory;
+	}
+
+	/**
+	 * This method expands the recurring tasks that are collapsed by "collapse"
+	 * command
+	 * 
+	 * 
+	 * @param list
+	 *            This is list of Task object. each element contains different
+	 *            commands entered by user
+	 * 
+	 * 
+	 * @return This method will return the feedback to be processed in UI
+	 *
+	 */
+	private String expandCommand(ArrayList<Task> list) {
+		for (int i = 0; i < list.size(); i++) {
+			if (list.get(i).isPrimaryRecurringTask == true) {
+				int index = list.get(i).detail.indexOf("- every");
+				if (index != -1) {
+					list.get(i).detail = list.get(i).detail.substring(0, index);
+					Task cmd = new Task();
+					cmd = list.get(i);
+					list.remove(i);
+					addRecurring(cmd, list);
+					i--;
+				}
+			}
+		}
+		return "All recurring tasks are expanded";
+	}
+
+	/**
+	 * This method will compress each recurring tasks in the list into one task
+	 * for editing and display.
+	 * 
+	 * 
+	 * @param list
+	 *            This is list of Task object. each element contains different
+	 *            commands entered by user
+	 * 
+	 * 
+	 * 
+	 * @return This method will return the feedback to be processed in UI
+	 *
+	 */
+	private String collapseCommand(ArrayList<Task> list) {
+		tempList = cloneToTempList(list);
+		for (int i = 0; i < list.size(); i++) {
+			if (list.get(i).isPrimaryRecurringTask == true) {
+				list.get(i).detail = list.get(i).detail + " - every "
+						+ list.get(i).recurring_interval + " "
+						+ list.get(i).recurring_period + " from "
+						+ list.get(i).recurring_from;
+				list.get(i).endDate = list.get(i).recurring_until;
+			}
+			if (list.get(i).recurring_interval != 0) {
+				if (list.get(i).isPrimaryRecurringTask == false) {
+					list.remove(i);
+					i--;
+				}
+			}
+		}
+		return "All recurring tasks are collapsed!";
+	}
+
+	/**
+	 * This method allows user to change any task into recurring task
+	 * 
+	 * 
+	 * @param list
+	 *            This is list of Task object. each element contains different
+	 *            commands entered by user
+	 * 
+	 * @param cmd
+	 *            This Task variable contains the user input
+	 * 
+	 * 
+	 * @return This method will return the feedback to be processed in UI
+	 *
+	 */
+	private String recurCommand(ArrayList<Task> list, Task cmd) {
+		tempList = cloneToTempList(list);
+		int index = Integer.parseInt(cmd.detail.trim());
+		cmd.detail = list.get(index - 1).detail;
+		addRecurring(cmd, list);
+		list.remove(index - 1);
+		return "The task no. " + index
+				+ " has been changed to the recurring task!";
+	}
+
+	/**
+	 * This method imports items in the text file currently saved in same
+	 * directory and put them in the array list.
+	 * 
+	 * @param list
+	 *            This is list of Task object. each element contains different
+	 *            commands entered by user
+	 * @return It returns the feedback to be processed in UI
+	 */
+	public ArrayList<Task> import_From_File(ArrayList<Task> list) {
+		list = s.readFromFile();
+		return list;
+	}
+
+	/**
+	 * This method will redo the last undo done by user
+	 * 
+	 * @param list
+	 *            This is list of Task object. each element contains different
+	 *            commands entered by user
+	 * @return It returns the feedback to be processed in UI
+	 */
+	private String redoCommand(ArrayList<Task> list) {
+		list.clear();
+		list.addAll(currList);
+		return " Redo to latest 1 undo(s)!";
+	}
+
+	/**
+	 * This method adds new task to the list, by calling appropriate method
+	 * depending on the type of task
+	 * 
+	 * @param cmd
+	 *            This variable contains the information of current task to be
+	 *            added
+	 * @param list
+	 *            This is list of Task object. each element contains different
+	 *            commands entered by user
+	 * @return It returns the feedback to be processed in UI
+	 */
+	private String addCommand(Task cmd, ArrayList<Task> list) {
+		tempList = cloneToTempList(list);
+
+		if (cmd.recurring_interval != 0) {
+			addRecurring(cmd, list);
+			return "Recurring task " + cmd.detail
+					+ " has been successfully added!";
+		} else if (edit == 0) {
+			list.add(cmd);
+			return cmd.detail + " has been successfully added!";
+		} else {
+
+			replaceItem(list, cmd, edit);
+			edit = 0;
+			return list.get(edit).detail + " has been successfully edited!";
+		}
+
+	}
+
+	/**
+	 * This method will add the recurring task to the list
+	 * 
+	 * @param cmd
+	 *            This variable contains the information of task such as
+	 *            description and endDate, and recurring information
+	 * @param list
+	 *            This is list of Task object. each element contains different
+	 *            commands entered by user
+	 * 
+	 */
+	private void addRecurring(Task cmd, ArrayList<Task> list) {
+
+		Task temp = new Task();
+		temp.detail = cmd.detail;
+		temp.endDate = cmd.recurring_from;
+		temp.recurring_interval = cmd.recurring_interval;
+		temp.recurring_period = cmd.recurring_period;
+		temp.recurring_until = cmd.recurring_until;
+		temp.recurring_from = cmd.recurring_from;
+		temp.isPrimaryRecurringTask = true;
+		list.add(temp);
+		if (cmd.recurring_until != DEFAULT_STRING) {
+			addRecurringGivenUntil(cmd, list, temp);
+
+		} else {
+
+			addRecurringWithoutUntil(cmd, list, temp);
+		}
+
+	}
+
+	/**
+	 * This method will add the recurring without ending date into the list. It
+	 * will add the task 10 times
+	 * 
+	 * @param cmd
+	 *            This variable contains the information of task such as
+	 *            description and endDate, and recurring information
+	 * @param list
+	 *            This is list of Task object. each element contains different
+	 *            commands entered by user
+	 * @param temp
+	 *            this is the temporary task object to be used
+	 * 
+	 */
+	private void addRecurringWithoutUntil(Task cmd, ArrayList<Task> list,
+			Task temp) {
+		for (int i = 1; i < 10; i++) {
+			String date = getDate(
+					cmd.recurring_interval + " " + cmd.recurring_period
+							+ " after " + temp.endDate).toString();
+			date = date.substring(0, date.length());
+			temp = new Task();
+			temp.detail = cmd.detail;
+			temp.recurring_interval = cmd.recurring_interval;
+			temp.endDate = p.trimDate(date);
+			list.add(temp);
+
+		}
+		for(int i=0; i<list.size(); i++){
+			if(list.get(i).isPrimaryRecurringTask==true && list.get(i).detail.equals( temp.detail)){
+				list.get(i).recurring_until = temp.endDate;
+			}
+		}
+		
+	}
+
+	/**
+	 * This method will add the recurring with ending date into the list
+	 * 
+	 * @param cmd
+	 *            This variable contains the information of task such as
+	 *            description and endDate, and recurring information
+	 * @param list
+	 *            This is list of Task object. each element contains different
+	 *            commands entered by user
+	 * @param temp
+	 *            this is the temporary task object to be used
+	 * 
+	 */
+	private void addRecurringGivenUntil(Task cmd, ArrayList<Task> list,
+			Task temp) {
+		while (getDate(temp.endDate).before(
+				getDate("one day after " + cmd.recurring_until))) {
+
+			String date = getDate(
+					cmd.recurring_interval + " " + cmd.recurring_period
+							+ " after " + temp.endDate).toString();
+			date = date.substring(0, date.length());
+			temp = new Task();
+			temp.detail = cmd.detail;
+			temp.recurring_interval = cmd.recurring_interval;
+			temp.endDate = p.trimDate(date);
+
+			if (getDate(temp.endDate).before(
+					getDate("23:59 " + cmd.recurring_until))) {
+
+				list.add(temp);
+			}
+
+		}
+		
+	}
+
+	/**
+	 * This method will delete the item that is specified by user
+	 * 
+	 * @param indice
+	 *            This String contains all the task numbers to be deleted,
+	 *            separate by one space.
+	 * @param list
+	 *            This is list of Task object. each element contains different
+	 *            commands entered by user
+	 * @return This method will return the feedback to be processed by UI
+	 */
+	private String deleteCommand(String indice, ArrayList<Task> list) {
+
+		tempList = cloneToTempList(list);
+		ArrayList<Task> deleteList = new ArrayList<Task>(list);
+		
+
+		String temp = indice;
+		String deleting_detail = DEFAULT_STRING;
+		String deleting_date = DEFAULT_STRING;
+		int index = 1;
+		while (index != -1) {
+			index = p.takeoutFirstInt(temp);
+
+			if (index != -1) {
+				deleting_detail = list.get(index - 1).detail;
+				deleting_date = list.get(index-1).endDate;
+				temp = temp.substring(temp.indexOf(" ") + 1, temp.length());
+				removeFromList(deleteList, deleting_detail,deleting_date);
+			} else {
+				index = Integer.parseInt(temp);
+				deleting_detail = list.get(index - 1).detail;
+				deleting_date = list.get(index-1).endDate;
+				removeFromList(deleteList, deleting_detail,deleting_date);
+				index = -1;
+			}
+
+		}
+		list.clear();
+		list.addAll(deleteList);
+
+		return "taks number " + indice + "have been deleted successfully!";
+	}
+
+	/**
+	 * This method remove all tasks marked as deleting in deleteCommand()
+	 * 
+	 *
+	 * @param list
+	 *            This is list of Task object. each element contains different
+	 *            commands entered by user
+	 * @param deleting
+	 *            this is the guide for which task to remove from list.
+	 * @param deleting_date 
+	 * 
+	 */
+	private void removeFromList(ArrayList<Task> list, String deleting, String deleting_date) {
+		for (int i = 0; i < list.size(); i++) {
+			if (list.get(i).detail.equals(deleting) && list.get(i).endDate.equals(deleting_date)) {
+				list.remove(i);
+				i--;
+			}
+		}
+
+	}
+
+	/**
+	 * This method will create a templist that is containing the information of
+	 * the list, mainly for undoing purpose
+	 * 
+	 *
+	 * @param list
+	 *            This is list of Task object. each element contains different
+	 *            commands entered by user
+	 *
+	 */
+	private ArrayList<Task> cloneToTempList(ArrayList<Task> list) {
+		tempList = new ArrayList<Task>();
+		tempList.addAll(list);
+		return tempList;
+	}
+
+	/**
+	 * This method saves all changes to the list into the text file
+	 * 
+	 *
+	 * @param list
+	 *            This is list of Task object. each element contains different
+	 *            commands entered by user
+	 *
+	 */
+	private String saveCommand(ArrayList<Task> list) {
+
+		s.writeToFile(list);
+		return "All changes saved at !";
+	}
+
+	/**
+	 * This method will clear all specified items in the list(recurring, all, completed)
+	 * 
+	 * 
+	 * @param list
+	 *            This is list of Task object. each element contains different
+	 *            commands entered by user
+	 * @param cmd
+	 *            This contains information on which tpye of tasks to be cleared
+	 *
+	 * 
+	 */
+	private String clearCommand(ArrayList<Task> list, String cmd) {
+		tempList = cloneToTempList(list);
+		if (cmd == DEFAULT_STRING) {
+
+			list.clear();
+			return "All contents are cleared";
+		} else {
+			if (cmd.equals("completed")) {
+				clearCompleted(list);
+				return "All completed contents are cleared";
+
+			} else if (cmd.equals("recurring")) {
+				clearRecurring(list);
+				return "All recurring contents are cleared";
+			}
+		}
+		return FAILURE;
+	}
+
+	/**
+	 * This method will clear All recurring tasks from the list
+	 * 
+	 * 
+	 * @param list
+	 *            This is list of Task object. each element contains different
+	 *            commands entered by user
+	 * 
+	 * 
+	 */
+	private void clearRecurring(ArrayList<Task> list) {
+		for (int i = 0; i < list.size(); i++) {
+			if (list.get(i).recurring_interval != 0) {
+				list.remove(i);
+				i--;
+			}
+		}
+
+	}
+
+	/**
+	 * This method will clear all tasks marked as completed by the user
+	 * 
+	 * 
+	 * @param list
+	 *            This is list of Task object. each element contains different
+	 *            commands entered by user
+	 *
+	 * 
+	 */
+	private void clearCompleted(ArrayList<Task> list) {
+		for (int i = 0; i < list.size(); i++) {
+			if (list.get(i).detail.contains("(completed)")) {
+				list.remove(i);
+				i--;
+			}
+		}
+
+	}
+
+	/**
+	 * This method will undo the last change made to the list
+	 * 
+	 * 
+	 * @param list
+	 *            This is list of Task object. each element contains different
+	 *            commands entered by user
+	 *
+	 */
+	private String undoCommand(ArrayList<Task> list) {
+
+		currList.clear();
+		currList.addAll(list);
+		list.clear();
+		list.addAll(tempList);
+		return " Undo to latest 1 change(s)!";
+	}
+
+	/**
+	 * This method will allow user to edit the existing item in the list
+	 * 
+	 *  @param cmd
+	 *            This contains information of new task
+	 *
+	 * @param list
+	 *            This is list of Task object. each element contains different
+	 *            commands entered by user
+	 *
+	 * 
+	 */
+	private String editCommand(Task cmd, ArrayList<Task> list) {
+
+		tempList = cloneToTempList(list);
+
+		int index;
+		index = Integer.parseInt(cmd.detail);
+		
+		edit = index;
+		if(list.get(index-1).isPrimaryRecurringTask==true){
+		return "edit recur " + index;
+		}
+		else{
+			return "edit "+index;
+		}
+
+	}
+
+	/**
+	 * This method will allow user to mark a task as completed
+	 * 
+	 *  @param cmd
+	 *            This contains user command input
+	 *
+	 * @param list
+	 *            This is list of Task object. each element contains different
+	 *            commands entered by user
+	 *
+	 * 
+	 */
+	private String doneCommand(Task cmd, ArrayList<Task> list) {
+
+		tempList = cloneToTempList(list);
+
+		int index;
+		index = Integer.parseInt(cmd.detail);
+		if (list.get(index - 1).detail.contains("(completed)")) {
+			list.get(index - 1).detail = list.get(index - 1).detail
+					.substring(list.get(index - 1).detail.indexOf(')') + 1);
+			return "The task no." + index + " has been marked incompleted!";
+		} else {
+			list.get(index - 1).detail = "(completed)"
+					+ list.get(index - 1).detail;
+			return "The task no." + index + " has been marked completed!";
+		}
+	}
+
+	/**
+	 * This method will allow user to search the existing items in the list by keyword
+	 * 
+	 *  @param cmd
+	 *            This contains information of new task
+	 *
+	 * @param list
+	 *            This is list of Task object. each element contains different
+	 *            commands entered by user
+	 *
+	 * 
+	 */
+	private String searchCommand(ArrayList<Task> list, String detail) {
+
+		for (int i = 0; i < list.size(); i++) {
+			if (list.get(i).detail.toLowerCase().contains(cmd.detail)
+					|| list.get(i).startDate.contains(cmd.detail)
+					|| list.get(i).endDate.contains(cmd.detail)) {
+				return "search " + detail;
+
+			}
+		}
+		return FAILURE;
+
+	}
+
+	/**
+	 * This method replaces the old item in the list with the new item
+	 * 
+	 *  @param cmd
+	 *            This contains information of new task
+	 *
+	 * @param list
+	 *            This is list of Task object. each element contains different
+	 *            commands entered by user
+	 *
+	 * 
+	 */
+	private void replaceItem(ArrayList<Task> list, Task cmd, int index) {
+		list.add(index - 1, cmd);
+
+		list.remove(index);
+
+	}
+
+	/**
+	 * This method will import the instruction file into the program
+	 * 
+	 *  @param cmd
+	 *            This contains information of new task
+	 *
+	 * @param text
+	 * 			this is arraylist of string which contains all the instructions line by line
+	 *
+	 * 
+	 */
+	public void import_instruction(ArrayList<String> text) {
+		s.importInstruction(text);
+
+	}
+
+	/**
+	 * This method will sort the list by its date and completion
+	 *
+	 * @param list
+	 *            This is list of Task object. each element contains different
+	 *            commands entered by user
+	 *
+	 * 
+	 */
+
+	private void sortList(ArrayList<Task> list) {
+		sortByMark(list);
+	}
+
+	/**
+	 * This method will return the date object of the given string
+	 * 
+	 *  @param date_input
+	 *            A string containing the date information to be passed into natty parser
+	 *
+	 *@return
+	 *			It returns the date object of the given date input
+	 * 
+	 */
+	public Date getDate(String date_input) {
+		DateGroup group = new DateGroup();
+
+		group = p.getNattyDateGroup(date_input);
+		Date date = new Date();
+		date = group.getDates().get(0);
+
+		return date;
+	}
+
+	
+	/**
+	 * This method will return arraylist consisting of floating tasks
+	 * 
+	 * @param list
+	 *            This is list of Task object. each element contains different
+	 *            commands entered by user
+	 *
+	 * @return
+	 * 			It returns an arraylist consisting of floating tasks
+	 */
+	private ArrayList<Task> getFloatTask(ArrayList<Task> list) {
+		ArrayList<Task> floating = new ArrayList<Task>();
+
+		for (int k = 0; k < list.size(); k++) {
+			if (list.get(k).endDate.equals(DEFAULT_STRING))
+				floating.add(list.get(k));
+		}
+		return floating;
+	}
+
+	/**
+	 * This method will return arraylist consisting of timed tasks
+	 * 
+	 * @param list
+	 *            This is list of Task object. each element contains different
+	 *            commands entered by user
+	 *
+	 * @return
+	 * 			Returns arraylist of tasks consisting only of timed tasks
+	 */
+	private ArrayList<Task> getTimedTask(ArrayList<Task> list) {
+		ArrayList<Task> timed = new ArrayList<Task>();
+
+		for (int k = 0; k < list.size(); k++) {
+			if (!list.get(k).endDate.equals(DEFAULT_STRING))
+				timed.add(list.get(k));
+		}
+
+		sortByDate(timed);
+		return timed;
+	}
+
+	/**
+	 * This method will sort the list of tasks in order of date.
+	 * 
+	 * @param list
+	 *            This is list of Task object. each element contains different
+	 *            commands entered by user
+	 *
+	 * 
+	 */
+	private void sortByDate(ArrayList<Task> list) {
+		for (int i = 1; i < list.size(); i++) {
+			for (int j = 0; j < list.size() - i; j++) {
+				String date_input1 = list.get(j).endDate.toString();
+				Date date1 = getDate(date_input1);
+
+				String date_input2 = list.get(j + 1).endDate.toString();
+				Date date2 = getDate(date_input2);
+
+				if (date2.before(date1))
+					Collections.swap(list, j, j + 1);
+			}
+		}
+	}
+
+	
+	/**
+	 * This method will sort the task list and gather all completed tasks together at the end
+	 * 
+	 * @param list
+	 *            This is list of Task object. each element contains different
+	 *            commands entered by user
+	 *
+	 * 
+	 */
+	private void sortByMark(ArrayList<Task> list) {
+		ArrayList<Task> todo = new ArrayList<Task>();
+		ArrayList<Task> todoSort = new ArrayList<Task>();
+		ArrayList<Task> mark = new ArrayList<Task>();
+		ArrayList<Task> markSort = new ArrayList<Task>();
+
+		for (int i = 0; i < list.size(); i++) {
+			if (list.get(i).detail.contains("(completed)"))
+				mark.add(list.get(i));
+			else
+				todo.add(list.get(i));
+		}
+
+		todoSort.addAll(getFloatTask(todo));
+		todoSort.addAll(getTimedTask(todo));
+		markSort.addAll(getFloatTask(mark));
+		markSort.addAll(getTimedTask(mark));
+
+		list.clear();
+		list.addAll(todoSort);
+		list.addAll(markSort);
+
+	}
+}
+
+	// End of segment: C:\Users\ChongKuk\Documents\NUS docs\CS2013T\Collate V2.0\Collate V2.0\Logic.java
+
+
+
+
+
+	/**
+	 * origin: C:\Users\ChongKuk\Documents\NUS docs\CS2013T\Collate V2.0\Collate V2.0\Task.java
+	 */
+
+
+//UI part -- Kim
+
+public class Task {
+	
+	private static final String DEFAULT_STRING = "none";
+	public String detail = DEFAULT_STRING;
+	public String startDate = DEFAULT_STRING;
+	public String endDate = DEFAULT_STRING;
+	public int recurring_interval=0;
+	public String recurring_period=DEFAULT_STRING;
+	public String recurring_until=DEFAULT_STRING;
+	public String recurring_from = DEFAULT_STRING;
+	public String recurring_time = DEFAULT_STRING;
+	public boolean isPrimaryRecurringTask = false;
+	
+
+	
+}
+
+	// End of segment: C:\Users\ChongKuk\Documents\NUS docs\CS2013T\Collate V2.0\Collate V2.0\Task.java
+
+
+
+
+
+	/**
+	 * origin: C:\Users\ChongKuk\Documents\NUS docs\CS2013T\Collate V2.0\Collate V2.0\UI.java
+	 */
+
+import java.awt.AlphaComposite;
+import java.awt.BorderLayout;
+import java.awt.Component;
+import java.awt.Dimension;
+import java.awt.FlowLayout;
+import java.awt.Font;
+import java.awt.FontMetrics;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.GridLayout;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import java.awt.image.BufferedImage;
+import java.io.File;
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.Date;
+
+import javax.imageio.ImageIO;
+import javax.swing.JButton;
+import javax.swing.JFrame;
+import javax.swing.JLabel;
+import javax.swing.JMenu;
+import javax.swing.JMenuBar;
+import javax.swing.JMenuItem;
+import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTable;
+import javax.swing.JTextField;
+import javax.swing.OverlayLayout;
+import javax.swing.table.DefaultTableCellRenderer;
+import javax.swing.table.DefaultTableModel;
+import javax.swing.table.TableCellRenderer;
+import javax.swing.table.TableColumnModel;
+
+@SuppressWarnings("serial")
+public class UI extends JFrame {
+	private static final String DEFAULT_STRING = "none";
+	static Logic l = new Logic();
+	static ArrayList<Task> list;
+	static JMenuBar menubar = new JMenuBar();
+	static JMenu display;
+	static JMenuItem today, oneweek, onemonth, all, floating, completed,
+			recurring;
+	static JLabel bg;
+	static JLabel feedbacks;
+	static JButton help_button, send_button;
+	static JPanel input_panel;
+	static JPanel bg_panel, feedback_panel, table_panel;
+	static JTextField text_field = new JTextField(40);
+	static String input = DEFAULT_STRING;
+	static JTable table;
+	static BufferedImage image;
+	static final String[] columns = { "Task", "Task Description", "Start Date",
+			"End Date" };
+	protected static String print_what = "all";
+	static DefaultTableModel tableModel = new DefaultTableModel(columns, 0);
+	static String bgfile = "background.png";
+
+	/**
+	 * This method is basic constructor for the user interface of COne-Organizer
+	 * 
+	 * 
+	 * 
+	 */
+	public UI() {
+		setTitle("Cone Organizer V0.5");
+		setSize(800, 700);
+		setVisible(true);
+		setDefaultCloseOperation(EXIT_ON_CLOSE);
+		setResizable(false);
+
+		input_panel = new JPanel();
+		bg_panel = new JPanel();
+		help_button = new JButton("Help");
+		send_button = new JButton("send");
+		table = new JTable(tableModel) {
+			{
+				setOpaque(false);
+
+				setDefaultRenderer(Object.class,
+						new DefaultTableCellRenderer() {
+							{
+								setOpaque(false);
+								
+							}
+						});
+
+			}
+
+			public boolean isCellEditable(int data, int columns) {
+				return false;
+			}
+			
+
+			protected void paintComponent(Graphics g) {
+				g.drawImage(image, 0, 0, getWidth(), getHeight(), null);
+				super.paintComponent(g);
+			}
+		};
+		table.setShowGrid(false);
+		// table.setFont(new Font("Serif", Font.PLAIN, 17));
+		table.setRowHeight(30);
+		// table.setDefaultRenderer(String.class, new edittablerenderer());
+		final TableColumnModel columnModel = table.getColumnModel();
+		columnModel.getColumn(0).setMaxWidth(50);
+		columnModel.getColumn(0).setMinWidth(49);
+		columnModel.getColumn(1).setMinWidth(340);
+		columnModel.getColumn(2).setMinWidth(130);
+		columnModel.getColumn(3).setMinWidth(130);
+
+		String name = tableModel.getColumnName(0);
+		Font f = table.getFont();
+		FontMetrics fm = table.getFontMetrics(f);
+		int width = fm.stringWidth(name);
+		table.getColumnModel().getColumn(0).setPreferredWidth(width);
+
+		table.setPreferredScrollableViewportSize(new Dimension(700, 100));
+		table.setFillsViewportHeight(true);
+		JScrollPane scrollbar = new JScrollPane(table);
+		scrollbar.setMaximumSize(new Dimension(800, 700));
+
+		feedback_panel = new JPanel();
+		table_panel = new JPanel(new BorderLayout());
+		table_panel.setLayout(new OverlayLayout(table_panel));
+		table_panel.setOpaque(false);
+
+		input_panel.setLayout(new FlowLayout(2));
+		input_panel.add(help_button);
+		input_panel.add(text_field);
+		input_panel.add(send_button);
+		table_panel.add(scrollbar);
+
+		add(input_panel, BorderLayout.SOUTH);
+		add(feedback_panel, BorderLayout.NORTH);
+		add(table_panel);
+
+		setJMenuBar(menubar);
+		display = new JMenu("display");
+		menubar.add(display);
+		today = new JMenuItem("Today");
+		oneweek = new JMenuItem("In 1 week");
+		onemonth = new JMenuItem("In 1 month");
+		all = new JMenuItem("All tasks");
+		floating = new JMenuItem("Floating tasks");
+		completed = new JMenuItem("Completed tasks");
+		recurring = new JMenuItem("Recurring tasks");
+		display.add(today);
+		display.addSeparator();
+		display.add(oneweek);
+		display.addSeparator();
+		display.add(onemonth);
+		display.addSeparator();
+		display.add(all);
+		display.addSeparator();
+		display.add(floating);
+		display.add(completed);
+		display.add(recurring);
+
+		revalidate();
+		repaint();
+
+	}
+
+	/**
+	 * This method will process the feedback given by the logic or other methods
+	 * in UI for printing, and taking necessary actions
+	 * 
+	 * @param text
+	 *            The feedback to by processed
+	 * @param GUI 
+	 * 
+	 */
+
+	public static void processFeedback(String text, UI GUI) {
+		assert text!=null;
+		clearFeedback();
+		feedbacks = new JLabel();
+		feedback_panel.add(feedbacks);
+		if (text.contains("edit recur ")) {
+			int index = Integer.parseInt(text.substring(
+					text.lastIndexOf(' ') + 1, text.length()));
+
+			text_field.setText("add " + list.get(index - 1).detail);
+			list.remove(index - 1);
+			feedbacks.setText("editing recurring task");
+		} else if (text.contains("edit ")) {
+			int index = Integer.parseInt(text.substring(text.indexOf(' ') + 1,
+					text.length()));
+			text_field.setText("add " + list.get(index - 1).detail + " - from "
+					+ list.get(index - 1).startDate + " to "
+					+ list.get(index - 1).endDate);
+			feedbacks.setText("Old task : " + list.get(index - 1).detail
+					+ "       Old Date : " + list.get(index - 1).startDate
+					+ " ~ " + list.get(index - 1).endDate);
+		} else if (text.contains("search ")) {
+			String keyword = text.substring(text.indexOf(' ') + 1,
+					text.length());
+			printWhat(print_what, list, keyword);
+			feedbacks.setText("Search Results: ");
+		} else if (text.contains("display")) {
+			int index = text.indexOf(" ");
+			print_what = text.substring(index + 1);
+			printWhat(print_what, list, "");
+
+		} else if (text.equals("help")) {
+			summonHelpScreen();
+		} else if (text.contains("background__ ")) {
+			bgfile = text.substring(text.indexOf(' ') + 1, text.length());
+			
+			feedbacks.setText("background picture has been changed to "
+					+ bgfile);
+			try {
+				image = ImageIO.read(new File(bgfile));
+				
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			image = makeTransparent();
+			GUI.revalidate();
+			GUI.repaint();
+			
+			
+		}
+
+		else {
+			feedbacks.setText(text);
+		}
+
+	}
+
+	/**
+	 * This method will pop the new java window that contains the user
+	 * instructions for each and every commands.
+	 * 
+	 *
+	 */
+
+	private static void summonHelpScreen() {
+		final JFrame reference = new JFrame("User Help");
+		reference.setVisible(true);
+		reference.setSize(700, 800);
+		reference.setLayout(new FlowLayout(3));
+		final JPanel reference_panel = new JPanel();
+		reference_panel.setLayout(new GridLayout(90, 1));
+		JScrollPane scrollFrame = new JScrollPane(reference_panel);
+		reference_panel.setAutoscrolls(true);
+		scrollFrame.setPreferredSize(new Dimension(680, 800));
+
+		// reference.pack();
+		ArrayList<String> texts = new ArrayList<String>();
+		l.import_instruction(texts);
+		for (int i = 0; i < texts.size(); i++) {
+
+			JLabel content = new JLabel();
+			content.setText(texts.get(i));
+			reference_panel.add(content);
+
+		}
+
+		reference.add(scrollFrame, reference_panel);
+		reference.revalidate();
+		reference.repaint();
+	}
+
+	/**
+	 * The main method where the program starts and initiate necessary
+	 * functions.
+	 * 
+	 * 
+	 */
+
+	public static void main(String[] args) throws IOException {
+
+		image = ImageIO.read(new File(bgfile));
+		image = makeTransparent();
+	
+
+		UI GUI = new UI();
+		list = l.import_From_File(list);
+		processFeedback("Displaying All Task:", GUI);
+		printWhat(print_what, list, "");
+
+		takeInputs(GUI);
+
+	}
+
+	/**
+	 * This method will draw a transparent imgae onto the jframe. Transparency
+	 * is set to 40% by default
+	 */
+
+	private static BufferedImage makeTransparent() {
+		assert image != null;
+		BufferedImage tmpImg = new BufferedImage(image.getWidth(),
+				image.getHeight(), BufferedImage.TYPE_INT_ARGB);
+
+		Graphics2D g2d = (Graphics2D) tmpImg.getGraphics();
+		g2d.setComposite(AlphaComposite.SrcOver.derive(0.4f));
+		// set the transparency level in range 0.0f - 1.0f
+		g2d.drawImage(image, 0, 0, null);
+		
+		return tmpImg;
+	}
+
+	/**
+	 * This method is responsible for processing the user-triggered
+	 * actions/inputs such as typing in text field or pressing buttons, clicking
+	 * on menu
+	 * 
+	 * @param GUI
+	 *            The main user interface which is going to be affected by the
+	 *            triggered events
+	 *
+	 */
+
+	public static void takeInputs(UI GUI) {
+		String temp = "default";
+
+		while (temp != input) {
+
+			// when user type enter
+			text_field.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					input = text_field.getText();
+					text_field.setText("");
+					String feedback = DEFAULT_STRING;
+					feedback = l.executeCommand(input, list);
+					printWhat(print_what, list, "");
+					processFeedback(feedback, GUI);
+				}
+
+			});
+
+			// When menu is clicked
+			today.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					print_what = "today";
+					printWhat(print_what, list, "");
+
+				}
+			});
+			oneweek.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					print_what = "week";
+					printWhat(print_what, list, "");
+
+				}
+			});
+			onemonth.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					print_what = "month";
+					printWhat(print_what, list, "");
+
+				}
+			});
+			all.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					print_what = "all";
+					printWhat(print_what, list, "");
+
+				}
+			});
+			floating.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					print_what = "floating";
+					printWhat(print_what, list, "");
+
+				}
+			});
+			completed.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					print_what = "completed";
+					printWhat(print_what, list, "");
+
+				}
+			});
+			recurring.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					print_what = "recurring";
+					printWhat(print_what, list, "");
+
+				}
+			});
+			// When button is pressed
+			send_button.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					input = text_field.getText();
+					text_field.setText("");
+					String feedback = DEFAULT_STRING;
+					feedback = l.executeCommand(input, list);
+					printWhat(print_what, list, "");
+					processFeedback(feedback, GUI);
+
+				}
+			});
+			help_button.addActionListener(new ActionListener() {
+				public void actionPerformed(ActionEvent e) {
+					summonHelpScreen();
+
+				}
+			});
+			temp = input;
+		}
+	}
+
+	/**
+	 * This method will decide on what items to be displayed in the table and
+	 * call the appropriate method.
+	 * 
+	 * @param printWhat
+	 *            This string contains the information on which display method
+	 *            to call
+	 * @param list
+	 *            This is list of Task object. each element contains different
+	 *            commands entered by user
+	 * 
+	 * @param keyword
+	 *            The printing method will print out the items on the list that
+	 *            contains this keyword. "" by default
+	 * 
+	 *
+	 */
+
+	protected static void printWhat(String printWhat, ArrayList<Task> list,
+			String keyword) {
+
+		switch (printWhat) {
+		case "week": {
+			printList_weeks(list, keyword);
+			break;
+		}
+		case "today": {
+			printList_today(list, keyword);
+			break;
+		}
+		case "month": {
+			printList_month(list, keyword);
+			break;
+		}
+		case "all": {
+			printList_entire(list, keyword);
+			break;
+		}
+		case "floating": {
+			printList_floating(list, keyword);
+			break;
+		}
+		case "completed": {
+			printList_completed(list, keyword);
+			break;
+		}
+		case "recurring": {
+			printList_recurring(list, keyword);
+			break;
+		}
+		default: {
+			if (printWhat.equals(DEFAULT_STRING)) {
+				printList_entire(list, keyword);
+				break;
+			} else {
+				printList_custom(list, printWhat, keyword);
+				break;
+			}
+		}
+		}
+
+	}
+
+	/**
+	 * This method will print the items on the task list onto table, according
+	 * to the custom input typed by user.
+	 * 
+	 * @param printWhat
+	 *            This string contains the information on which display method
+	 *            to call
+	 * @param list
+	 *            This is list of Task object. each element contains different
+	 *            commands entered by user
+	 * 
+	 * @param keyword
+	 *            The printing method will print out the items on the list that
+	 *            contains this keyword. "" by default
+	 * 
+	 *
+	 */
+
+	private static void printList_custom(ArrayList<Task> list,
+			String printWhat, String keyword) {
+		processFeedback("Displaying tasks in " + printWhat, null);
+		clearTable();
+		Date end = l.getDate(printWhat + " after today 23:59");
+		Date today = l.getDate("00:00 today");
+		int row_count = 0;
+		for (int i = 0; i < list.size(); i++) {
+			String task_date = list.get(i).endDate;
+
+			if (!task_date.equals(DEFAULT_STRING)) {
+
+				Date taskdate = l.getDate(task_date);
+				if (taskdate.before(end) && taskdate.after(today)) {
+					if (list.get(i).detail.contains(keyword)
+							|| list.get(i).startDate.contains(keyword)
+							|| list.get(i).endDate.contains(keyword)) {
+						int taskNum = i + 1;
+						String task = list.get(i).detail;
+						String startDate = list.get(i).startDate;
+						if (startDate.equals(DEFAULT_STRING)) {
+							startDate = "";
+						}
+						String endDate = list.get(i).endDate;
+						if (endDate.equals(DEFAULT_STRING)) {
+							endDate = "";
+						}
+						checkCompleted(row_count, taskNum, task, startDate,
+								endDate);
+						row_count++;
+					}
+				}
+			}
+		}
+
+	}
+
+	/**
+	 * This method will print all the recurring tasks in the list
+	 * 
+	 *
+	 * @param list
+	 *            This is list of Task object. each element contains different
+	 *            commands entered by user
+	 * 
+	 * @param keyword
+	 *            The printing method will print out the items on the list that
+	 *            contains this keyword. "" by default
+	 * 
+	 *
+	 */
+	private static void printList_recurring(ArrayList<Task> list, String keyword) {
+		processFeedback("Displaying all recurring tasks", null);
+		clearTable();
+		int row_count = 0;
+		for (int i = 0; i < list.size(); i++) {
+			if (list.get(i).recurring_interval != 0) {
+				if (list.get(i).detail.contains(keyword)
+						|| list.get(i).startDate.contains(keyword)
+						|| list.get(i).endDate.contains(keyword)) {
+					int taskNum = i + 1;
+					String task = list.get(i).detail;
+
+					String startDate = list.get(i).startDate;
+					if (startDate.equals(DEFAULT_STRING)) {
+						startDate = "";
+					}
+					String endDate = list.get(i).endDate;
+					if (endDate.equals(DEFAULT_STRING)) {
+						endDate = "";
+					}
+					// collapseRecurring(list);
+					checkCompleted(row_count, taskNum, task, startDate, endDate);
+					row_count++;
+				}
+			}
+		}
+
+	}
+
+	/**
+	 * This method will print out all the tasks marked completed by user.
+	 * 
+	 * 
+	 * @param list
+	 *            This is list of Task object. each element contains different
+	 *            commands entered by user
+	 * 
+	 * @param keyword
+	 *            The printing method will print out the items on the list that
+	 *            contains this keyword. "" by default
+	 * 
+	 *
+	 */
+
+	private static void printList_completed(ArrayList<Task> list, String keyword) {
+		processFeedback("Displaying all completed tasks", null);
+		clearTable();
+		int row_count = 0;
+		for (int i = 0; i < list.size(); i++) {
+			if (list.get(i).detail.contains("(completed)")) {
+				if (list.get(i).detail.contains(keyword)
+						|| list.get(i).startDate.contains(keyword)
+						|| list.get(i).endDate.contains(keyword)) {
+					int taskNum = i + 1;
+					String task = list.get(i).detail;
+
+					String startDate = list.get(i).startDate;
+					if (startDate.equals(DEFAULT_STRING)) {
+						startDate = "";
+					}
+					String endDate = list.get(i).endDate;
+					if (endDate.equals(DEFAULT_STRING)) {
+						endDate = "";
+					}
+					checkCompleted(row_count, taskNum, task, startDate, endDate);
+					row_count++;
+				}
+			}
+		}
+
+	}
+
+	/**
+	 * This method will print out all the floating tasks with no specific
+	 * deadline
+	 * 
+	 * 
+	 * @param list
+	 *            This is list of Task object. each element contains different
+	 *            commands entered by user
+	 * 
+	 * @param keyword
+	 *            The printing method will print out the items on the list that
+	 *            contains this keyword. "" by default
+	 * 
+	 *
+	 */
+	private static void printList_floating(ArrayList<Task> list, String keyword) {
+		processFeedback("Displaying all floating tasks", null);
+		clearTable();
+		int row_count = 0;
+		for (int i = 0; i < list.size(); i++) {
+			if (list.get(i).endDate.equals(DEFAULT_STRING)) {
+				if (list.get(i).detail.contains(keyword)
+						|| list.get(i).startDate.contains(keyword)
+						|| list.get(i).endDate.contains(keyword)) {
+					int taskNum = i + 1;
+					String task = list.get(i).detail;
+
+					String startDate = list.get(i).startDate;
+					if (startDate.equals(DEFAULT_STRING)) {
+						startDate = "";
+					}
+					String endDate = list.get(i).endDate;
+					if (endDate.equals(DEFAULT_STRING)) {
+						endDate = "";
+					}
+					checkCompleted(row_count, taskNum, task, startDate, endDate);
+					row_count++;
+				}
+			}
+		}
+
+	}
+
+	/**
+	 * This method will print out all the tasks that is due today
+	 * 
+	 * 
+	 * @param list
+	 *            This is list of Task object. each element contains different
+	 *            commands entered by user
+	 * 
+	 * @param keyword
+	 *            The printing method will print out the items on the list that
+	 *            contains this keyword. "" by default
+	 * 
+	 *
+	 */
+	private static void printList_today(ArrayList<Task> list, String keyword) {
+		processFeedback("Displaying today's tasks", null);
+		clearTable();
+		Date today_start = l.getDate("00:00 today");
+		Date today_end = l.getDate("23:59 today");
+		int row_count = 0;
+
+		for (int i = 0; i < list.size(); i++) {
+			String task_date = list.get(i).endDate;
+
+			if (!task_date.equals(DEFAULT_STRING)) {
+
+				Date taskdate = l.getDate(task_date);
+				if (taskdate.after(today_start) && taskdate.before(today_end)) {
+					if (list.get(i).detail.contains(keyword)
+							|| list.get(i).startDate.contains(keyword)
+							|| list.get(i).endDate.contains(keyword)) {
+						int taskNum = i + 1;
+						String task = list.get(i).detail;
+						String startDate = list.get(i).startDate;
+						if (startDate.equals(DEFAULT_STRING)) {
+							startDate = "";
+						}
+						String endDate = list.get(i).endDate;
+						if (endDate.equals(DEFAULT_STRING)) {
+							endDate = "";
+						}
+						checkCompleted(row_count, taskNum, task, startDate,
+								endDate);
+						row_count++;
+					}
+				}
+			}
+		}
+
+	}
+
+	/**
+	 * This method will print out all the tasks due in one week.
+	 * 
+	 * 
+	 * @param list
+	 *            This is list of Task object. each element contains different
+	 *            commands entered by user
+	 * 
+	 * @param keyword
+	 *            The printing method will print out the items on the list that
+	 *            contains this keyword. "" by default
+	 * 
+	 *
+	 */
+	private static void printList_weeks(ArrayList<Task> list, String keyword) {
+		processFeedback("Displaying this week's tasks", null);
+		clearTable();
+		Date next_week = l.getDate("23:59 in 1 week");
+		Date today = l.getDate("00:00 today");
+		int row_count = 0;
+		for (int i = 0; i < list.size(); i++) {
+			String task_date = list.get(i).endDate;
+
+			if (!task_date.equals(DEFAULT_STRING)) {
+
+				Date taskdate = l.getDate(task_date);
+				if (taskdate.before(next_week) && taskdate.after(today)) {
+					if (list.get(i).detail.contains(keyword)
+							|| list.get(i).startDate.contains(keyword)
+							|| list.get(i).endDate.contains(keyword)) {
+						int taskNum = i + 1;
+						String task = list.get(i).detail;
+						String startDate = list.get(i).startDate;
+						if (startDate.equals(DEFAULT_STRING)) {
+							startDate = "";
+						}
+						String endDate = list.get(i).endDate;
+						if (endDate.equals(DEFAULT_STRING)) {
+							endDate = "";
+						}
+						checkCompleted(row_count, taskNum, task, startDate,
+								endDate);
+						row_count++;
+					}
+				}
+			}
+		}
+
+	}
+
+	/**
+	 * This method will print out all the tasks due one month from today.
+	 * 
+	 * 
+	 * @param list
+	 *            This is list of Task object. each element contains different
+	 *            commands entered by user
+	 * 
+	 * @param keyword
+	 *            The printing method will print out the items on the list that
+	 *            contains this keyword. "" by default
+	 * 
+	 *
+	 */
+	private static void printList_month(ArrayList<Task> list, String keyword) {
+		processFeedback("Displaying this month's tasks", null);
+		clearTable();
+		Date next_month = l.getDate("23:59 in 1 month");
+		Date today = l.getDate("00:00 today");
+		int row_count = 0;
+		for (int i = 0; i < list.size(); i++) {
+			String task_date = list.get(i).endDate;
+
+			if (!task_date.equals(DEFAULT_STRING)) {
+
+				Date taskdate = l.getDate(task_date);
+				if (taskdate.before(next_month) && taskdate.after(today)) {
+					if (list.get(i).detail.contains(keyword)
+							|| list.get(i).startDate.contains(keyword)
+							|| list.get(i).endDate.contains(keyword)) {
+						int taskNum = i + 1;
+						String task = list.get(i).detail;
+						String startDate = list.get(i).startDate;
+						if (startDate.equals(DEFAULT_STRING)) {
+							startDate = "";
+						}
+						String endDate = list.get(i).endDate;
+						if (endDate.equals(DEFAULT_STRING)) {
+							endDate = "";
+						}
+						checkCompleted(row_count, taskNum, task, startDate,
+								endDate);
+						row_count++;
+					}
+				}
+			}
+		}
+
+	}
+
+	/**
+	 * This method checks if the item in the list is marked completed by the
+	 * user.
+	 * 
+	 * 
+	 * @param index
+	 *            This is the position of item in the list to be checked.
+	 * @param taskNum
+	 *            This is the number of the task that is to be displayed in the
+	 *            table
+	 * 
+	 * @param startDate
+	 *            This is the startDate of the task that is to be added into the
+	 *            table
+	 * @param endDate
+	 *            This is the finishing date of the task that is to be added
+	 *            into the table
+	 * 
+	 *
+	 */
+	private static void checkCompleted(int index, int taskNum, String task,
+			String startDate, String endDate) {
+		if (task.contains("(completed)")) {
+			Object[] data = { taskNum, task, startDate, endDate };
+
+			tableModel.addRow(data);
+
+			paintTable(index, "bold");
+
+		} else {
+			Object[] data = { taskNum, task, startDate, endDate };
+			tableModel.addRow(data);
+			paintTable(index, "plain");
+		}
+	}
+
+	/**
+	 * This method will print out all the tasks including floating tasks.
+	 * 
+	 * 
+	 * @param list
+	 *            This is list of Task object. each element contains different
+	 *            commands entered by user
+	 * 
+	 * @param keyword
+	 *            The printing method will print out the items on the list that
+	 *            contains this keyword. "" by default
+	 * 
+	 *
+	 */
+	private static void printList_entire(ArrayList<Task> list, String keyword) {
+		processFeedback("Displaying all tasks", null);
+		clearTable();
+		int row_count = 0;
+
+		for (int i = 0; i < list.size(); i++) {
+			if (list.get(i).detail.contains(keyword)
+					|| list.get(i).startDate.contains(keyword)
+					|| list.get(i).endDate.contains(keyword)) {
+				int taskNum = i + 1;
+				String task = list.get(i).detail;
+				String startDate = list.get(i).startDate;
+				if (startDate.equals(DEFAULT_STRING)) {
+					startDate = "";
+				}
+				String endDate = list.get(i).endDate;
+				if (endDate.equals(DEFAULT_STRING)) {
+					endDate = "";
+				}
+				checkCompleted(row_count, taskNum, task, startDate, endDate);
+				row_count++;
+			}
+		}
+	}
+
+	/**
+	 * This method is responsible for design of the table such as fond size of
+	 * items and the column width
+	 * 
+	 * 
+	 * @param rowIndex
+	 *            This is the index of the items in a specific row to be changed
+	 * 
+	 * @param font
+	 *            This string defines the font of the items to be changed.
+	 * 
+	 *
+	 */
+	private static void paintTable(int rowIndex, String font) {
+
+		final TableCellRenderer renderer = table
+				.getDefaultRenderer(Object.class);
+
+		table.setDefaultRenderer(Object.class, new TableCellRenderer() {
+
+			public Component getTableCellRendererComponent(JTable table,
+					Object value,
+
+					boolean isSelected, boolean hasFocus, int row, int column)
+
+			{
+
+				Component c = renderer.getTableCellRendererComponent(table,
+						value, isSelected,
+
+						hasFocus, row, column);
+				if (font.equals("plain")) {
+					c.setFont(new Font("Serif", Font.PLAIN, 17));
+				}
+
+				if (row == rowIndex) {
+
+					if (font.equals("bold")) {
+						c.setFont(new Font("Serif", Font.BOLD, 17));
+					}
+
+				}
+				
+			
+
+				return c;
+
+			}
+
+		});
+
+	}
+
+	/**
+	 * This method will remove all information in the table for printing updated tasks
+	 * 
+	 * 
+	 *
+	 *
+	 */
+	private static void clearTable() {
+		int size = tableModel.getRowCount();
+		for (int i = 0; i < size; i++) {
+			tableModel.removeRow(0);
+		}
+
+	}
+
+	/**
+	 *This method will clear the current feedback panel for the new feedback.
+	 * 
+	 * 
+	 * 
+	 */
+	protected static void clearFeedback() {
+
+		feedback_panel.removeAll();
+		feedback_panel.revalidate();
+		feedback_panel.repaint();
+
+	}
+}
+	// End of segment: C:\Users\ChongKuk\Documents\NUS docs\CS2013T\Collate V2.0\Collate V2.0\UI.java
+
+
+
+
+
